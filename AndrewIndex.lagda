@@ -32,7 +32,8 @@ import IntegersHCF
 import ncRationals
 import FieldAxioms
 import Rationals
-import NewDedekindReals
+--import LogarithmsWork
+--import NewDedekindReals
 --import DedekindReals
 
 \end{code}
