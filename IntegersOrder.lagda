@@ -29,7 +29,6 @@ x > y = y < x
 open IntegersProperties
 open UF-Subsingletons --TypeTopology
 
-
 ℤ≤-is-prop : (x y : ℤ) → is-prop (x ≤ y)
 ℤ≤-is-prop x y (p , q , r) (p' , q' , r') = to-subtype-≡ (λ a → ×-is-prop (positive-is-prop a) ℤ-is-set) (ℤ+-lc p p' x (r ∙ (r' ⁻¹)))
 
@@ -478,5 +477,27 @@ ordering-multiplication-transitive a (pos (succ b)) (pos (succ c)) d g₁ g₂ �
 
   V : (a + b) ≤ (absℤ a + absℤ b)
   V = ℤ≤-adding a (absℤ a) b (absℤ b) ii iv
+
+open import NaturalsOrder renaming (_<_ to _ℕ<_)
+open import NaturalsOrderExtended
+
+ℕ-order-respects-ℤ-order : (m n : ℕ) → m ℕ< n → pos m < pos n 
+ℕ-order-respects-ℤ-order m n l = pos (succ k) , pos-succ-greater-than-zero k , II
+ where
+  I : Σ k ꞉ ℕ , succ k ℕ+ m ≡ n
+  I = subtraction'' m n l
+  
+  k : ℕ
+  k = pr₁ I
+
+  e : succ k ℕ+ m ≡ n
+  e = pr₂ I
+
+  II : pos m + pos (succ k) ≡ pos n
+  II = pos m + pos (succ k) ≡⟨ pos-addition-equiv-to-ℕ m (succ k) ⟩
+       pos (m ℕ+ succ k)    ≡⟨ ap pos (addition-commutativity m (succ k)) ⟩
+       pos (succ k ℕ+ m)    ≡⟨ ap pos e ⟩ 
+       pos n ∎
+  
 
 \end{code}

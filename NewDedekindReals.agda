@@ -19,7 +19,7 @@ module NewDedekindReals
        where
 
 open PropositionalTruncation pt -- TypeTopology
-open Rationals renaming (_<_ to _ℚ<_ ; _+_ to _ℚ+_ ; _*_ to _ℚ*_ ; -_ to ℚ-_)
+open Rationals renaming (_<_ to _ℚ<_ ; _+_ to _ℚ+_ ; _*_ to _ℚ*_ ; -_ to ℚ-_ ; _≤_ to _ℚₙ≤_)
 open UF-Powerset -- TypeTopology
 open UF-Subsingletons --Type Topology
 open UF-Subsingletons-FunExt -- TypeTopology
@@ -179,6 +179,16 @@ open import UF-Base --TypeTopology
 open NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_)
 open import Integers renaming (_+_ to ℤ+_)
 
+⟨2/3⟩^_ : ℕ → ℚ
+⟨2/3⟩^ 0  = toℚ (pos 1 , 0)
+⟨2/3⟩^ (succ n)  = rec (toℚ (pos 2 , 2)) (λ k → k ℚ* toℚ (pos 2 , 2)) n
+
+ℝ-order-lemma : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ) → (x y : ℚ) → x ∈ L → y ∈ R → zero-ℚ ℚ< (y ℚ+ (ℚ- x))
+ℝ-order-lemma ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) x y x-L y-R = ℚ<-subtraction''' fe x y I
+ where
+  I : x ℚ< y
+  I = disjoint x y (x-L , y-R)
+
 ℝ-arithmetically-located : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
                          → (p : ℚ)
                          → zero-ℚ ℚ< p
@@ -190,26 +200,48 @@ open import Integers renaming (_+_ to ℤ+_)
  where
   d : ∃ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
                                    × b₀ ∈ R
-                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* rec (toℚ (pos 2 , 2)) (λ k → k ℚ* k) n) ℚ< p))
+                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
   d = ∥∥-functor δ (binary-choice inhabited-left inhabited-right)
    where
     δ : (Σ a ꞉ ℚ , a ∈ L) × (Σ b ꞉ ℚ , b ∈ R) → Σ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
                                                                               × b₀ ∈ R
-                                                                              × (((b₀ ℚ+ (ℚ- a₀)) ℚ* rec (toℚ (pos 2 , 2)) (λ k → k ℚ* k) n) ℚ< p))
+                                                                              × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
     δ ((a , a-L) , b , b-R) = (a , b , {!!}) , a-L , (b-R , {!!})
-
+    
+  
   I : Σ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
                                    × b₀ ∈ R
-                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* rec (toℚ (pos 2 , 2)) (λ k → k ℚ* k) n) ℚ< p))
+                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
     → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
-  I ((a₀ , b₀ , n) , a₀-L , b₀-R , l) = course-of-values-induction (λ n → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)) step n
+  I ((a₀ , b₀ , zero)   , a₀-L , b₀-R , l')   = (a₀ , b₀) , (a₀-L , b₀-R , (ℝ-order-lemma (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) ) a₀ b₀ a₀-L b₀-R , transport (_ℚ< p) (ℚ-mult-right-id fe (b₀ ℚ+ (ℚ- a₀))) l'))
+  I ((a₀ , b₀ , succ n) , a₀-L , b₀-R , l') = {!II!}
    where
-    step : (n : ℕ) → ((m : ℕ) → m ℕ< n → Σ (a₁ , b₁) ꞉ ℚ × ℚ , pr₁ _ ∈ L ×
-                                                               pr₂ _ ∈ R ×
-                                                               (zero-ℚ ℚ< (pr₂ _ ℚ+ (ℚ- pr₁ _))) × ((pr₂ _ ℚ+ (ℚ- pr₁ _)) ℚ< p)) → {!!}
-    step = {!!}
-   
+    II : (Σ (aₙ , bₙ) ꞉ ℚ × ℚ , aₙ ∈ L × bₙ ∈ R × ((bₙ ℚ+ (ℚ- aₙ)) ℚ< p) × {!!}) → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
+    II = induction base step n
+     where
+      base : {!!}
+      base = {!!}
 
+      step : {!!}
+      step = {!!}
+  
+
+
+  {-  ∥∥-rec {!!} III (II II-lemma)
+   where
+    x y : ℚ
+    x = {!? ℚ!} -- a₀ + (b₀ - a₀) * 1/3
+    y = {!!} -- a₀ + (b₀ - a₀) * 2/3
+    II-lemma : x ℚ< y
+    II-lemma = {!!} -- because b₀ - a₀ > 0, a₀ ∈ L, b₀ ∈ R
+    II : x ℚ< y → x ∈ L ∨ y ∈ R
+    II = located x y
+    III : x ∈ L ∔ y ∈ R → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
+    III (inl z) = (x , b₀) , (z , (b₀-R , ({!!} , {!!})))
+    III (inr z) = {!!}
+  -}
+  -- 2/3^_+1 = rec (toQ (pos 2 , 2)) (\k -> k Q* k)
+  
 ℝ-addition-lemma : (((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
                     ((L-y , R-y) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) : ℝ)
                  → (p q : ℚ)
@@ -494,4 +526,5 @@ _+_ : ℝ → ℝ → ℝ
                      q ∎
           
 
-  
+
+

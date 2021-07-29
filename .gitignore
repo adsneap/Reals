@@ -1,0 +1,5 @@
+*.agdai
+*.agda~
+*.agda#
+*.lagda~
+*.lagda#

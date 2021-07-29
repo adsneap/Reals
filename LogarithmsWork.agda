@@ -8,7 +8,7 @@ open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_) --TypeTop
 height-preserves-≤-lemma₀ : (m : ℕ) → height (succ m) ℕ≤ succ (height m)
 height-preserves-≤-lemma₀ zero     = ⋆
 height-preserves-≤-lemma₀ (succ m) = I
- where
+ whereg
   I : size (Succ (Succ (binary m))) ℕ≤ succ (size (Succ (binary m)))
   I = {!!}
 
@@ -35,7 +35,13 @@ height-preserves-≤-lemma2 = induction base step
        → height k ℕ≤ height (succ k)
        → height (succ k) ℕ≤ height (succ (succ k))
   step k IH = {!!}
+   where
+    I : height k ℕ< succ (height k)
+    I = <-succ (height k)
 
+    II : height (succ k) ℕ< succ (height (succ k))
+    II = <-succ (height (succ k))
+    
 -- height is floor of log 2
 height-preserves-≤ : (m n : ℕ) → m ℕ≤ n → height m ℕ≤ height n
 height-preserves-≤ m = induction base step
@@ -94,11 +100,29 @@ height-preserves-< m = induction base step
     
 -}
 
-open import Integers
-open import Rationals renaming (_<_ to _ℚ<_) 
+open import Integers 
+open import ncRationals renaming (_<_ to _ℚₙ<)
+open import Rationals renaming (_<_ to _ℚ<_)
+open import IntegersOrder renaming (_<_ to _ℤ<_)
 
 embedding-ℕ-in-ℚ : ℕ → ℚ
 embedding-ℕ-in-ℚ n = toℚ (pos n , 0)
 
 embedding-preserves-order : (m n : ℕ) → m ℕ< n → embedding-ℕ-in-ℚ m ℚ< embedding-ℕ-in-ℚ n
-embedding-preserves-order m n l = {!!}
+embedding-preserves-order m n l = I
+ where
+  I : toℚ (pos m , 0) ℚ< toℚ (pos n , 0)
+  I = <-lemma (pos m , 0) (pos n , 0) II
+   where
+    II : pos m ℤ< pos n 
+    II = ℕ-order-respects-ℤ-order m n l
+
+embedding-ℤ-in-ℚ : ℤ → ℚ
+embedding-ℤ-in-ℚ z = toℚ (z , 0)
+
+
+
+ℚ-floor : (q : ℚ) → Σ z ꞉ ℤ , ((embedding-ℤ-in-ℚ z) ℚ< q) × {!!}
+ℚ-floor q = {!!}
+
+

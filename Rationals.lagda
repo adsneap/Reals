@@ -22,7 +22,7 @@ import FieldAxioms
 import HCF
 import Integers
 
-import IntegersOrder
+import IntegersOrder renaming (_≤_ to _ℤ≤_)
 import IntegersProperties
 import NaturalsMultiplication
 import NaturalsDivision
@@ -375,6 +375,12 @@ _<_ : ℚ → ℚ → 𝓤₀ ̇
 
 ℚ<-trans : (p q r : ℚ) → p < q → q < r → p < r
 ℚ<-trans (p , α) (q , β) (c , γ) x y = ℚₙ-trans p q c x y
+
+_≤_ : ℚ → ℚ → 𝓤₀ ̇
+(p , ψ) ≤ (q , ζ) = p ℚₙ≤ q
+
+ℚ≤-is-prop : (p q : ℚ) → is-prop (p ≤ q)
+ℚ≤-is-prop (p , ψ) (q , η) = ℚₙ≤-is-prop p q
 
 <-lemma : (p q : ℚₙ) → p ℚₙ< q → toℚ p < toℚ q 
 <-lemma (x , a) (y , b) l = ordering-right-cancellable (x' ℤ* pos (succ b')) (y' ℤ* (pos (succ a'))) (pos (succ h ℕ* succ h')) IV V
@@ -1043,6 +1049,18 @@ open FieldAxioms
             (q + (- p))            ≡⟨ refl ⟩
             k                      ∎
 
+ℚ<-subtraction''' : Fun-Ext → (p q : ℚ) → (p < q) → zero-ℚ < (q + (- p))
+ℚ<-subtraction''' fe p q l = transport (zero-ℚ <_) ii i
+ where
+  I : Σ k ꞉ ℚ , (zero-ℚ < k) × (k ≡ (q + (- p)))
+  I = ℚ<-subtraction'' fe p q l
+  k : ℚ
+  k = pr₁ I
+  i : zero-ℚ < k
+  i = pr₁ (pr₂ I)
+  ii : k ≡ (q + (- p))
+  ii = pr₂ (pr₂ I)
+  
 ℚ-minus-minus : Fun-Ext → (p : ℚ) → p ≡ (- (- p))
 ℚ-minus-minus fe p = IV
  where

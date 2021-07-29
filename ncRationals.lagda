@@ -499,8 +499,37 @@ half-ℚₙ (x , a) = x , (succ (2 ℕ* a))
   γ = pos 0 ℤ* pos (succ (pred (succ a ℕ* succ b))) ℤ+ n₁ ℤ* n₂ ≡⟨ ap (λ - → - ℤ+ n₁ ℤ* n₂) (ℤ-zero-left-is-zero (pos (succ (pred (succ a ℕ* succ b))))) ⟩
       pos 0 ℤ+ n₁ ℤ* n₂ ≡⟨ ℤ-zero-left-neutral (n₁ ℤ* n₂) ⟩
       n₁ ℤ* n₂          ≡⟨ ap₂ _ℤ*_ α β ⟩
-      x ℤ* y           ≡⟨ ℤ-mult-right-id (x ℤ* y) ⟩ 
-      x ℤ* y ℤ* pos 1 ∎
+      x ℤ* y            ≡⟨ ℤ-mult-right-id (x ℤ* y) ⟩ 
+      x ℤ* y ℤ* pos 1   ∎
+
+_ℚₙ≤_ _ℚₙ≥_ : ℚₙ → ℚₙ → 𝓤₀ ̇
+p ℚₙ≤ q = (p < q) ∔ (p ≡ q)
+p ℚₙ≥ q = q ℚₙ≤ p
+
+ℚₙ≤-is-prop : (p q : ℚₙ) → is-prop (p ℚₙ≤ q)
+ℚₙ≤-is-prop (x , a) (y , b) = +-is-prop (ℚₙ<-is-prop (x , a) (y , b)) ℚₙ-is-set I
+ where
+  I : (x , a) < (y , b) → ¬ ((x , a) ≡ (y , b))
+  I (k , g , α) e = zero-not-greater-than-zero (transport (λ - → greater-than-zero -) IV g)
+   where
+    II : (x ≡ y) × (a ≡ b)
+    II = from-×-≡' e
+    i = pr₁ II
+    ii = pr₂ II
+  
+    III : (x ℤ* pos (succ b) ℤ+ k ≡ x ℤ* pos (succ b))
+    III = x ℤ* pos (succ b) ℤ+ k ≡⟨ α ⟩
+          y ℤ* pos (succ a)      ≡⟨ ap₂ _ℤ*_ (i ⁻¹) (ap pos (ap succ ii)) ⟩
+          x ℤ* pos (succ b)      ∎
+
+    IV : k ≡ pos 0
+    IV = ℤ≤-anti-lemma (x ℤ* pos (succ b)) k III
+
+ℚₙ≤-trans : (p q r : ℚₙ) → p ℚₙ≤ q → q ℚₙ≤ r → p ℚₙ≤ r
+ℚₙ≤-trans p q r (inl a) (inl b) = inl (ℚₙ-trans p q r a b)
+ℚₙ≤-trans p q r (inl a) (inr b) = inl (transport (p <_) b a)
+ℚₙ≤-trans p q r (inr a) (inl b) = inl (transport (_< r) (a ⁻¹) b)
+ℚₙ≤-trans p q r (inr a) (inr b) = inr (a ∙ b)
 
 {-
 
