@@ -272,8 +272,24 @@ conv-real α = (x , f) , refl where
   f (pos 0)        = downIsDown (α 0) [-1,1]
   f (pos (succ n)) = downIsDown (α (succ n)) (x (pos n))
 
+3Cases : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } {A : 𝓣 ̇ }
+       → X ⊹ Y ⊹ Z → A → A → A → A
+3Cases (inl      _ ) x y z = x
+3Cases (inr (inl _)) x y z = y
+3Cases (inr (inr _)) x y z = z
+
+test : (i j : Interval) → i -immediatelyDownFrom- j
+     → (i ≡ downLeft j) ⊹ (i ≡ downMid j) ⊹ (i ≡ downRight j)
+test (c , .(succℤ p)) (k , p) ((pr₃ , pr₄) , refl) = {!pr₃ pr₄!}
+
 real-conv : CompactInterval [-1,1] → (ℕ → 𝟛)
-real-conv = {!!}
+real-conv ((x , f) , e) 0
+ = 3Cases (test (x (pos 0)) [-1,1]
+            (transport (x (pos 0) -immediatelyDownFrom-_) e (f (pos 0))))
+     −1 O +1
+real-conv ((x , f) , e) (succ n)
+ = 3Cases (test (x (pos (succ n))) (x (pos n)) (f (pos (succ n))))
+     −1 O +1
 
 
 {-
