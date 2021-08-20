@@ -6,6 +6,7 @@ open import DecidableAndDetachable
 open import DiscreteAndSeparated
 open import NaturalNumbers-Properties
 open import NaturalsOrder renaming (_<_ to _<ℕ_ ; _≤_ to _≤ℕ_)
+open import UF-Base
 open import UF-Subsingletons
 open import UF-Miscelanea
 open import IntegersProperties
@@ -201,9 +202,8 @@ conv→' α (succ n) = conv→ α n
 conv→ α n = down (α n) (conv→' α n)
 
 _-immediatelyDownFrom-_ : Interval → Interval → 𝓤₀ ̇
-(k , p) -immediatelyDownFrom- (c , q)
- = (codeOf (downLeft (c , q))) ≤ℤ k ≤ℤ codeOf (downRight (c , q))
- × (p ≡ succℤ q)
+i -immediatelyDownFrom- j
+ = (i ≡ downLeft j) ⊹ (i ≡ downMid j) ⊹ (i ≡ downRight j)
 
 halfEq : (n : ℕ) → (n ≡ (n /2) +ℕ (n /2)) ⊹ (n ≡ succ ((n /2) +ℕ (n /2)))
 halfEq 0 = inl refl
@@ -234,13 +234,13 @@ upRightEq (negsucc k , p)
                        (succpredℤ p ⁻¹)))
 
 downLeftIsDown : (i : Interval) → downLeft i -immediatelyDownFrom- i
-downLeftIsDown i = ((0 , refl) , (2 , refl)) , refl
+downLeftIsDown i = inl refl
 
 downMidIsDown : (i : Interval) → downMid i -immediatelyDownFrom- i
-downMidIsDown i = ((1 , refl) , (1 , refl)) , refl
+downMidIsDown i = (inr ∘ inl) refl
 
 downRightIsDown : (i : Interval) → downRight i -immediatelyDownFrom- i
-downRightIsDown i = ((2 , refl) , (0 , refl)) , refl
+downRightIsDown i = (inr ∘ inr) refl
 
 downFromUpRight : (i : Interval) → i -immediatelyDownFrom- upRight i
 downFromUpRight i
@@ -259,18 +259,65 @@ Real : 𝓤₀ ̇
 Real = Σ x ꞉ (ℤ → Interval)
      , Π n ꞉ ℤ , (x n) -immediatelyDownFrom- (x (predℤ n))
 
+upRightOrDownLeft : Interval → ℤ → Interval
+upRightOrDownLeft i (negsucc n) = upRightₙ  i (succ n)
+upRightOrDownLeft i (pos n)     = downLeftₙ i n
+
+awayFromZero : ℤ → ℤ
+awayFromZero (pos n) = succℤ (pos n)
+awayFromZero (negsucc n) = predℤ (pos n)
+
+upRightOrDownLeftIsDown : (i : Interval) (n m : ℤ) → m ≡ predℤ n
+                        → upRightOrDownLeft i n
+                         -immediatelyDownFrom-
+                          upRightOrDownLeft i m
+upRightOrDownLeftIsDown i (negsucc n) _ refl = downFromUpRight (upRightₙ i (succ n))
+upRightOrDownLeftIsDown i (pos 0) _ refl = downFromUpRight i
+upRightOrDownLeftIsDown i (pos (succ n)) _ refl = downLeftIsDown (downLeftₙ i n)
+
+fromInterval : Interval → Real
+fromInterval (k , p)
+ = (λ n → upRightOrDownLeft (k , p) (n - p))
+ , (λ n → upRightOrDownLeftIsDown (k , p) (n - p) (predℤ n - p) (ℤ-left-pred n (- p)))
+
 CompactInterval : Interval → 𝓤₀ ̇
 CompactInterval (k , p) = Σ (x , f) ꞉ Real , x p ≡ (k , p)
 
+x' : (α : ℕ → 𝟛) → ℤ → Interval
+x' α (negsucc n) = upRightₙ [-1,1] n
+x' α (pos n)     = conv→ α n
+
+f' : (α : ℕ → 𝟛) (n : ℤ) → x' α n -immediatelyDownFrom- x' α (predℤ n)
+f' α (negsucc n)    = downFromUpRight (x' α (negsucc n))
+f' α (pos 0)        = downIsDown (α 0) [-1,1]
+f' α (pos (succ n)) = downIsDown (α (succ n)) (x' α (pos n))
+
 conv-real : (ℕ → 𝟛) → CompactInterval [-1,1]
-conv-real α = (x , f) , refl where
-  x : ℤ → Interval
-  x (negsucc n) = upRightₙ [-1,1] n
-  x (pos n)     = conv→ α n
-  f : (n : ℤ) → x n -immediatelyDownFrom- x (predℤ n)
-  f (negsucc n)    = downFromUpRight (x (negsucc n))
-  f (pos 0)        = downIsDown (α 0) [-1,1]
-  f (pos (succ n)) = downIsDown (α (succ n)) (x (pos n))
+conv-real α = (x' α , f' α) , refl 
+
+Interval-is-set : is-set Interval
+Interval-is-set = ×-is-set ℤ-is-set ℤ-is-set
+
+-- downMid≢downRight : 
+
+immediatelyDown-isProp : (i j : Interval) → is-prop (i -immediatelyDownFrom- j)
+immediatelyDown-isProp i j = +-is-prop Interval-is-set
+                            (+-is-prop Interval-is-set Interval-is-set
+                              {!!}) {!!}
+
+Π-is-prop : {X : 𝓤 ̇ } {A : X → 𝓥 ̇ }
+          → ((x : X) → is-prop (A x))
+          → is-prop (Π A)
+Π-is-prop = {!!}
+
+conv-real-∼ : (α : ℕ → 𝟛) (((x , f) , e) : CompactInterval [-1,1])
+            → x' α ∼ x
+            → conv-real α ≡ (x , f) , e
+conv-real-∼ α ((x , f) , e) x∼x = to-Σ-≡ ((to-Σ-≡ (γ₀ , γ₁)) , γ₂) where
+  γ₀ : x' α ≡ x
+  γ₀ = {!!} -- FunExt
+  γ₁ = Π-is-prop (λ z → immediatelyDown-isProp (x z) (x (predℤ z))) _ _
+  γ₂ = Interval-is-set _ _
 
 3Cases : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } {A : 𝓣 ̇ }
        → X ⊹ Y ⊹ Z → A → A → A → A
@@ -278,19 +325,50 @@ conv-real α = (x , f) , refl where
 3Cases (inr (inl _)) x y z = y
 3Cases (inr (inr _)) x y z = z
 
-test : (i j : Interval) → i -immediatelyDownFrom- j
-     → (i ≡ downLeft j) ⊹ (i ≡ downMid j) ⊹ (i ≡ downRight j)
-test (c , .(succℤ p)) (k , p) ((pr₃ , pr₄) , refl) = {!pr₃ pr₄!}
+3Cases-elim₁ : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } {A : 𝓣 ̇ }
+             → {xyz : X ⊹ Y ⊹ Z}
+             → Σ x ꞉ X , (xyz ≡ inl x)
+             → {a b c : A} → 3Cases xyz a b c ≡ a
+3Cases-elim₁ (_ , e) = ap (λ ■ → 3Cases ■ _ _ _) e
+
+3Cases-elim₂ : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } {A : 𝓣 ̇ }
+             → {xyz : X ⊹ Y ⊹ Z}
+             → Σ y ꞉ Y , (xyz ≡ (inr ∘ inl) y)
+             → {a b c : A} → 3Cases xyz a b c ≡ b
+3Cases-elim₂ (_ , e) = ap (λ ■ → 3Cases ■ _ _ _) e
+
+3Cases-elim₃ : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } {A : 𝓣 ̇ }
+             → {xyz : X ⊹ Y ⊹ Z}
+             → Σ z ꞉ Z , (xyz ≡ (inr ∘ inr) z)
+             → {a b c : A} → 3Cases xyz a b c ≡ c
+3Cases-elim₃ (x , e) = ap (λ ■ → 3Cases ■ _ _ _) e
 
 real-conv : CompactInterval [-1,1] → (ℕ → 𝟛)
 real-conv ((x , f) , e) 0
- = 3Cases (test (x (pos 0)) [-1,1]
-            (transport (x (pos 0) -immediatelyDownFrom-_) e (f (pos 0))))
+ = 3Cases (transport (x (pos 0) -immediatelyDownFrom-_) e (f (pos 0)))
      −1 O +1
 real-conv ((x , f) , e) (succ n)
- = 3Cases (test (x (pos (succ n))) (x (pos n)) (f (pos (succ n))))
+ = 3Cases (f (pos (succ n)))
      −1 O +1
 
+−1* : CompactInterval [-1,1]
+−1* = fromInterval [-1,1] , refl
+
+eq₁ : (conv-real ∘ real-conv) −1* ≡ −1*
+eq₁ = {!!} where
+  α : ℕ → 𝟛
+  α = real-conv −1*
+  α-eq : α ∼ (λ _ → −1)
+  α-eq 0 = refl
+  α-eq (succ _) = refl
+  r : conv-real (λ _ → −1) ≡ −1*
+  r = {!!}
+  x-eq : x' (λ _ → −1) ∼ (λ n → upRightOrDownLeft [-1,1] (succℤ n))
+  x-eq (pos zero) = refl
+  x-eq (pos (succ zero)) = refl
+  x-eq (pos (succ (succ x))) = {!!}
+  x-eq (negsucc zero) = refl
+  x-eq (negsucc (succ x)) = refl
 
 {-
 intInterval : ℤ → Interval

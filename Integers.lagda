@@ -96,9 +96,7 @@ open NaturalsMultiplication renaming (_*_ to _ℕ*_)
 infixl 32 _*_
 
 _-_ : ℤ → ℤ → ℤ 
-x - pos 0        = x + (- pos 0)
-x - pos (succ y) = x + (- pos (succ y))
-x - negsucc y    = x + (- negsucc y)
+x - y = x + (- y)
 
 positive : ℤ → 𝓤₀ ̇
 positive (pos x)     = 𝟙
