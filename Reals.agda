@@ -108,7 +108,7 @@ succ+ℕ : (a b : ℕ) → succ (a +ℕ b) ≡ succ a +ℕ b
 succ+ℕ a zero = refl
 succ+ℕ a (succ b) = ap succ (succ+ℕ a b)
 
-{-
+
 succ+ℤ : (a b : ℤ) → succℤ (a + b) ≡ succℤ a + b
 succ+ℤ a (pos zero) = refl
 succ+ℤ a (pos (succ x)) = ap succℤ (succ+ℤ a (pos x))
@@ -117,7 +117,7 @@ succ+ℤ a (negsucc zero) = succpredℤ a
 succ+ℤ a (negsucc (succ x)) = succpredℤ (a + negsucc x)
                             ∙ predsuccℤ (a + negsucc x) ⁻¹
                             ∙ ap predℤ (succ+ℤ a (negsucc x))
-
+{-
 fact'' : (m n : ℕ) (a b : ℤ) → a ≤ℤ b → m ≤ℕ n
        → (succℤ ^ m) (a + a) ≤ℤ (succℤ ^ n) (b + b)
 fact'' zero zero a b (c , f) ⋆
@@ -292,17 +292,46 @@ fromInterval (k , p)
 CompactInterval : Interval → 𝓤₀ ̇
 CompactInterval (k , p) = Σ (x , f) ꞉ Real , x p ≡ (k , p)
 
-x' : (α : ℕ → 𝟛) → ℤ → Interval
-x' α (negsucc n) = upRightₙ [-1,1] n
-x' α (pos n)     = conv→ α n
+ℤ≤-succℤ-ap : {x y : ℤ} → x ≤ℤ y → succℤ x ≤ℤ succℤ y
+ℤ≤-succℤ-ap (n , f) = n , (succ+ℤ _ (pos n) ⁻¹  ∙ ap succℤ f)
 
-f' : (α : ℕ → 𝟛) (n : ℤ) → x' α n -immediatelyDownFrom- x' α (predℤ n)
-f' α (negsucc n)    = downFromUpRight (x' α (negsucc n))
-f' α (pos 0)        = downIsDown (α 0) [-1,1]
-f' α (pos (succ n)) = downIsDown (α (succ n)) (x' α (pos n))
+≤split : (n m : ℤ) → (n ≤ℤ m) ⊹ (m ≤ℤ n)
+≤split (pos 0) (pos m)
+ = inl (m , ℤ-zero-left-neutral (pos m))
+≤split (pos (succ n)) (pos 0)
+ = inr ({!!} , {!!})
+ 
 
-conv-real : (ℕ → 𝟛) → CompactInterval [-1,1]
-conv-real α = (x' α , f' α) , refl 
+if_then_else_ : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {Z : 𝓦 ̇ } → (X ⊹ Y) → Z → Z → Z
+if (inl _) then x else y = x
+if (inr _) then x else y = y
+
+x''' : Interval → (α : ℕ → 𝟛) → ℕ → Interval
+x''' i α 0 = i
+x''' i α (succ n) = down (α n) (x''' i α n)
+
+x'' : (i : Interval) (α : ℕ → 𝟛) (n : ℤ) → (precOf i ≤ℤ n) ⊹ (n ≤ℤ precOf i) → Interval
+x'' i α n (inl (m , _)) = x''' i α m
+x'' i α n (inr (m , _)) = upRightₙ i m
+
+x' = λ i α n → x'' i α n (≤split (precOf i) n)
+
+f' : (i : Interval) (α : ℕ → 𝟛) (n : ℤ)
+   → (o₁ : (precOf i ≤ℤ n) ⊹ (n ≤ℤ precOf i))
+   → (o₂ : (precOf i ≤ℤ predℤ n) ⊹ (predℤ n ≤ℤ precOf i))
+   → x'' i α n o₁ -immediatelyDownFrom- x'' i α (predℤ n) o₂   
+f' i α n (inl (zero , _)) (inl (m₂ , _)) = 𝟘-elim {!!} 
+f' i α n (inl (succ m₁ , _)) (inl (m₂ , _)) = {!!} where
+  γ : x''' i α (succ m₁) -immediatelyDownFrom- x''' i α m₁
+  γ = {!!} -- downIsDown (α (succ m₁)) _
+f' i α n (inl x) (inr x₁) = {!!}
+f' i α n (inr x) (inl x₁) = {!!}
+f' i α n (inr x) (inr x₁) = {!!} 
+
+conv-real : {i : Interval} → (ℕ → 𝟛) → CompactInterval i
+conv-real {i} α = (x' i α
+                  , λ n → f' i α n (≤split (precOf i) n) (≤split (precOf i) (predℤ n)))
+                , {!!}
 
 Interval-is-set : is-set Interval
 Interval-is-set = ×-is-set ℤ-is-set ℤ-is-set
@@ -343,11 +372,12 @@ immediatelyDown-isProp i j = +-is-prop Interval-is-set
                                 (λ y → downLeft≢downMid j (y ⁻¹ ∙ x))
                                 (λ y → downLeft≢downRight j (x ⁻¹ ∙ y)))
 
-conv-real-∼ : (α : ℕ → 𝟛) (((x , f) , e) : CompactInterval [-1,1])
-            → x' α ∼ x
+conv-real-∼ : {i : Interval}
+            → (α : ℕ → 𝟛) (((x , f) , e) : CompactInterval i)
+            → x' i α ∼ x
             → conv-real α ≡ (x , f) , e
-conv-real-∼ α ((x , f) , e) x∼x = to-Σ-≡ ((to-Σ-≡ (γ₀ , γ₁)) , γ₂) where
-  γ₀ : x' α ≡ x
+conv-real-∼ {i} α ((x , f) , e) x∼x = to-Σ-≡ ((to-Σ-≡ (γ₀ , γ₁)) , γ₂) where
+  γ₀ : x' i α ≡ x
   γ₀ = dfunext (fe 𝓤₀ 𝓤₀) x∼x
   γ₁ = Π-is-prop (fe 𝓤₀ 𝓤₀) (λ z → immediatelyDown-isProp (x z) (x (predℤ z))) _ _
   γ₂ = Interval-is-set _ _
@@ -361,7 +391,7 @@ imeq i j (inr (inr z)) = +1 , z
 imeq₁ = λ i j f → pr₁ (imeq i j f)
 imeq₂ = λ i j f → pr₂ (imeq i j f)
 
-real-conv' : CompactInterval [-1,1] → (ℕ → 𝟛)
+real-conv' : {i : Interval} → CompactInterval i → (ℕ → 𝟛)
 real-conv' ((x , f) , _) n = imeq₁ (x (pos n)) (x (predℤ (pos n))) (f (pos n))
 
 -- conv-real-∼ (real-conv' ((x , f) , e)) ((x , f) , e) x-eq where
@@ -369,12 +399,19 @@ real-conv' ((x , f) , _) n = imeq₁ (x (pos n)) (x (predℤ (pos n))) (f (pos n
 _≣_ : Real → Real → 𝓤₀ ̇
 (x , _) ≣ (y , _) = Σ k ꞉ ℤ , Π n ꞉ ℤ , (k ≤ℤ n → x n ≡ y n)
 
-_≣'_ : CompactInterval [-1,1] → CompactInterval [-1,1] → 𝓤₀ ̇
+_≣'_ : {i : Interval} → CompactInterval i → CompactInterval i → 𝓤₀ ̇
 (xf , _) ≣' (yg , _) = xf ≣ yg
 
-eqx : (n : ℤ) → negsucc 0 ≤ℤ n
-    → (x : CompactInterval [-1,1])
-    → (pr₁ ∘ pr₁) ((conv-real ∘ real-conv') x) n ≡ ((pr₁ ∘ pr₁) x) n
+eqx : (i : Interval) → (conv-real {i} ∘ real-conv' {i}) ∼ id
+eqx i ((x , f) , e) = conv-real-∼ (real-conv' ((x , f) , e)) ((x , f) , e) γ where
+  γ : x' i (real-conv' ((x , f) , e)) ∼ x
+  γ n = dep-cases γ₂ {!!} (≤split (precOf i) n) where
+    γ₂ : (o : precOf i ≤ℤ n) → x'' i (real-conv' ((x , f) , e)) n (inl o) ≡ x n
+    γ₂ (0 , g) = e ⁻¹ ∙ ap x g
+    γ₂ (succ m , g) = ap (down (real-conv' ((x , f) , e) m)) {!!}
+                    ∙ {!ime₂!}
+
+{-
 eqx (pos n)     -1≤n ((x , f) , e)
  = ap (down (imeq₁ (x (pos n)) (x (predℤ (pos n))) (f (pos n)))) (γ n)
  ∙ imeq₂ (x (pos n)) (x (predℤ (pos n))) (f (pos n)) ⁻¹
@@ -386,14 +423,16 @@ eqx (pos n)     -1≤n ((x , f) , e)
           (succ n , (ap succℤ (ℤ-pred-is-minus-one (pos n) ⁻¹) ∙ succpredℤ (pos n)))
           ((x , f) , e)
 eqx (negsucc 0) _ ((x , f) , e) = e ⁻¹
-eqx (negsucc (succ n)) -1≤n _   = 𝟘-elim {!!}
-
+eqx (negsucc (succ n)) (m , g) _
+ = 𝟘-elim {!!}
+-}
+{-
 eqx* : ∀ x → (conv-real ∘ real-conv') x ≣' x
 eqx* x = negsucc 0 , λ n o → eqx n o x
 
 eqy : real-conv' ∘ conv-real ∼ id
 eqy y = {!!}
-
+-}
 {-
 intInterval : ℤ → Interval
 intInterval n = (n + n , pos 0)
