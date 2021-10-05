@@ -18,7 +18,7 @@ open import UF-Equiv
 {-# BUILTIN INTEGERPOS    pos     #-}
 {-# BUILTIN INTEGERNEGSUC negsucc #-}
 
-module Reals (fe : FunExt) where
+module Reals2 (fe : FunExt) where
 
 _+ℕ_ : ℕ → ℕ → ℕ
 a +ℕ 0 = a
