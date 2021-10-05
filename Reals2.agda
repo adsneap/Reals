@@ -5,13 +5,13 @@ open import Integers
 open import DecidableAndDetachable
 open import DiscreteAndSeparated
 open import NaturalNumbers-Properties
-open import NaturalsOrder renaming (_<_ to _<ℕ_ ; _≤_ to _≤ℕ_)
 open import UF-Base
 open import UF-Subsingletons
 open import UF-Miscelanea
 open import UF-FunExt
 open import IntegersProperties
 open import UF-Subsingletons-FunExt
+open import UF-Equiv
 -- open import IntegersOrder
 
 {-# BUILTIN INTEGER       ℤ       #-}
@@ -66,10 +66,6 @@ succ+ℤ a (negsucc zero)
 succ+ℤ a (negsucc (succ x))
  = succpredℤ _ ∙ predsuccℤ _ ⁻¹ ∙ ap predℤ (succ+ℤ a (negsucc x))
 
-to-zero : ℤ → ℤ
-to-zero (pos n) = pos (pred n)
-to-zero (negsucc n) = negsucc (pred n)
-
 from-zero : ℤ → ℤ
 from-zero (pos n) = pos (succ n)
 from-zero (negsucc n) = negsucc (succ n)
@@ -77,10 +73,6 @@ from-zero (negsucc n) = negsucc (succ n)
 Interval : 𝓤₀ ̇
 Interval = ℤ × ℤ
 -- ⟦ (k , p) ⟧ = [k/2ᵖ⁺¹ , (k+2)/2ᵖ⁺¹]
-
-codeOf precOf : Interval → ℤ
-codeOf = pr₁
-precOf = pr₂
 
 _/2 : ℕ → ℕ
 0 /2 = 0
@@ -107,19 +99,16 @@ a ≤ℤ b = Σ c ꞉ ℕ , a + pos c ≡ b
 _<ℤ_ : (a b : ℤ) → 𝓤₀ ̇
 a <ℤ b = succℤ a ≤ℤ b
 
-_≤ℤ_≤ℤ_ : (a b c : ℤ) → 𝓤₀ ̇
-a ≤ℤ b ≤ℤ c = (a ≤ℤ b) × (b ≤ℤ c)
+_<ℕ_ : ℕ → ℕ → 𝓤₀ ̇
+a <ℕ b = Σ c ꞉ ℕ , succ a +ℕ c ≡ b
 
-_<ℕ2_ : ℕ → ℕ → 𝓤₀ ̇
-a <ℕ2 b = Σ c ꞉ ℕ , succ a +ℕ c ≡ b
-
-<ℕ-succ : (a b : ℕ) → a <ℕ2 b → succ a <ℕ2 succ b
+<ℕ-succ : (a b : ℕ) → a <ℕ b → succ a <ℕ succ b
 <ℕ-succ a b (d , e) = d , (succ+ℕ (succ a) d ⁻¹ ∙ ap succ e)
 
-pos-< : (a b : ℕ) → a <ℕ2 b → pos a <ℤ pos b
+pos-< : (a b : ℕ) → a <ℕ b → pos a <ℤ pos b
 pos-< a b (d , e) = d , (+-pos (succ a) d ⁻¹ ∙ ap pos e)
 
-ℕ-trich : (a b : ℕ) → (a <ℕ2 b) ⊹ (a ≡ b) ⊹ (b <ℕ2 a)
+ℕ-trich : (a b : ℕ) → (a <ℕ b) ⊹ (a ≡ b) ⊹ (b <ℕ a)
 ℕ-trich zero zero = inr (inl refl)
 ℕ-trich zero (succ b) = inl (b , 1+ℕ b)
 ℕ-trich (succ a) zero = (inr ∘ inr) (a , 1+ℕ a)
@@ -130,14 +119,14 @@ pos-< a b (d , e) = d , (+-pos (succ a) d ⁻¹ ∙ ap pos e)
    (inr ∘ inl ∘ ap succ)
    (inr ∘ inr ∘ <ℕ-succ b a))
 
-+ℕℤ-assoc : ∀ a b c → a +pos (b +ℕ c) ≡ (a +pos b) +pos c
-+ℕℤ-assoc a b zero = refl
-+ℕℤ-assoc a b (succ c) = ap succℤ (+ℕℤ-assoc a b c)
+assoc+ℤℕ : ∀ a b c → a +pos (b +ℕ c) ≡ (a +pos b) +pos c
+assoc+ℤℕ a b zero = refl
+assoc+ℤℕ a b (succ c) = ap succℤ (assoc+ℤℕ a b c)
 
 <ℤ-trans : {a b c : ℤ} → a <ℤ b → b <ℤ c → a <ℤ c
 <ℤ-trans {a} {b} {c} (d₁ , e₁) (d₂ , e₂)
  = (d₁ +ℕ (succ d₂))
- , (+ℕℤ-assoc (succℤ a) d₁ (succ d₂)
+ , (assoc+ℤℕ (succℤ a) d₁ (succ d₂)
  ∙ (ap succℤ (ap (_+pos d₂) e₁) ∙ succ+ℤ b (pos d₂))
  ∙ e₂)
 
@@ -167,7 +156,7 @@ a<b-negsucc⁻¹ a b (d , e)
  = d , (succ+ℤ (negsucc a) (pos d) ⁻¹
      ∙ ap succℤ e)
 
-casta<b : ∀ a b → a <ℕ2 b →
+casta<b : ∀ a b → a <ℕ b →
       (negsucc a <ℤ negsucc b) ⊹
       (negsucc a ≡ negsucc b) ⊹ (negsucc b <ℤ negsucc a)
 casta<b zero zero (zero , ())
@@ -181,7 +170,13 @@ casta<b (succ a) (succ b) (d , e)
      (inr ∘ inl ∘ ap from-zero)
      (inr ∘ inr ∘ a<b-negsucc b a))
 
-ℤ-trich : (a b : ℤ) → (a <ℤ b) ⊹ (a ≡ b) ⊹ (b <ℤ a)
+trichotomous∙ : {X : 𝓤 ̇ } (_<_ : X → X → 𝓥 ̇ ) → X → X → 𝓤 ⊔ 𝓥 ̇
+trichotomous∙ _<_ a b = (a < b) ⊹ (a ≡ b) ⊹ (b < a)
+
+trichotomous : {X : 𝓤 ̇ } (_<_ : X → X → 𝓥 ̇ ) → 𝓤 ⊔ 𝓥 ̇ 
+trichotomous _<_ = ∀ a b → trichotomous∙ _<_ a b
+
+ℤ-trich : trichotomous _<ℤ_
 ℤ-trich (pos a) (pos b)
  = Cases (ℕ-trich a b)
    (inl ∘ pos-< a b)
@@ -205,14 +200,7 @@ casta<b (succ a) (succ b) (d , e)
 data 𝟛 : 𝓤₀ ̇ where
   −1 O +1 : 𝟛
 
-match𝟛 : {X : 𝓤 ̇ } → (a : 𝟛) → X → X → X → X
-match𝟛 −1 x y z = x
-match𝟛  O x y z = y
-match𝟛 +1 x y z = z
-
-_∶∶_ : {X : 𝓤 ̇ } → X → (ℕ → X) → (ℕ → X)
-(a ∶∶ α) 0 = a
-(a ∶∶ α) (succ n) = α n
+𝟛ᴺ = ℕ → 𝟛
 
 down : 𝟛 → (ℤ → ℤ)
 down −1 = downLeft
@@ -221,11 +209,6 @@ down +1 = downRight
 
 [-1,1] : Interval
 [-1,1] = (negsucc 0 , negsucc 0)
-
-conv→ conv→' : (ℕ → 𝟛) → (ℕ → ℤ)
-conv→' α 0 = negsucc 0
-conv→' α (succ n) = conv→ α n
-conv→ α n = down (α n) (conv→' α n)
 
 _-immediatelyDownFrom-_ : ℤ → ℤ → 𝓤₀ ̇
 i -immediatelyDownFrom- j
@@ -240,29 +223,6 @@ CompactInterval (k , p)
  = Σ α ꞉ (ℕ → ℤ)  , (α 0 -immediatelyDownFrom- k)
  × (Π n ꞉ ℕ , α (succ n) -immediatelyDownFrom- α n)
 
-halfEq : (n : ℕ) → (n ≡ (n /2) +ℕ (n /2)) ⊹ (n ≡ succ ((n /2) +ℕ (n /2)))
-halfEq 0 = inl refl
-halfEq 1 = inr refl
-halfEq (succ (succ n))
- = Cases (halfEq n)
-    (λ f → inl (ap (succ ∘ succ) f ∙ ap succ (succ+ℕ (n /2) (n /2))))
-    (λ g → inr (ap (succ ∘ succ) g ∙ ap succ (succ+ℕ (n /2) (succ (n /2)))))
-
-ap-× : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {x₁ x₂ : X} {y₁ y₂ : Y}
-     → x₁ ≡ x₂ → y₁ ≡ y₂ → (x₁ , y₁) ≡ (x₂ , y₂)
-ap-× {𝓤} {𝓥} {X} {Y} {x₁} {.x₁} {y₁} {.y₁} refl refl = refl
-
-upRightEq : (i : ℤ) → (i ≡ downLeft (upRight i)) ⊹ (i ≡ downMid (upRight i))
-upRightEq (pos k)
-  = Cases (halfEq k)
-      (λ f → inl (ap pos f ∙ +-pos (k /2) (k /2)))
-      (λ g → inr (ap pos g ∙ ap succℤ (+-pos (k /2) (k /2))))
-upRightEq (negsucc k)
-  = Cases (halfEq k)
-      (λ f → inr (ap negsucc f ∙ +-negsucc (k /2) (k /2)))
-      (λ g → inl (ap negsucc g ∙ ap predℤ (+-negsucc (k /2) (k /2))
-                       ∙ predsuccℤ (negsucc (k /2) +negsucc (k /2))))
-
 downLeftIsDown : (i : ℤ) → downLeft i -immediatelyDownFrom- i
 downLeftIsDown i = inl refl
 
@@ -272,6 +232,11 @@ downMidIsDown i = (inr ∘ inl) refl
 downRightIsDown : (i : ℤ) → downRight i -immediatelyDownFrom- i
 downRightIsDown i = (inr ∘ inr) refl
 
+downIsDown : (i : ℤ) (b : 𝟛) → down b i -immediatelyDownFrom- i
+downIsDown i −1 = downLeftIsDown  i
+downIsDown i  O = downMidIsDown   i
+downIsDown i +1 = downRightIsDown i
+
 downFromUpRight : (i : ℤ) → i -immediatelyDownFrom- upRight i
 downFromUpRight i
  = Cases (upRightEq i)
@@ -279,44 +244,99 @@ downFromUpRight i
               (e ⁻¹) (downLeftIsDown (upRight i)))
      (λ e → transport (_-immediatelyDownFrom- upRight i)
               (e ⁻¹) (downMidIsDown (upRight i)))
+  where
+    halfEq : (n : ℕ) → (n ≡ (n /2) +ℕ (n /2)) ⊹ (n ≡ succ ((n /2) +ℕ (n /2)))
+    halfEq 0 = inl refl
+    halfEq 1 = inr refl
+    halfEq (succ (succ n))
+      = Cases (halfEq n)
+          (λ f → inl (ap (succ ∘ succ) f ∙ ap succ (succ+ℕ (n /2) (n /2))))
+          (λ g → inr (ap (succ ∘ succ) g ∙ ap succ (succ+ℕ (n /2) (succ (n /2)))))
+    upRightEq : (i : ℤ) → (i ≡ downLeft (upRight i)) ⊹ (i ≡ downMid (upRight i))
+    upRightEq (pos k)
+      = Cases (halfEq k)
+          (λ f → inl (ap pos f ∙ +-pos (k /2) (k /2)))
+          (λ g → inr (ap pos g ∙ ap succℤ (+-pos (k /2) (k /2))))
+    upRightEq (negsucc k)
+      = Cases (halfEq k)
+          (λ f → inr (ap negsucc f ∙ +-negsucc (k /2) (k /2)))
+          (λ g → inl (ap negsucc g ∙ ap predℤ (+-negsucc (k /2) (k /2))
+                                   ∙ predsuccℤ (negsucc (k /2) +negsucc (k /2))))
 
-Cases-property : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } {A : 𝓦 ̇ } {P : A → 𝓣 ̇ }
-               → (xy : X ⊹ Y) {f : X → A} {g : Y → A}
-               → Π (P ∘ f)
-               → Π (P ∘ g)
-               → P (Cases xy f g)
-Cases-property (inl x) F G = F x
-Cases-property (inr y) F G = G y
-
-back : {n p : ℤ} (e : (n <ℤ p) ⊹ (n ≡ p) ⊹ (p <ℤ n))
-     → (predℤ n <ℤ p) ⊹ (predℤ n ≡ p) ⊹ (p <ℤ predℤ n)
-back {n} {p} (inl (d , e))
+ℤ-trich-prec : {n p : ℤ} → trichotomous∙ _<ℤ_ n p → trichotomous∙ _<ℤ_ (predℤ n) p 
+ℤ-trich-prec {n} {p} (inl (d , e))
  = inl (succ d , (ap (λ ─ → succℤ (─ +pos d)) (succpredℤ n) ∙ succ+ℤ n (pos d) ∙ e))
-back {n} {.n} (inr (inl refl))
+ℤ-trich-prec {n} {.n} (inr (inl refl))
  = inl (0 , succpredℤ n)
-back {n} {p} (inr (inr (0 , e)))
+ℤ-trich-prec {n} {p} (inr (inr (0 , e)))
  = inr (inl (ap predℤ (e ⁻¹) ∙ predsuccℤ p))
-back {n} {p} (inr (inr (succ d , e)))
+ℤ-trich-prec {n} {p} (inr (inr (succ d , e)))
  = inr (inr (d , succℤ-lc (e ∙ succpredℤ n ⁻¹)))
 
-succℤ≢ : {n : ℤ} → succℤ n ≢ n
-succℤ≢ {negsucc 0} ()
-succℤ≢ {negsucc (succ x)} ()
+succn≢n : {n : ℤ} → succℤ n ≢ n
+succn≢n {negsucc 0} ()
+succn≢n {negsucc (succ x)} ()
 
-succℤ≢2 : (n : ℤ) (d : ℕ) → n +pos (succ d) ≢ n
-succℤ≢2 n 0 = succℤ≢ 
-succℤ≢2 n (succ d) e = {!!}
-    
-ℤ-trich-is-prop : (n p : ℤ) → is-prop ((n <ℤ p) ⊹ (n ≡ p) ⊹ (p <ℤ n))
-ℤ-trich-is-prop n p = +-is-prop {!!} (+-is-prop {!!} {!!} {!!}) {!!}
+add-unique-0 : (n d : ℤ) → n + d ≡ n → d ≡ pos 0
+add-unique-0 n d e = ℤ+-lc d (pos 0) (n +pos 0) e
+
+succ≢0 : {n : ℕ} → succ n ≢ 0
+succ≢0 {n} ()
+
+add-nonzero-not-equal : (n : ℤ) (d : ℕ) → n +pos (succ d) ≢ n
+add-nonzero-not-equal n 0 = succn≢n
+add-nonzero-not-equal n (succ d) e
+ = succ≢0 (pos-lc (add-unique-0 n (pos (succ (succ d))) e))
+
+downLeft≢downMid : (k : ℤ) → downLeft k ≢ downMid k
+downLeft≢downMid k e = 𝟘-elim (add-nonzero-not-equal (k + k) 0 (e ⁻¹))
+
+downMid≢downRight : (k : ℤ) → downMid k ≢ downRight k
+downMid≢downRight k e = 𝟘-elim (add-nonzero-not-equal (succℤ (k + k)) 0 (e ⁻¹))
+
+downLeft≢downRight : (k : ℤ) → downLeft k ≢ downRight k
+downLeft≢downRight k e = 𝟘-elim (add-nonzero-not-equal (k + k) 1 (e ⁻¹))
+
+immediatelyDown-isProp : (i j : ℤ) → is-prop (i -immediatelyDownFrom- j)
+immediatelyDown-isProp i j = +-is-prop ℤ-is-set
+                               (+-is-prop ℤ-is-set ℤ-is-set
+                                 (λ x y → downMid≢downRight j (x ⁻¹ ∙ y)))
+                                (λ x → cases
+                                  (λ y → downLeft≢downMid j (x ⁻¹ ∙ y))
+                                  (λ y → downLeft≢downRight j (x ⁻¹ ∙ y))) 
+
++pos-lc : ∀ a b c → a +pos b ≡ a +pos c → b ≡ c
++pos-lc a zero zero e = refl
++pos-lc a zero (succ c) e = 𝟘-elim (add-nonzero-not-equal a c (e ⁻¹))
++pos-lc a (succ b) zero e = 𝟘-elim (add-nonzero-not-equal a b e)
++pos-lc a (succ b) (succ c) e
+ = ap succ (+pos-lc (succℤ a) _ _ (succ+ℤ a (pos b) ⁻¹ ∙ e ∙ succ+ℤ a (pos c)))
+
+<ℤ-is-prop : (n p : ℤ) → is-prop (n <ℤ p)
+<ℤ-is-prop n p (d₁ , e₁) (d₂ , e₂) = to-Σ-≡ (γ₁ , (ℤ-is-set _ _)) where
+  γ₁ : d₁ ≡ d₂
+  γ₁ = +pos-lc (succℤ n) d₁ d₂ (e₁ ∙ e₂ ⁻¹)
+
+ℤ-trich-is-prop : (n p : ℤ) → is-prop (trichotomous∙ _<ℤ_ n p)
+ℤ-trich-is-prop n p
+ = +-is-prop (<ℤ-is-prop n p)
+    (+-is-prop ℤ-is-set (<ℤ-is-prop p n) γ)
+    (λ n<p → cases (δ n<p) (ζ n<p))
  where
-   δ : (n p : ℤ) → n <ℤ p → ¬ (n ≡ p)
-   δ n .n (d , e₁) refl = succℤ≢2 n d (succ+ℤ n (pos d) ∙ e₁)
-   ζ : (n p : ℤ) → n <ℤ p → ¬ (p <ℤ n)
-   ζ n p (d₁ , e₁) (d₂ , e₂) = {!!}
-   γ : (n p : ℤ) → n ≡ p → ¬ (p <ℤ n)
-   γ n .n refl (zero , e) = {!!}
-   γ n .n refl (succ d , e) = {!d !}
+   δ : {n p : ℤ} → n <ℤ p → ¬ (n ≡ p)
+   δ {n} {.n} (d , e₁) refl = add-nonzero-not-equal n d (succ+ℤ n (pos d) ∙ e₁)
+   ζ : {n p : ℤ} → n <ℤ p → ¬ (p <ℤ n)
+   ζ {n} {p} (d₁ , e₁) (d₂ , e₂) = add-nonzero-not-equal n (succ (d₁ +ℕ d₂)) (y ∙ x) where
+     x : succℤ (succℤ n +pos d₁) +pos d₂ ≡ n
+     x = ap (λ ─ → succℤ ─ +pos d₂) e₁ ∙ e₂
+     y : (n +pos succ (succ (d₁ +ℕ d₂))) ≡ succℤ (succℤ n +pos d₁) +pos d₂
+     y = ap succℤ
+         (ap (λ ─ → n +pos ─) (succ+ℕ d₁ d₂)
+         ∙ assoc+ℤℕ n (succ d₁) d₂
+         ∙ ap (_+pos d₂) (succ+ℤ n (pos d₁)))
+       ∙ succ+ℤ (succℤ n +pos d₁) (pos d₂)
+   γ : {n p : ℤ} → n ≡ p → ¬ (p <ℤ n)
+   γ {n} {.n} refl (d , e) = add-nonzero-not-equal n d (succ+ℤ n (pos d) ∙ e)
 
 CompactToReal : (i : Interval) → CompactInterval i → Real
 CompactToReal (k , p) (α , f , g)
@@ -327,7 +347,7 @@ CompactToReal (k , p) (α , f , g)
   β n (inr (inr (d , _))) = α d
   δ : (n : ℤ) → (e : (n <ℤ p) ⊹ (n ≡ p) ⊹ (p <ℤ n))
     → β n e -immediatelyDownFrom-
-      β (predℤ n) (back e)
+      β (predℤ n) (ℤ-trich-prec e)
   δ n (inl (d , e))            = downFromUpRight (β n (inl (d , e)))
   δ n (inr (inl refl))         = downFromUpRight (β n (inr (inl refl)))
   δ n (inr (inr (0 , e)))      = f
@@ -341,9 +361,83 @@ CompactToReal (k , p) (α , f , g)
        (ℤ-trich-is-prop n p e (ℤ-trich n p))
        (transport
        (λ ─ → β n e -immediatelyDownFrom- β (predℤ n) ─)
-       (ℤ-trich-is-prop (predℤ n) p (back e) (ℤ-trich (predℤ n) p))
+       (ℤ-trich-is-prop (predℤ n) p (ℤ-trich-prec e) (ℤ-trich (predℤ n) p))
        (δ n e))
+       
+-- θ = k , down (α 0) k , down (α 1) (down (α 0) k) ...
+-- β =     down (α 0) k , down (α 1) (down (α 0) k) ...
+θ : ℤ → 𝟛ᴺ → (ℕ → ℤ)
+θ k α 0 = k
+θ k α (succ n) = down (α n) (θ k α n)
+β : ℤ → 𝟛ᴺ → (ℕ → ℤ)
+β k α = θ k α ∘ succ
+γ* : (k : ℤ) (α : ℕ → 𝟛) (n : ℕ) → β k α n -immediatelyDownFrom- θ k α n
+γ* k α n = downIsDown (θ k α n) (α n)
 
- -- if n < p then upRightⁿ (n - p) k
- -- if n ≡ p then k
- -- if n > p then calculate from α
+SignedToCompact : (i : Interval) → 𝟛ᴺ → CompactInterval i
+SignedToCompact (k , _) α = β k α , γ* k α 0 , γ* k α ∘ succ
+
+down-to-𝟛 : (i j : ℤ) → i -immediatelyDownFrom- j → 𝟛
+down-to-𝟛 i j (inl _)       = −1
+down-to-𝟛 i j (inr (inl _)) =  O
+down-to-𝟛 i j (inr (inr _)) = +1
+
+CompactToSigned : (i : Interval) → CompactInterval i → 𝟛ᴺ
+CompactToSigned (k , _) (α , δ , γ) 0        = down-to-𝟛 (α 0) k δ
+CompactToSigned (k , _) (α , δ , γ) (succ n) = down-to-𝟛 (α (succ n)) (α n) (γ n)
+
+down-eq₁ : (k : ℤ) (b : 𝟛) (f : down b k -immediatelyDownFrom- k)
+         → down-to-𝟛 (down b k) k f ≡ b
+down-eq₁ k −1 (inl _)       = refl
+down-eq₁ k −1 (inr (inl e)) = 𝟘-elim (add-nonzero-not-equal (k + k) 0 (e ⁻¹))
+down-eq₁ k −1 (inr (inr e)) = 𝟘-elim (add-nonzero-not-equal (k + k) 1 (e ⁻¹))
+down-eq₁ k  O (inl e)       = 𝟘-elim (add-nonzero-not-equal (k + k) 0 e)
+down-eq₁ k  O (inr (inl _)) = refl
+down-eq₁ k  O (inr (inr e)) = 𝟘-elim (add-nonzero-not-equal (succℤ (k + k)) 0 (e ⁻¹))
+down-eq₁ k +1 (inl e)       = 𝟘-elim (add-nonzero-not-equal (k + k) 1 e)
+down-eq₁ k +1 (inr (inl e)) = 𝟘-elim (add-nonzero-not-equal (succℤ (k + k)) 0 e)
+down-eq₁ k +1 (inr (inr _)) = refl
+
+Compact-id : (i : Interval) → CompactToSigned i ∘ SignedToCompact i ∼ id
+Compact-id (k , p) α = dfunext (fe _ _) γ where
+  γ : (CompactToSigned (k , p) ∘ SignedToCompact (k , p)) α ∼ α
+  γ zero = down-eq₁ k (α zero) (downIsDown k (α zero))
+  γ (succ n) = down-eq₁ (down (α n) _) (α (succ n)) (downIsDown (down (α n) _) (α (succ n)))
+
+down-eq₂ : (k : ℤ) (n : ℤ) (f : n -immediatelyDownFrom- k)
+        → down (down-to-𝟛 n k f) k ≡ n
+down-eq₂ k n (inl x)       = x ⁻¹
+down-eq₂ k n (inr (inl x)) = x ⁻¹
+down-eq₂ k n (inr (inr x)) = x ⁻¹
+
+Signed-id : (i : Interval) → SignedToCompact i ∘ CompactToSigned i ∼ id
+Signed-id (k , p) (α , δ₀ , δₛ)
+ = to-Σ-≡ ((dfunext (fe _ _) γ)
+ , (to-×-≡ (immediatelyDown-isProp (α 0) k _ _)
+     (Π-is-prop (fe _ _) (λ n → immediatelyDown-isProp (α (succ n)) (α n)) _ _)))
+ where
+  γ : pr₁ ((SignedToCompact (k , p) ∘ CompactToSigned (k , p)) (α , δ₀ , δₛ)) ∼ α
+  γ zero = down-eq₂ k (α 0) δ₀
+  γ (succ n) = ap (down (down-to-𝟛 (α (succ n)) (α n) (δₛ n))) (γ n)
+             ∙ down-eq₂ (α n) (α (succ n)) (δₛ n)
+
+equiv : Interval × 𝟛ᴺ ≃ Σ CompactInterval
+equiv = qinveq (λ (i , α) → i , SignedToCompact i α)
+               ((λ (i , c) → i , CompactToSigned i c)
+               , ((λ (i , α) → to-×-≡ refl (Compact-id i α))
+               , (λ (i , c) → to-Σ-≡ (refl , (Signed-id i c)))))
+
+open import GenericConvergentSequence
+open import Codistance fe
+
++-to-𝟚 : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } → X ⊹ Y → 𝟚
++-to-𝟚 (inl _) = ₁
++-to-𝟚 (inr _) = ₀
+
+C : (i : Interval) → CompactInterval i × CompactInterval i → ℕ∞
+C i ((β , _) , (δ , _))
+ = force-decreasing α , force-decreasing-is-decreasing α where
+  α : ℕ → 𝟚
+  α n = +-to-𝟚 (ℤ-is-discrete (β n) (δ n))
+
+
