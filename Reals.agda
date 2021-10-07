@@ -28,6 +28,10 @@ a +ℕ succ b = succ (a +ℕ b)
 1+ℕ zero = refl
 1+ℕ (succ a) = ap succ (1+ℕ a)
 
+0+ℕ : (a : ℕ) → 0 +ℕ a ≡ a
+0+ℕ zero = refl
+0+ℕ (succ a) = ap succ (0+ℕ a)
+
 +-pos : (a b : ℕ) → pos (a +ℕ b) ≡ pos a + pos b
 +-pos a 0 = refl
 +-pos a (succ b) = ap succℤ (+-pos a b)
@@ -57,6 +61,12 @@ succ+ℕ : (a b : ℕ) → succ (a +ℕ b) ≡ succ a +ℕ b
 succ+ℕ a zero = refl
 succ+ℕ a (succ b) = ap succ (succ+ℕ a b)
 
++ℕ-comm : (a b : ℕ) → a +ℕ b ≡ b +ℕ a
++ℕ-comm zero zero = refl
++ℕ-comm (succ a) zero = ap succ (+ℕ-comm a 0)
++ℕ-comm zero (succ b) = ap succ (+ℕ-comm 0 b)
++ℕ-comm (succ a) (succ b) = ap succ (succ+ℕ a b ⁻¹ ∙ ap succ (+ℕ-comm a b) ∙ succ+ℕ b a)
+
 succ+ℤ : (a b : ℤ) → succℤ (a + b) ≡ succℤ a + b
 succ+ℤ a (pos zero) = refl
 succ+ℤ a (pos (succ x))
@@ -79,6 +89,14 @@ _/2 : ℕ → ℕ
 1 /2 = 0
 succ (succ n) /2 = succ (n /2)
 
+con : ℤ → (ℕ → ℤ)
+con (pos _) = pos
+con (negsucc _) = negsucc
+
+num : ℤ → ℕ
+num (pos n) = n
+num (negsucc n) = n
+
 −_ : Interval → Interval
 − (k , p) = (negsucc 1 - k , p)
 
@@ -86,8 +104,7 @@ downLeft downMid downRight upRight : ℤ → ℤ
 downLeft  k           = k + k          
 downMid   k           = k + k + pos 1  
 downRight k           = k + k + pos 2  
-upRight   (pos x)     = pos     (x /2) 
-upRight   (negsucc x) = negsucc (x /2)
+upRight   k           = con k (num k /2)
 
 upRightⁿ : ℤ → ℕ → ℤ
 upRightⁿ k 0 = k
@@ -207,19 +224,25 @@ down −1 = downLeft
 down  O = downMid
 down +1 = downRight
 
-[-1,1] : Interval
-[-1,1] = (negsucc 0 , negsucc 0)
+[-1,1]ρ : Interval
+[-1,1]ρ = (negsucc 0 , negsucc 0)
+
+-- [      α n      ]
+
+-- [ αₛ n ][  αₛ n ]
+--     [ αₛ n  ]
 
 _-immediatelyDownFrom-_ : ℤ → ℤ → 𝓤₀ ̇
 i -immediatelyDownFrom- j
  = (i ≡ downLeft j) ⊹ (i ≡ downMid j) ⊹ (i ≡ downRight j)
 
-Real : 𝓤₀ ̇
-Real = Σ x ꞉ (ℤ → ℤ)
-     , Π n ꞉ ℤ , (x n) -immediatelyDownFrom- (x (predℤ n))
+Realρ : 𝓤₀ ̇
+Realρ = Σ x ꞉ (ℤ → ℤ) , Π n ꞉ ℤ , (x n) -immediatelyDownFrom- (x (predℤ n))
+-- Realρ would be the pre-set
+-- + an equivalence relation → Setoid (Set in Bishop)
 
-CompactInterval : Interval → 𝓤₀ ̇
-CompactInterval (k , p)
+CompactIntervalρ : Interval → 𝓤₀ ̇
+CompactIntervalρ (k , p)
  = Σ α ꞉ (ℕ → ℤ)  , (α 0 -immediatelyDownFrom- k)
  × (Π n ꞉ ℕ , α (succ n) -immediatelyDownFrom- α n)
 
@@ -338,8 +361,8 @@ immediatelyDown-isProp i j = +-is-prop ℤ-is-set
    γ : {n p : ℤ} → n ≡ p → ¬ (p <ℤ n)
    γ {n} {.n} refl (d , e) = add-nonzero-not-equal n d (succ+ℤ n (pos d) ∙ e)
 
-CompactToReal : (i : Interval) → CompactInterval i → Real
-CompactToReal (k , p) (α , f , g)
+CompactToRealρ : (i : Interval) → CompactIntervalρ i → Realρ
+CompactToRealρ (k , p) (α , f , g)
  = (λ n → β n (ℤ-trich n p)) , (λ n → γ n (ℤ-trich n p))  where
   β : (n : ℤ) → (n <ℤ p) ⊹ (n ≡ p) ⊹ (p <ℤ n) → ℤ
   β n (inl (d , _))       = upRightⁿ k (succ d)
@@ -374,7 +397,7 @@ CompactToReal (k , p) (α , f , g)
 γ* : (k : ℤ) (α : ℕ → 𝟛) (n : ℕ) → β k α n -immediatelyDownFrom- θ k α n
 γ* k α n = downIsDown (θ k α n) (α n)
 
-SignedToCompact : (i : Interval) → 𝟛ᴺ → CompactInterval i
+SignedToCompact : (i : Interval) → 𝟛ᴺ → CompactIntervalρ i
 SignedToCompact (k , _) α = β k α , γ* k α 0 , γ* k α ∘ succ
 
 down-to-𝟛 : (i j : ℤ) → i -immediatelyDownFrom- j → 𝟛
@@ -382,7 +405,7 @@ down-to-𝟛 i j (inl _)       = −1
 down-to-𝟛 i j (inr (inl _)) =  O
 down-to-𝟛 i j (inr (inr _)) = +1
 
-CompactToSigned : (i : Interval) → CompactInterval i → 𝟛ᴺ
+CompactToSigned : (i : Interval) → CompactIntervalρ i → 𝟛ᴺ
 CompactToSigned (k , _) (α , δ , γ) 0        = down-to-𝟛 (α 0) k δ
 CompactToSigned (k , _) (α , δ , γ) (succ n) = down-to-𝟛 (α (succ n)) (α n) (γ n)
 
@@ -421,7 +444,7 @@ Signed-id (k , p) (α , δ₀ , δₛ)
   γ (succ n) = ap (down (down-to-𝟛 (α (succ n)) (α n) (δₛ n))) (γ n)
              ∙ down-eq₂ (α n) (α (succ n)) (δₛ n)
 
-equiv : Interval × 𝟛ᴺ ≃ Σ CompactInterval
+equiv : Interval × 𝟛ᴺ ≃ Σ CompactIntervalρ
 equiv = qinveq (λ (i , α) → i , SignedToCompact i α)
                ((λ (i , c) → i , CompactToSigned i c)
                , ((λ (i , α) → to-×-≡ refl (Compact-id i α))
@@ -430,35 +453,64 @@ equiv = qinveq (λ (i , α) → i , SignedToCompact i α)
 open import GenericConvergentSequence
 open import Codistance fe
 
+open sequences ℤ ℤ-is-discrete
+
 +-to-𝟚 : {X : 𝓤 ̇ } {Y : 𝓥 ̇ } → X ⊹ Y → 𝟚
 +-to-𝟚 (inl _) = ₁
 +-to-𝟚 (inr _) = ₀
 
-C : (i : Interval) → CompactInterval i × CompactInterval i → ℕ∞
-C i ((β , _) , (δ , _))
- = force-decreasing α , force-decreasing-is-decreasing α where
-  α : ℕ → 𝟚
-  α n = +-to-𝟚 (ℤ-is-discrete (β n) (δ n))
+Cᴿ : Realρ → Realρ → ℕ∞
+Cᴿ (α , _) (β , _) = codistance (α ∘ pos) (β ∘ pos)
 
-CauchySequence : (i : Interval) → 𝓤₀ ̇ 
-CauchySequence i = Σ s ꞉ (ℕ → CompactInterval i) , Π ε ꞉ ℕ , Σ N ꞉ ℕ
-                 , ∀ m n → (N <ℕ m) × (N <ℕ n) → under ε ≺ C i (s m , s n)
+C : (i : Interval) → CompactIntervalρ i → CompactIntervalρ i → ℕ∞
+C i (α , _) (β , _) = codistance α β
 
-has-limit : {X : 𝓤 ̇ } → (ℕ → X) → 𝓤 ̇
-has-limit {X} s = Σ i ꞉ ℕ , Π n ꞉ ℕ , (i <ℕ succ n → s n ≡ s i)
-
-complete : (i : Interval) → ((s , _) : CauchySequence i) → has-limit s
-complete = {!!}
-
-
-{-
-CUT-CauchySequence : CoUltrametricType → 𝓤 ̇
-CUT-CauchySequence (X , c , _) = Σ s ꞉ (ℕ → X) , Π ε ꞉ ℕ , Σ N ꞉ ℕ
-                                 , ∀ m n → (N < m) × (N < n) → under ε ≺ c (s m) (s n)
+CauchySequence : {X : 𝓤 ̇ } → (ℕ → (ℕ → X)) → (c : (ℕ → X) → (ℕ → X) → ℕ∞) → 𝓤₀ ̇ 
+CauchySequence s c
+ = Π ε ꞉ ℕ , Σ N ꞉ ℕ , ∀ m n → (N <ℕ m) × (N <ℕ n) → under ε ≺ c (s m) (s n)
 
 has-limit : {X : 𝓤 ̇ } → (ℕ → X) → 𝓤 ̇
-has-limit {X} s = Σ i ꞉ ℕ , Π n ꞉ ℕ , (i ≤ n → s n ≡ s i)
+has-limit {X} s = Σ k ꞉ ℕ , Π n ꞉ ℕ , (k <ℕ n → s k ≡ s n)
 
-CUT-Complete : CoUltrametricType → 𝓤 ̇
-CUT-Complete C = Π (s , _) ꞉ CUT-CauchySequence C , has-limit s
--}
+complete : (s : ℕ → ℕ → ℤ) → CauchySequence s codistance → has-limit s
+complete s c = {!!} -- impossible to prove
+
+reverse : (s : ℕ → ℕ → ℤ) → has-limit s → CauchySequence s codistance
+reverse s (k , l) ε
+ = k , λ m n (k<m , k<n)
+     → transport (under ε ≺_)
+         (infinitely-close-to-itself _ ⁻¹
+           ∙ ap (codistance (s k)) (l n k<n)
+           ∙ ap (λ ─ → codistance ─ (s n)) (l m k<m))
+         (∞-≺-maximal ε)
+
+f = λ α β → upRight (upRight (α + β))
+
+_≤ℤ_≤ℤ_ : ℤ → ℤ → ℤ → 𝓤₀ ̇ 
+a ≤ℤ b ≤ℤ c = (a ≤ℤ b) × (b ≤ℤ c)
+
+ff : (a b c d : ℤ) → a -immediatelyDownFrom- c → b -immediatelyDownFrom- d
+   → (downLeft (c + d)) ≤ℤ (a + b) ≤ℤ downRight (c + d + pos 1)
+ff .(downLeft c) .(downLeft d) c d (inl refl) (inl refl)
+ = (0 , {!!}) , {!!}
+ff a b c d (inl x) (inr f₁) = {!!}
+ff a b c d (inr e) (inl x) = {!!}
+ff a b c d (inr (inl x)) (inr (inl x₁)) = {!!}
+ff a b c d (inr (inl x)) (inr (inr x₁)) = {!!}
+ff a b c d (inr (inr x)) (inr (inl x₁)) = {!!}
+ff .(downRight c) .(downRight d) c d (inr (inr refl)) (inr (inr refl))
+ = {!!} , (0 , {!!})
+
+
+
+gg : (a b : ℤ) → downLeft a ≤ℤ b -- ≤ℤ succℤ (succℤ (downRight a))
+   → downLeft (upRight a) ≤ℤ upRight b -- ≤ℤ succℤ (downRight (upRight a))
+-- → upRight (upRight b) -immediatelyDownFrom- upRight (upRight a)
+gg a b f = {!!}
+
+_+ρ_ : Realρ → Realρ → Realρ 
+(α , γα) +ρ (β , γβ) = (λ n → upRight (upRight (α n + β n))) , γ
+ where
+   γ : (n : ℤ) → upRight (upRight (α n + β n)) -immediatelyDownFrom-
+                 upRight (upRight (α (predℤ n) + β (predℤ n))) 
+   γ n = {!!}
