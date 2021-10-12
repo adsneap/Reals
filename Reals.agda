@@ -493,7 +493,8 @@ ff : (a b c d : ℤ) → a -immediatelyDownFrom- c → b -immediatelyDownFrom- d
    → (downLeft (c + d)) ≤ℤ (a + b) ≤ℤ downRight (c + d + pos 1)
 ff .(downLeft c) .(downLeft d) c d (inl refl) (inl refl)
  = (0 , {!!}) , {!!}
-ff a b c d (inl x) (inr f₁) = {!!}
+ff .(downLeft c) .(downMid d) c d (inl refl) (inr (inl refl)) = {!!}
+ff .(downLeft c) .(downRight d) c d (inl refl) (inr (inr refl)) = {!!}
 ff a b c d (inr e) (inl x) = {!!}
 ff a b c d (inr (inl x)) (inr (inl x₁)) = {!!}
 ff a b c d (inr (inl x)) (inr (inr x₁)) = {!!}
@@ -501,12 +502,68 @@ ff a b c d (inr (inr x)) (inr (inl x₁)) = {!!}
 ff .(downRight c) .(downRight d) c d (inr (inr refl)) (inr (inr refl))
  = {!!} , (0 , {!!})
 
+linear-f : (f : ℤ → ℤ) → 𝓤₀ ̇
+linear-f f = (a b : ℤ) → a <ℤ b → f a <ℤ f b
 
+linear-f₂ : (f : ℤ → ℤ → ℤ) → 𝓤₀ ̇
+linear-f₂ f = {a b c d : ℤ} → a ≤ℤ b → c ≤ℤ d → f a c ≤ℤ f b d 
+
+add-is-linear : linear-f₂ _+_
+add-is-linear {a} {b} {c} {d} (m , a≤b) (n , c≤d)
+ = succ (m +ℕ n)
+ , {!!}
+
+down-≤ℤ : (a b : ℤ) → a -immediatelyDownFrom- b → (downLeft b) ≤ℤ a ≤ℤ (downRight b)
+down-≤ℤ .(downLeft b)  b (inl refl)       = (0 , refl) , (2 , refl)
+down-≤ℤ .(downMid b)   b (inr (inl refl)) = (1 , refl) , (1 , refl)
+down-≤ℤ .(downRight b) b (inr (inr refl)) = (2 , refl) , (0 , refl)
+
+≤ℤ-down : (a b : ℤ) → (downLeft b) ≤ℤ a ≤ℤ (downRight b) → a -immediatelyDownFrom- b
+≤ℤ-down = {!!}
+
+fun-cover : (f : ℤ → ℤ → ℤ) → linear-f₂ f
+          → (a b c₁ c₂ d₁ d₂ : ℤ) → c₁ ≤ℤ a ≤ℤ c₂ → d₁ ≤ℤ b ≤ℤ d₂
+          → (f c₁ d₁ ≤ℤ f a b ≤ℤ f c₂ d₂)
+fun-cover f l a b c₁ c₂ d₁ d₂ (x , y) (z , w) = l x z , l y w
+
+fun-cover2 : (f : ℤ → ℤ → ℤ) → linear-f₂ f
+           → (a b c d : ℤ) → a -immediatelyDownFrom- c →  b -immediatelyDownFrom- d
+           → (f (downLeft c) (downLeft d) ≤ℤ f a b ≤ℤ f (downRight c) (downRight d))
+fun-cover2 f l a b c d e₁ e₂
+ = fun-cover f l
+     a b (downLeft c) (downRight c) (downLeft d) (downRight d)
+     (down-≤ℤ a c e₁) (down-≤ℤ b d e₂)
 
 gg : (a b : ℤ) → downLeft a ≤ℤ b -- ≤ℤ succℤ (succℤ (downRight a))
    → downLeft (upRight a) ≤ℤ upRight b -- ≤ℤ succℤ (downRight (upRight a))
 -- → upRight (upRight b) -immediatelyDownFrom- upRight (upRight a)
 gg a b f = {!!}
+
+upCalc' : (a b : ℕ) (k : ℕ) → a +ℕ k ≡ b → Σ n ꞉ ℕ , (a /2) +ℕ n ≡ (b /2)
+upCalc' zero .(zero +ℕ k) k refl = (k /2) , {!!}
+upCalc' (succ zero) .(1 +ℕ k) k refl = succ (k /2) , {!!}
+upCalc' (succ (succ a)) .(succ (succ a) +ℕ k) k refl = pr₁ IH , ({!!} ⁻¹ ∙ ap succ (pr₂ IH) ∙ γ ⁻¹)
+ where IH : Sigma ℕ (λ n → ((a /2) +ℕ n) ≡ ((a +ℕ k) /2))
+       IH = upCalc' a (a +ℕ k) k refl
+       γ : ((succ (succ a) +ℕ k) /2) ≡ ((succ (succ (a +ℕ k))) /2)
+       γ = {!!}
+
+upCalc : (a b : ℤ) (k : ℕ) → a +pos k ≡ b → Σ n ꞉ ℕ , (upRight ^ n) a ≡ (upRight ^ n) b
+upCalc a b 0 a≤b = 0 , a≤b
+upCalc a b (succ k) a≤b = k , {!!}
+ where IH : Σ n ꞉ ℕ , (upRight ^ n) a ≡ (upRight ^ n) (predℤ b)
+       IH = upCalc a (predℤ b) k {!!}
+
+probablynot : ∀ a b → upRight (upRight (a + b))
+                    ≡ upRight (upRight (a + b))
+probablynot (pos zero) (pos zero) = refl
+probablynot (pos zero) (pos (succ zero)) = refl
+probablynot (pos zero) (pos (succ (succ x₁))) = refl
+probablynot (pos (succ x)) (pos zero) = refl
+probablynot (pos (succ x)) (pos (succ x₁)) = refl
+probablynot (pos x) (negsucc x₁) = refl
+probablynot (negsucc x) (pos x₁) = refl
+probablynot (negsucc x) (negsucc x₁) = refl
 
 _+ρ_ : Realρ → Realρ → Realρ 
 (α , γα) +ρ (β , γβ) = (λ n → upRight (upRight (α n + β n))) , γ
@@ -514,3 +571,5 @@ _+ρ_ : Realρ → Realρ → Realρ
    γ : (n : ℤ) → upRight (upRight (α n + β n)) -immediatelyDownFrom-
                  upRight (upRight (α (predℤ n) + β (predℤ n))) 
    γ n = {!!}
+   δ : (n : ℤ) → (downLeft (α (predℤ n)) + downLeft (β (predℤ n))) ≤ℤ (α n + β n) ≤ℤ (downRight (α (predℤ n)) + downRight (β (predℤ n)))
+   δ n = fun-cover2 _+_ add-is-linear (α n) (β n) (α (predℤ n)) (β (predℤ n)) (γα n) (γβ n)
