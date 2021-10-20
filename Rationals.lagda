@@ -56,6 +56,9 @@ open NaturalNumbers-Properties --TypeTopology
 open Integers renaming (_*_ to _ℤ*_ ; _+_ to _ℤ+_ ; -_ to ℤ-_)
 open IntegersProperties
 
+
+-- 
+
 toℚlemma : ((x , a) : ℚₙ) → Σ ((x' , a') , p) ꞉ ℚ , (Σ h ꞉ ℕ , (x ≡ (pos (succ h)) ℤ* x') × (succ a ≡ (succ h) ℕ* succ a'))
 toℚlemma (pos a , b) = f (divbyhcf a (succ b))
  where
@@ -501,6 +504,14 @@ _≤_ : ℚ → ℚ → 𝓤₀ ̇
   f (inr (inl z)) = inr (inl (ℚ-trichotomous-lemma fe ((x , a) , α) ((y , b) , β) z))
   f (inr (inr z)) = inr (inr z)
 
+ℚ-dichotomous : Fun-Ext → (p q : ℚ) → (p ≤ q) ∔ (q < p)
+ℚ-dichotomous fe p q = I (ℚ-trichotomous fe p q)
+ where
+  I : (p < q) ∔ (p ≡ q) ∔ (q < p) → (p ≤ q) ∔ (q < p)
+  I (inl x)       = inl (inl x)
+  I (inr (inl x)) = inl (inr (ℚ≡-to-ℚₙ≡ p q x))
+  I (inr (inr x)) = inr x
+
 located-property : Fun-Ext → (p q x : ℚ) → p < q → (p < x) ∔ (x < q) 
 located-property fe p q x l = f (ℚ-trichotomous fe x q)
  where
@@ -820,6 +831,9 @@ toℚ-over-minus fe (x , a) = IV
        (- toℚ (p' ℚₙ+ q'))                                                                          ≡⟨ refl ⟩
        (- (((x , a) , p) + ((y , b) , q))) ∎
 
+ℚ-minus-zero-is-zero : zero-ℚ ≡ - zero-ℚ 
+ℚ-minus-zero-is-zero = refl
+
 ℚ+-inverse-lemma : ((x , a) : ℚₙ) → ((ℤ- x , a) ℚₙ+ (x , a)) ℚₙ≈ (pos zero , zero)
 ℚ+-inverse-lemma (x , a) = I
  where
@@ -1087,6 +1101,19 @@ open FieldAxioms
        (- (- toℚ (x , a)))   ≡⟨ ap (λ k → - (- k)) (pr₂ p-constructed ⁻¹) ⟩
        (- (- p)) ∎
 
+ℚ-zero-less-than-positive : (x y : ℕ) → zero-ℚ < toℚ ((pos (succ x)) , y)
+ℚ-zero-less-than-positive x y = <-lemma (pos 0 , 0) (pos (succ x) , y) ((pos (succ x)) , (⋆ , I))
+ where
+  I : pos 0 ℤ* pos (succ y) ℤ+ pos (succ x) ≡ pos (succ x) ℤ* pos 1
+  I = pos 0 ℤ* pos (succ y) ℤ+ pos (succ x) ≡⟨ ap (_ℤ+ (pos (succ x))) (ℤ-zero-left-is-zero (pos (succ y))) ⟩
+      pos 0 ℤ+ pos (succ x)                 ≡⟨ ℤ-zero-left-neutral (pos (succ x)) ⟩
+      pos (succ x)                          ≡⟨ ℤ-mult-right-id (pos (succ x)) ⟩
+      pos (succ x) ℤ* pos 1 ∎
+
+
+
+-- approximate-half : Σ h ꞉ ℚ , (zero-ℚ < (h + h)) × ((h + h) < 1ℚ)
+-- approximate-half = {!!}
 
 {-
 ℚ<-to-+ : (p q r : ℚ) → (p + q) < r → Σ (p' , q') ꞉ ℚ × ℚ , p' + q' ≡ r

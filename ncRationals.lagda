@@ -532,6 +532,11 @@ p ℚₙ≥ q = q ℚₙ≤ p
 ℚₙ≤-trans p q r (inr a) (inr b) = inr (a ∙ b)
 
 {-
+third-addition : (pos 1 , 2) + (pos 1 , 2) ≡ pos 2 , 2
+third-addition = {!refl!}
+-}
+
+{-
 
 ℚₙ-half-addition : ((x , a) : ℚₙ) → (x , pred (2 ℕ* succ a)) + (x , pred (2 ℕ* succ a)) ℚₙ≈ (x , a)
 ℚₙ-half-addition (x , a) = I

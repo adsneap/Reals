@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --exact-split   #-}
+{-# OPTIONS --without-K --exact-split #-}
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
 open import UF-FunExt -- TypeTopology
@@ -19,7 +19,7 @@ module NewDedekindReals
        where
 
 open PropositionalTruncation pt -- TypeTopology
-open Rationals renaming (_<_ to _ℚ<_ ; _+_ to _ℚ+_ ; _*_ to _ℚ*_ ; -_ to ℚ-_ ; _≤_ to _ℚₙ≤_)
+open Rationals renaming (_<_ to _ℚ<_ ; _+_ to _ℚ+_ ; _*_ to _ℚ*_ ; -_ to ℚ-_ ; _≤_ to _ℚ≤_)
 open UF-Powerset -- TypeTopology
 open UF-Subsingletons --Type Topology
 open UF-Subsingletons-FunExt -- TypeTopology
@@ -176,12 +176,28 @@ x # y = (x < y) ∨ (y < x)
 
 open import UF-Base --TypeTopology
 
+
+
+
+
+
+
+
+
+
+
+
+
+{-
 open NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_)
 open import Integers renaming (_+_ to ℤ+_)
-
+{-
 ⟨2/3⟩^_ : ℕ → ℚ
 ⟨2/3⟩^ 0  = toℚ (pos 1 , 0)
 ⟨2/3⟩^ (succ n)  = rec (toℚ (pos 2 , 2)) (λ k → k ℚ* toℚ (pos 2 , 2)) n
+-}
+_ℚ--_ : ℚ → ℚ → ℚ
+p ℚ-- q = p ℚ+ (ℚ- q)
 
 ℝ-order-lemma : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ) → (x y : ℚ) → x ∈ L → y ∈ R → zero-ℚ ℚ< (y ℚ+ (ℚ- x))
 ℝ-order-lemma ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) x y x-L y-R = ℚ<-subtraction''' fe x y I
@@ -189,61 +205,138 @@ open import Integers renaming (_+_ to ℤ+_)
   I : x ℚ< y
   I = disjoint x y (x-L , y-R)
 
-ℝ-arithmetically-located : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
-                         → (p : ℚ)
-                         → zero-ℚ ℚ< p
-                         → ∃ (e , t) ꞉ ℚ × ℚ , e ∈ L
-                                              × t ∈ R
-                                              × (zero-ℚ ℚ< (t ℚ+ (ℚ- e)))
-                                              × ((t ℚ+ (ℚ- e)) ℚ< p)
-ℝ-arithmetically-located ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-functor I d
+open import TestingGround
+
+_ℚ<_ℚ<_ : ℚ → ℚ → ℚ → 𝓤₀ ̇
+a ℚ< b ℚ< c = (a ℚ< b) × (b ℚ< c)
+
+foo : ⟨2/3⟩^ 1 ≡ ((⟨2/3⟩^ 0) ℚ* 2/3)
+foo = blah
  where
-  d : ∃ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
-                                   × b₀ ∈ R
-                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
-  d = ∥∥-functor δ (binary-choice inhabited-left inhabited-right)
+  abstract
+   blah : ⟨2/3⟩^ 1 ≡ ((⟨2/3⟩^ 0) ℚ* 2/3)
+   blah = ℚ-mult-left-id fe 2/3 ⁻¹
+
+ral-lemma : (n : ℕ) → ⟨2/3⟩^ succ n ≡ ((⟨2/3⟩^ n) ℚ* 2/3)
+ral-lemma zero = foo -- (ℚ-mult-left-id fe 2/3) ⁻¹
+ral-lemma (succ n) = refl
+
+ral-lemma₂ : Fun-Ext → (q : ℚ) → (n : ℕ) → ((⟨2/3⟩^ n) ℚ* 2/3) ℚ* q ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* q))  
+ral-lemma₂ fe q n = ℚ*-assoc fe (⟨2/3⟩^ n) 2/3 q
+
+ral-lemma₃ : Fun-Ext → (q : ℚ) → (n : ℕ) → (⟨2/3⟩^ succ n) ℚ* q ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* q))
+ral-lemma₃ fe q n = ap (_ℚ* q) (ral-lemma n) ∙ ral-lemma₂ fe q n
+
+{-
+Want to show Σ x y , 0 < (y - x) < p ,x ∈ L, y ∈ R
+x ∈ L
+y ∈ R
+
+x < x' < y' < y
+
+y' - x = 2/3 (y - x)
+
+locatedness x' y' - x' ∈ L, y' ∈ R
+
+Σ n , (2/3)^n * (y - x) < p
+
+Σ x' y' , x' ∈ L , y' ∈ R , 0 < (y' - x') < p
+
+Suggestion : Define y' = (2/3)^n * y' , (2/3)^n x'
+ Maybe a stronger n 
+
+-}
+
+ℝ-arithmetically-located' : (((L , R) , _) : ℝ)
+              → (p : ℚ)
+              → zero-ℚ ℚ< p
+              → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+ℝ-arithmetically-located' ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
+ where
+  I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+  I ((x , x-L) , (y , y-R)) = II {!!} {!!}
    where
-    δ : (Σ a ꞉ ℚ , a ∈ L) × (Σ b ꞉ ℚ , b ∈ R) → Σ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
-                                                                              × b₀ ∈ R
-                                                                              × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
-    δ ((a , a-L) , b , b-R) = (a , b , {!!}) , a-L , (b-R , {!!})
-    
-  
-  I : Σ (a₀ , b₀ , n) ꞉ ℚ × ℚ × ℕ , (a₀ ∈ L
-                                   × b₀ ∈ R
-                                   × (((b₀ ℚ+ (ℚ- a₀)) ℚ* (⟨2/3⟩^ n)) ℚ< p))
-    → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
-  I ((a₀ , b₀ , zero)   , a₀-L , b₀-R , l')   = (a₀ , b₀) , (a₀-L , b₀-R , (ℝ-order-lemma (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) ) a₀ b₀ a₀-L b₀-R , transport (_ℚ< p) (ℚ-mult-right-id fe (b₀ ℚ+ (ℚ- a₀))) l'))
-  I ((a₀ , b₀ , succ n) , a₀-L , b₀-R , l') = {!II!}
-   where
-    II : (Σ (aₙ , bₙ) ꞉ ℚ × ℚ , aₙ ∈ L × bₙ ∈ R × ((bₙ ℚ+ (ℚ- aₙ)) ℚ< p) × {!!}) → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
-    II = induction base step n
+    II : (n : ℕ) → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+    II zero l₂            = ∣ (x , y) , x-L , y-R , α , β ∣
      where
-      base : {!!}
-      base = {!!}
+      abstract
+       α : zero-ℚ ℚ< (y ℚ-- x)
+       α =  ℚ<-subtraction''' fe x y (disjoint x y (x-L , y-R))
+       β : (y ℚ-- x) ℚ< p
+       β = (transport (_ℚ< p) (ℚ-mult-left-id fe (y ℚ-- x))) l₂
+     
+    II (succ zero) l₂     = {!!}
+    II (succ (succ n)) l₂ = II (succ n) {!!}
+     where
+      III : (Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x))) → ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ℚ< p
+      III ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) = {!!}
 
-      step : {!!}
-      step = {!!}
-  
-
-
-  {-  ∥∥-rec {!!} III (II II-lemma)
+-- This function allows succ n. I can't fill these holes, since I need to know if x' ∈ L or y' ∈ R
+-- The next function shows that once I know the above, I can complete the induction. Unfortunately, it results in termination problems. I'm not sure how to tackle this.
+last-attempt : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
+                          → (p : ℚ)
+                          → zero-ℚ ℚ< p
+                          → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
+last-attempt ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
+ where
+  I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+  I ((x , x-L) , (y , y-R)) = II x y x-L y-R {!!} (trisect fe x y (disjoint x y (x-L , y-R))) {!!} 
    where
-    x y : ℚ
-    x = {!? ℚ!} -- a₀ + (b₀ - a₀) * 1/3
-    y = {!!} -- a₀ + (b₀ - a₀) * 2/3
-    II-lemma : x ℚ< y
-    II-lemma = {!!} -- because b₀ - a₀ > 0, a₀ ∈ L, b₀ ∈ R
-    II : x ℚ< y → x ∈ L ∨ y ∈ R
-    II = located x y
-    III : x ∈ L ∔ y ∈ R → Σ (e , t) ꞉ ℚ × ℚ , e ∈ L × t ∈ R × (zero-ℚ ℚ< (t ℚ+ (ℚ- e))) × ((t ℚ+ (ℚ- e)) ℚ< p)
-    III (inl z) = (x , b₀) , (z , (b₀-R , ({!!} , {!!})))
-    III (inr z) = {!!}
-  -}
-  -- 2/3^_+1 = rec (toQ (pos 2 , 2)) (\k -> k Q* k)
-  
-ℝ-addition-lemma : (((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
-                    ((L-y , R-y) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) : ℝ)
+    II : (x y : ℚ) → x ∈ L → y ∈ R → (n : ℕ) → (Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x)))
+       → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p
+       → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
+    II x y x-L y-R zero ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄            = ∣ (x , y) , x-L , y-R , {!!} , {!!} ∣
+    II x y x-L y-R (succ zero) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄     = {!!}
+    II x y x-L y-R (succ (succ n)) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄ = II {!!} {!!} {!!} {!!} (succ n) {!!} {!!} -- ∥∥-rec ∃-is-prop IH (located x' y' l₂)
+     where
+      split : x' ∈ L ∔ y' ∈ R → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
+      split (inl x'-L) = II {!!} {!!} {!!} {!!} n {!!} {!!}
+      split (inr y'-R) = {!!}
+
+
+ℝ-arithmetically-located : (((L , R) , _) : ℝ)
+              → (p : ℚ)
+              → zero-ℚ ℚ< p
+              → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+ℝ-arithmetically-located ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
+ where
+  I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+  I ((x , x-L) , (y , y-R)) = II x y x-L y-R (trisect fe x y (disjoint x y (x-L , y-R))) {!!} {!!} -- II (trisect fe x y (disjoint x y (x-L , y-R)))
+   where
+    II : (x y : ℚ) → x ∈ L → y ∈ R
+       → Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x))
+       → (n : ℕ) → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p
+       → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
+    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) zero l₅ = {!!} -- ∣ (x , y) , (x-L , (y-R , ((ℚ<-subtraction''' fe x y (disjoint x y (x-L , y-R))) , (transport (_ℚ< p) (ℚ-mult-left-id fe (y ℚ-- x)) l₅)))) ∣
+    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) (succ zero) l₅ = {!!}
+     where
+      III : x' ∈ L ∔ y' ∈ R → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
+      III (inl x'-L) = {!!} -- ∣ (x' , y) , (x'-L , (y-R , ((ℚ<-subtraction''' fe x' y (ℚ<-trans x' y' y l₂ l₃)) , (transport (_ℚ< p) (e₁ ⁻¹) l₅)))) ∣
+      III (inr y'-R) = {!!}
+    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) (succ (succ n)) l₅ = ∥∥-rec ∃-is-prop III (located x' y' l₂)
+     where
+      III : x' ∈ L ∔ y' ∈ R → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
+      III (inl x'-L) = {!!} -- II x' y x'-L y-R (trisect fe x' y (ℚ<-trans x' y' y l₂ l₃)) (succ n) (transport (_ℚ< p) v l₅)
+       where
+        i : ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* (y ℚ-- x)))
+        i = ral-lemma₃ fe (y ℚ-- x) n
+        ii :  ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* (y ℚ-- x))) ≡  ( (⟨2/3⟩^ n) ℚ* (y ℚ-- x'))
+        ii = ap ((⟨2/3⟩^ n) ℚ*_) (e₁ ⁻¹)
+        iii : ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ n) ℚ* (y ℚ-- x'))
+        iii = i ∙ ii
+        iv : ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ (succ (succ n))) ℚ* (y ℚ-- x)) 
+        iv = refl
+        v : ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡ (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* (y ℚ-- x'))
+        v = ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡⟨ iv ⁻¹ ⟩
+             ( ((⟨2/3⟩^ (succ (succ n))) ℚ* (y ℚ-- x)))        ≡⟨ ral-lemma₃ fe (y ℚ-- x) (succ  n) ⟩
+             ((⟨2/3⟩^ succ n) ℚ* (2/3 ℚ* (y ℚ-- x)))           ≡⟨ ap (((⟨2/3⟩^ succ n)) ℚ*_) (e₁ ⁻¹) ⟩
+             ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x'))                   ≡⟨ refl ⟩
+             (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* (y ℚ-- x')) ∎
+      III (inr y'-R) = II {!!} {!!} {!!} {!!} {!!} n {!!}
+
+
+ℝ-addition-lemma : (((L-x , R-x) , _)
+                    ((L-y , R-y) , _) : ℝ)
                  → (p q : ℚ)
                  → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ L-x × s ∈ L-y × p ℚ< (r ℚ+ s) → ∃ (r , s) ꞉ ℚ × ℚ , r ∈ L-x × s ∈ L-y × (p ≡ r ℚ+ s))
                  ×  ((∃ (r , s) ꞉ ℚ × ℚ , r ∈ R-x × s ∈ R-y × ((r ℚ+ s)) ℚ< q) → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ R-x × s ∈ R-y × (q ≡ r ℚ+ s)))
@@ -453,7 +546,7 @@ _+_ : ℝ → ℝ → ℝ
   located-z p q l = I (ℚ<-subtraction'' fe p q l)
    where
     I : (Σ k ꞉ ℚ , (zero-ℚ ℚ< k) × (k ≡ (q ℚ+ (ℚ- p)))) → (p ∈ L-z) ∨ (q ∈ R-z)
-    I (k , l' , e') = II (ℝ-arithmetically-located (((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)) k l')
+    I (k , l' , e') = II (ℝ-arithmetically-located (((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)) k l') -- arithmetically located functoion goes here
      where
       II : (∃ (e , t) ꞉ ℚ × ℚ , e ∈ L-x × t ∈ R-x × (zero-ℚ ℚ< (t ℚ+ (ℚ- e)) ) × ((t ℚ+ (ℚ- e)) ℚ< k)) → (p ∈ L-z) ∨ (q ∈ R-z)
       II = ∥∥-rec ∨-is-prop δ
@@ -505,11 +598,11 @@ _+_ : ℝ → ℝ → ℝ
             i : p ℚ< (e ℚ+ x)
             i = transport₂ _ℚ<_ ii iii (ℚ-addition-preserves-order (p ℚ+ (ℚ- e)) x e (pr₁ (pr₂ γ)))
              where
-              ii : ((p ℚ+ (ℚ- e)) ℚ+ e) ≡ p
-              ii = ((p ℚ+ (ℚ- e)) ℚ+ e) ≡⟨ ℚ+-assoc fe p (ℚ- e) e ⟩
-                   (p ℚ+ ((ℚ- e) ℚ+ e)) ≡⟨ ap (p ℚ+_) (ℚ-inverse-sum-to-zero' fe e) ⟩
-                   p ℚ+ zero-ℚ          ≡⟨ ℚ-zero-right-neutral fe p ⟩
-                   p ∎
+              ii : (p ℚ+ (ℚ- e)) ℚ+ e ≡ p
+              ii = (p ℚ+ (ℚ- e)) ℚ+ e    ≡⟨ ℚ+-assoc fe p (ℚ- e) e ⟩
+                    p ℚ+ ((ℚ- e) ℚ+ e)   ≡⟨ ap (p ℚ+_) (ℚ-inverse-sum-to-zero' fe e) ⟩
+                    p ℚ+ zero-ℚ          ≡⟨ ℚ-zero-right-neutral fe p ⟩
+                    p                    ∎
               iii : x ℚ+ e ≡ (e ℚ+ x)
               iii = ℚ+-comm x e
           η (inr y-r) = inr (helper₂ ∣ (t , y) , (r-x , y-r , i) ∣)
@@ -519,12 +612,12 @@ _+_ : ℝ → ℝ → ℝ
              where
               ii : y ℚ+ t ≡ t ℚ+ y
               ii = ℚ+-comm y t
-              iii : ((q ℚ+ (ℚ- t)) ℚ+ t) ≡ q
-              iii = ((q ℚ+ (ℚ- t)) ℚ+ t) ≡⟨ ℚ+-assoc fe q (ℚ- t) t ⟩
-                     (q ℚ+ ((ℚ- t) ℚ+ t)) ≡⟨ ap (q ℚ+_) (ℚ-inverse-sum-to-zero' fe t) ⟩
-                     q ℚ+ zero-ℚ          ≡⟨ ℚ-zero-right-neutral fe q ⟩
-                     q ∎
+              iii : (q ℚ+ (ℚ- t)) ℚ+ t ≡ q
+              iii = (q ℚ+ (ℚ- t)) ℚ+ t  ≡⟨ ℚ+-assoc fe q (ℚ- t) t ⟩
+                     q ℚ+ ((ℚ- t) ℚ+ t) ≡⟨ ap (q ℚ+_) (ℚ-inverse-sum-to-zero' fe t) ⟩
+                     q ℚ+ zero-ℚ        ≡⟨ ℚ-zero-right-neutral fe q ⟩
+                     q                  ∎
           
-
+-}
 
 

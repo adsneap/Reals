@@ -8,7 +8,7 @@ open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_) --TypeTop
 height-preserves-≤-lemma₀ : (m : ℕ) → height (succ m) ℕ≤ succ (height m)
 height-preserves-≤-lemma₀ zero     = ⋆
 height-preserves-≤-lemma₀ (succ m) = I
- whereg
+ where
   I : size (Succ (Succ (binary m))) ℕ≤ succ (size (Succ (binary m)))
   I = {!!}
 
