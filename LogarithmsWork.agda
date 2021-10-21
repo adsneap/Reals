@@ -4,7 +4,7 @@ module LogarithmsWork where
 
 open import BinaryNaturals --TypeTopology
 open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_) --TypeTopology
-
+{-
 height-preserves-≤-lemma₀ : (m : ℕ) → height (succ m) ℕ≤ succ (height m)
 height-preserves-≤-lemma₀ zero     = ⋆
 height-preserves-≤-lemma₀ (succ m) = I
@@ -71,7 +71,7 @@ height-preserves-≤ m = induction base step
 
       III : height m ℕ≤ height m
       III = ≤-refl (height m)
-
+-}
 -- The following code is not productive. Need to be very careful about less than since I am working with floors. Going to be a lot more difficult than first anticipated.
 {-
 need-this : (m : ℕ) → height m ℕ< height (succ m)
@@ -102,7 +102,7 @@ height-preserves-< m = induction base step
 
 open import Integers 
 open import ncRationals renaming (_<_ to _ℚₙ<)
-open import Rationals renaming (_<_ to _ℚ<_)
+open import Rationals renaming (_<_ to _ℚ<_ ; _*_ to _ℚ*_ ; _≤_ to _ℚ≤_)
 open import IntegersOrder renaming (_<_ to _ℤ<_)
 
 embedding-ℕ-in-ℚ : ℕ → ℚ
@@ -120,9 +120,20 @@ embedding-preserves-order m n l = I
 embedding-ℤ-in-ℚ : ℤ → ℚ
 embedding-ℤ-in-ℚ z = toℚ (z , 0)
 
-
-
+{-
 ℚ-floor : (q : ℚ) → Σ z ꞉ ℤ , ((embedding-ℤ-in-ℚ z) ℚ< q) × {!!}
 ℚ-floor q = {!!}
+-}
 
+-- Work with positive bases
 
+_ℚ^_ : ℚ → ℕ → ℚ
+q ℚ^ zero   = toℚ (pos 1 , 0)
+q ℚ^ succ n = rec q (_ℚ* q) n
+
+_ℚ<_ℚ<_ : (q1 q2 q3 : ℚ) → 𝓤₀ ̇
+q1 ℚ< q2 ℚ< q3 = (q1 ℚ< q2) × (q2 ℚ< q3)
+
+log_base_ : (q : ℚ) → (b : ℕ) → Σ n ꞉ ℕ , ((toℚ (pos b , 0) ℚ^ n) ℚ≤ q) × (q ℚ< (toℚ (pos b , 0) ℚ^ n))
+log q base zero   = ?
+log q base succ b = {!!}

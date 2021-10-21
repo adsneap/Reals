@@ -175,27 +175,15 @@ x # y = (x < y) ∨ (y < x)
 #-is-prop _ _ = ∨-is-prop
 
 open import UF-Base --TypeTopology
-
-
-
-
-
-
-
-
-
-
-
-
-
-{-
 open NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_)
 open import Integers renaming (_+_ to ℤ+_)
+
 {-
 ⟨2/3⟩^_ : ℕ → ℚ
 ⟨2/3⟩^ 0  = toℚ (pos 1 , 0)
 ⟨2/3⟩^ (succ n)  = rec (toℚ (pos 2 , 2)) (λ k → k ℚ* toℚ (pos 2 , 2)) n
 -}
+
 _ℚ--_ : ℚ → ℚ → ℚ
 p ℚ-- q = p ℚ+ (ℚ- q)
 
@@ -210,130 +198,74 @@ open import TestingGround
 _ℚ<_ℚ<_ : ℚ → ℚ → ℚ → 𝓤₀ ̇
 a ℚ< b ℚ< c = (a ℚ< b) × (b ℚ< c)
 
-foo : ⟨2/3⟩^ 1 ≡ ((⟨2/3⟩^ 0) ℚ* 2/3)
-foo = blah
+ral-lemma : (α β : ℚ) → (n : ℕ) → β ≡ 2/3 ℚ* α → ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* α) ≡ (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* β)
+ral-lemma α β n e = ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* α) ≡⟨ refl ⟩
+               (((⟨2/3⟩^ (succ (succ n))) ℚ* α) )         ≡⟨ ap (_ℚ* α) (I (succ n)) ⟩
+               (((⟨2/3⟩^ succ n) ℚ* 2/3) ℚ* α)            ≡⟨ ℚ*-assoc fe (⟨2/3⟩^ (succ n)) 2/3 α ⟩
+               ((⟨2/3⟩^ succ n) ℚ* (2/3 ℚ* α))            ≡⟨ ap ((⟨2/3⟩^ (succ n)) ℚ*_) (e ⁻¹) ⟩
+               (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* β) ∎
  where
-  abstract
-   blah : ⟨2/3⟩^ 1 ≡ ((⟨2/3⟩^ 0) ℚ* 2/3)
-   blah = ℚ-mult-left-id fe 2/3 ⁻¹
-
-ral-lemma : (n : ℕ) → ⟨2/3⟩^ succ n ≡ ((⟨2/3⟩^ n) ℚ* 2/3)
-ral-lemma zero = foo -- (ℚ-mult-left-id fe 2/3) ⁻¹
-ral-lemma (succ n) = refl
-
-ral-lemma₂ : Fun-Ext → (q : ℚ) → (n : ℕ) → ((⟨2/3⟩^ n) ℚ* 2/3) ℚ* q ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* q))  
-ral-lemma₂ fe q n = ℚ*-assoc fe (⟨2/3⟩^ n) 2/3 q
-
-ral-lemma₃ : Fun-Ext → (q : ℚ) → (n : ℕ) → (⟨2/3⟩^ succ n) ℚ* q ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* q))
-ral-lemma₃ fe q n = ap (_ℚ* q) (ral-lemma n) ∙ ral-lemma₂ fe q n
-
-{-
-Want to show Σ x y , 0 < (y - x) < p ,x ∈ L, y ∈ R
-x ∈ L
-y ∈ R
-
-x < x' < y' < y
-
-y' - x = 2/3 (y - x)
-
-locatedness x' y' - x' ∈ L, y' ∈ R
-
-Σ n , (2/3)^n * (y - x) < p
-
-Σ x' y' , x' ∈ L , y' ∈ R , 0 < (y' - x') < p
-
-Suggestion : Define y' = (2/3)^n * y' , (2/3)^n x'
- Maybe a stronger n 
-
--}
-
-ℝ-arithmetically-located' : (((L , R) , _) : ℝ)
-              → (p : ℚ)
-              → zero-ℚ ℚ< p
-              → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
-ℝ-arithmetically-located' ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
- where
-  I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
-  I ((x , x-L) , (y , y-R)) = II {!!} {!!}
+  I : (n : ℕ) → ⟨2/3⟩^ (succ n) ≡ ((⟨2/3⟩^ n) ℚ* 2/3)
+  I zero = f
    where
-    II : (n : ℕ) → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
-    II zero l₂            = ∣ (x , y) , x-L , y-R , α , β ∣
-     where
-      abstract
-       α : zero-ℚ ℚ< (y ℚ-- x)
-       α =  ℚ<-subtraction''' fe x y (disjoint x y (x-L , y-R))
-       β : (y ℚ-- x) ℚ< p
-       β = (transport (_ℚ< p) (ℚ-mult-left-id fe (y ℚ-- x))) l₂
-     
-    II (succ zero) l₂     = {!!}
-    II (succ (succ n)) l₂ = II (succ n) {!!}
-     where
-      III : (Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x))) → ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ℚ< p
-      III ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) = {!!}
+    abstract
+     f : ⟨2/3⟩^ (succ 0) ≡ ((⟨2/3⟩^ 0) ℚ* 2/3)
+     f = (ℚ-mult-left-id fe 2/3) ⁻¹
+  I (succ n) = refl
 
--- This function allows succ n. I can't fill these holes, since I need to know if x' ∈ L or y' ∈ R
--- The next function shows that once I know the above, I can complete the induction. Unfortunately, it results in termination problems. I'm not sure how to tackle this.
-last-attempt : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
+exists-2/3-n : (x y p : ℚ) → x ℚ< y → zero-ℚ ℚ< p → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p)
+exists-2/3-n x y p l₁ l₂ = {!!} , {!!}
+
+ℝ-arithmetically-located : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
                           → (p : ℚ)
                           → zero-ℚ ℚ< p
                           → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
-last-attempt ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
- where
-  I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
-  I ((x , x-L) , (y , y-R)) = II x y x-L y-R {!!} (trisect fe x y (disjoint x y (x-L , y-R))) {!!} 
-   where
-    II : (x y : ℚ) → x ∈ L → y ∈ R → (n : ℕ) → (Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x)))
-       → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p
-       → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
-    II x y x-L y-R zero ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄            = ∣ (x , y) , x-L , y-R , {!!} , {!!} ∣
-    II x y x-L y-R (succ zero) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄     = {!!}
-    II x y x-L y-R (succ (succ n)) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄ = II {!!} {!!} {!!} {!!} (succ n) {!!} {!!} -- ∥∥-rec ∃-is-prop IH (located x' y' l₂)
-     where
-      split : x' ∈ L ∔ y' ∈ R → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
-      split (inl x'-L) = II {!!} {!!} {!!} {!!} n {!!} {!!}
-      split (inr y'-R) = {!!}
-
-
-ℝ-arithmetically-located : (((L , R) , _) : ℝ)
-              → (p : ℚ)
-              → zero-ℚ ℚ< p
-              → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
 ℝ-arithmetically-located ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) p l = ∥∥-rec ∃-is-prop I (binary-choice inhabited-left inhabited-right)
  where
   I : (Σ x ꞉ ℚ , x ∈ L) × (Σ y ꞉ ℚ , y ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
-  I ((x , x-L) , (y , y-R)) = II x y x-L y-R (trisect fe x y (disjoint x y (x-L , y-R))) {!!} {!!} -- II (trisect fe x y (disjoint x y (x-L , y-R)))
+  I ((x , x-L) , (y , y-R)) = II x y x-L y-R (pr₁ γ) (trisect fe x y (disjoint x y (x-L , y-R))) (pr₂ γ) 
    where
-    II : (x y : ℚ) → x ∈ L → y ∈ R
-       → Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x))
-       → (n : ℕ) → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p
-       → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
-    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) zero l₅ = {!!} -- ∣ (x , y) , (x-L , (y-R , ((ℚ<-subtraction''' fe x y (disjoint x y (x-L , y-R))) , (transport (_ℚ< p) (ℚ-mult-left-id fe (y ℚ-- x)) l₅)))) ∣
-    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) (succ zero) l₅ = {!!}
+    γ : Sigma ℕ (λ n → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p)
+    γ = exists-2/3-n x y p (disjoint x y (x-L , y-R)) l
+    
+    II : (x y : ℚ) → x ∈ L → y ∈ R → (n : ℕ) → (Σ (x' , y') ꞉ ℚ × ℚ , (x ℚ< x') × (x' ℚ< y') × (y' ℚ< y) × ((y ℚ-- x') ≡ (2/3 ℚ* (y ℚ-- x))) × (y' ℚ-- x ≡ 2/3 ℚ* (y ℚ-- x)))
+       → ((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p
+       → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
+    II x y x-L y-R zero ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄            = ∣ (x , y) , x-L , y-R , α , β ∣
      where
-      III : x' ∈ L ∔ y' ∈ R → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
-      III (inl x'-L) = {!!} -- ∣ (x' , y) , (x'-L , (y-R , ((ℚ<-subtraction''' fe x' y (ℚ<-trans x' y' y l₂ l₃)) , (transport (_ℚ< p) (e₁ ⁻¹) l₅)))) ∣
-      III (inr y'-R) = {!!}
-    II x y x-L y-R ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) (succ (succ n)) l₅ = ∥∥-rec ∃-is-prop III (located x' y' l₂)
+      abstract
+       α : zero-ℚ ℚ< (y ℚ-- x)
+       α = ℚ<-subtraction''' fe x y (disjoint x y (x-L , y-R))
+       β : (y ℚ-- x) ℚ< p
+       β = transport (_ℚ< p) (ℚ-mult-left-id fe (y ℚ-- x)) l₄
+      
+    II x y x-L y-R (succ zero) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄     = ∥∥-rec ∃-is-prop III (located x' y' l₂)
      where
-      III : x' ∈ L ∔ y' ∈ R → ∃ (x' , y') ꞉ ℚ × ℚ , x' ∈ L × y' ∈ R × (zero-ℚ ℚ< (y' ℚ-- x') ℚ< p)
-      III (inl x'-L) = {!!} -- II x' y x'-L y-R (trisect fe x' y (ℚ<-trans x' y' y l₂ l₃)) (succ n) (transport (_ℚ< p) v l₅)
+      III : (x' ∈ L) ∔ (y' ∈ R) → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x) ℚ< p)
+      III (inl x'-L) = ∣ (x' , y) , x'-L , y-R , α , β ∣
        where
-        i : ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* (y ℚ-- x)))
-        i = ral-lemma₃ fe (y ℚ-- x) n
-        ii :  ((⟨2/3⟩^ n) ℚ* (2/3 ℚ* (y ℚ-- x))) ≡  ( (⟨2/3⟩^ n) ℚ* (y ℚ-- x'))
-        ii = ap ((⟨2/3⟩^ n) ℚ*_) (e₁ ⁻¹)
-        iii : ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ n) ℚ* (y ℚ-- x'))
-        iii = i ∙ ii
-        iv : ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡ ((⟨2/3⟩^ (succ (succ n))) ℚ* (y ℚ-- x)) 
-        iv = refl
-        v : ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡ (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* (y ℚ-- x'))
-        v = ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* (y ℚ-- x)) ≡⟨ iv ⁻¹ ⟩
-             ( ((⟨2/3⟩^ (succ (succ n))) ℚ* (y ℚ-- x)))        ≡⟨ ral-lemma₃ fe (y ℚ-- x) (succ  n) ⟩
-             ((⟨2/3⟩^ succ n) ℚ* (2/3 ℚ* (y ℚ-- x)))           ≡⟨ ap (((⟨2/3⟩^ succ n)) ℚ*_) (e₁ ⁻¹) ⟩
-             ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x'))                   ≡⟨ refl ⟩
-             (rec 2/3 (λ k → k ℚ* 2/3) n ℚ* (y ℚ-- x')) ∎
-      III (inr y'-R) = II {!!} {!!} {!!} {!!} {!!} n {!!}
-
+        abstract
+         α : zero-ℚ ℚ< (y ℚ-- x')
+         α = ℚ<-subtraction''' fe x' y (disjoint x' y (x'-L , y-R))
+         β : (y ℚ-- x') ℚ< p
+         β = transport (_ℚ< p) (e₁ ⁻¹) l₄
+      III (inr y'-R) = ∣ (x , y') , x-L , y'-R , α , β ∣
+       where
+        abstract
+         α : zero-ℚ ℚ< (y' ℚ-- x)
+         α = ℚ<-subtraction''' fe x y' (disjoint x y' (x-L , y'-R))
+         β : (y' ℚ-- x) ℚ< p
+         β = transport (_ℚ< p) (e₂ ⁻¹) l₄
+    II x y x-L y-R (succ (succ n)) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄ =
+      ∥∥-induction (λ _ → ∃-is-prop)
+        (cases (λ x'-L → II x' y  x'-L y-R  (succ n) (trisect fe x' y (ℚ<-trans x' y' y l₂ l₃)) III)
+               (λ y'-R → II x  y' x-L  y'-R (succ n) (trisect fe x y' (ℚ<-trans x x' y' l₁ l₂)) IV))
+        (located x' y' l₂)
+     where
+      III : ((⟨2/3⟩^ succ n) ℚ* (y ℚ-- x')) ℚ< p
+      III = transport (_ℚ< p) (ral-lemma (y ℚ-- x) (y ℚ-- x') n e₁) l₄
+      IV : ((⟨2/3⟩^ succ n) ℚ* (y' ℚ-- x)) ℚ< p
+      IV = transport (_ℚ< p) (ral-lemma (y ℚ-- x) (y' ℚ-- x) n e₂) l₄
 
 ℝ-addition-lemma : (((L-x , R-x) , _)
                     ((L-y , R-y) , _) : ℝ)
@@ -617,7 +549,21 @@ _+_ : ℝ → ℝ → ℝ
                      q ℚ+ ((ℚ- t) ℚ+ t) ≡⟨ ap (q ℚ+_) (ℚ-inverse-sum-to-zero' fe t) ⟩
                      q ℚ+ zero-ℚ        ≡⟨ ℚ-zero-right-neutral fe q ⟩
                      q                  ∎
-          
--}
 
+ℝ+-comm : (a b : ℝ) → a + b ≡ b + a
+ℝ+-comm ((Lx , Rx) , _) ((Ly , Ry) , _) = to-subtype-≡ (λ (L , R)  → isCut-is-prop L R) I
+ where
+  I : (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Lx × s ∈ Ly × (p ≡ r ℚ+ s)) , ∃-is-prop) , (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Rx × s ∈ Ry × (p ≡ r ℚ+ s)) , ∃-is-prop)
+    ≡ (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Ly × s ∈ Lx × (p ≡ r ℚ+ s)) , ∃-is-prop) , (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Ry × s ∈ Rx × (p ≡ r ℚ+ s)) , ∃-is-prop)
+  I = to-×-≡ II III
+   where
+    II :  (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Lx × s ∈ Ly × (p ≡ r ℚ+ s)) , ∃-is-prop) ≡  (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Ly × s ∈ Lx × (p ≡ r ℚ+ s)) , ∃-is-prop)
+    II = Π-is-prop fe i (λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Lx × s ∈ Ly × (p ≡ r ℚ+ s)) , ∃-is-prop) λ p → (∃ (r , s) ꞉ ℚ × ℚ , r ∈ Ly × s ∈ Lx × (p ≡ r ℚ+ s)) , ∃-is-prop
+     where
+      i : (p : ℚ) → is-prop Ω₀
+      i p α β = {!!}
+    III : {!!}
+    III = {!!}
 
+ℝ+-comm' : (a b : ℝ) → a + b ≡ b + a
+ℝ+-comm' ((Lx , Rx) , _) ((Ly , Ry) , _) = to-subtype-≡ {!!} {!subset-extensionality!}
