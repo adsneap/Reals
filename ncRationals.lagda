@@ -531,6 +531,8 @@ p ℚₙ≥ q = q ℚₙ≤ p
 ℚₙ≤-trans p q r (inr a) (inl b) = inl (transport (_< r) (a ⁻¹) b)
 ℚₙ≤-trans p q r (inr a) (inr b) = inr (a ∙ b)
 
+
+
 {-
 third-addition : (pos 1 , 2) + (pos 1 , 2) ≡ pos 2 , 2
 third-addition = {!refl!}

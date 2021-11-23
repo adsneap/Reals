@@ -159,14 +159,164 @@ one-ℝ = embedding-ℚ-to-ℝ 1ℚ
 _<_ : ℝ → ℝ → 𝓤₀ ̇
 ((Lx , Rx) , isCutx) < ((Ly , Ry) , isCuty) = ∃ q ꞉ ℚ , q ∈ Rx × q ∈ Ly
 
+--Could write a ℚ function obtaining this. Inhabited-right x, inhabited left y, 
+
 _≤_ : ℝ → ℝ → 𝓤₀ ̇
 ((Lx , Rx) , isCutx) ≤ ((Ly , Ry) , isCuty) = (q : ℚ) → q ∈ Lx → q ∈ Ly
+
+{-
+lemma11-2-2 : (((L , R) , cut) : ℝ) → (q : ℚ) → (q ∈ L ⇔ (embedding-ℚ-to-ℝ q < (((L , R) , cut)))) × (q ∈ R ⇔ (((L , R) , cut) < (embedding-ℚ-to-ℝ) q))
+lemma11-2-2 ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) q = (I , II) , (III , IV)
+ where
+  I : q ∈ L → embedding-ℚ-to-ℝ q < ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located)
+  I q-L = (pr₁ (rounded-left q)) q-L
+  
+  II : embedding-ℚ-to-ℝ q < ((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) → q ∈ L
+  II exists-p = ∥∥-rec (∈-is-prop L q) i exists-p
+   where
+    i : (Σ p ꞉ ℚ , p ∈ pr₂ (pr₁ (embedding-ℚ-to-ℝ q)) × p ∈ L) → q ∈ L
+    i (p , (p-Rq , p-Lx)) = (pr₂ (rounded-left q)) ∣ p , ({!!} , p-Lx) ∣
+  
+  III : {!!}
+  III = {!!}
+  
+  IV : {!!}
+  IV = {!!}
+
+-}
 
 <-is-prop : (x y : ℝ) → is-prop (x < y)
 <-is-prop x y = ∃-is-prop
 
 ≤-is-prop : (x y : ℝ) → is-prop (x ≤ y)
 ≤-is-prop ((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) = Π₂-is-prop fe (λ q _ → ∈-is-prop Ly q)
+
+max : ℝ → ℝ → ℝ
+max ((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((L-y , R-y) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) = (L-z , R-z) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
+ where
+  L-z : ℚ-subset-of-propositions
+  L-z q = (q ∈ L-x ∨ q ∈ L-y) , ∨-is-prop
+
+  R-z : ℚ-subset-of-propositions
+  R-z q = (q ∈ R-x × q ∈ R-y) , ×-is-prop (∈-is-prop R-x q) (∈-is-prop R-y q)
+  
+  inhabited-left-z : inhabited-left L-z
+  inhabited-left-z = ∥∥-functor i inhabited-left-x
+   where
+    i : Σ p ꞉ ℚ , p ∈ L-x → Σ p ꞉ ℚ , p ∈ L-z
+    i (p , p-Lx) = p , ∣ inl p-Lx ∣
+  
+  inhabited-right-z : inhabited-right R-z
+  inhabited-right-z = ∥∥-functor i exists-pq
+   where
+    exists-pq : ∥ (Σ p ꞉ ℚ , p ∈ R-x) × (Σ q ꞉ ℚ , q ∈ R-y) ∥
+    exists-pq = binary-choice inhabited-right-x inhabited-right-y
+    i : (Σ p ꞉ ℚ , p ∈ R-x) × (Σ q ꞉ ℚ , q ∈ R-y) → Σ r ꞉ ℚ , r ∈ R-z
+    i ((p , p-Rx) , q , q-Ry) = ii (ℚ-trichotomous fe p q)
+     where
+      ii : (p ℚ< q) ∔ (p ≡ q) ∔ (q ℚ< p) → Σ r ꞉ ℚ , r ∈ R-z
+      ii (inl l) = q , (lemma ∣ p , (l , p-Rx) ∣ , q-Ry)
+       where
+        lemma : ∃ p ꞉ ℚ , (p ℚ< q) × p ∈ R-x → q ∈ R-x
+        lemma = pr₂ (rounded-right-x q)
+      ii (inr (inl l)) = p , (p-Rx , transport (_∈ R-y) (l ⁻¹) q-Ry)
+      ii (inr (inr l)) = p , (p-Rx , lemma ∣ q , (l , q-Ry) ∣)
+       where
+        lemma : ∃ q ꞉ ℚ , (q ℚ< p) × q ∈ R-y → p ∈ R-y
+        lemma = pr₂ (rounded-right-y p)
+
+  rounded-left-z : rounded-left L-z
+  rounded-left-z z = I , II
+   where
+    I : z ∈ L-z → ∃ p ꞉ ℚ , (z ℚ< p) × p ∈ L-z
+    I z-Lz = ∥∥-rec ∃-is-prop α z-Lz
+     where
+      α : z ∈ L-x ∔ z ∈ L-y → ∃ p ꞉ ℚ , (z ℚ< p) × p ∈ L-z
+      α (inl z-Lx) = ∥∥-functor (λ (p , (l , p-Lx)) → p , l , ∣ inl p-Lx ∣) β
+       where
+        β : ∃ p ꞉ ℚ , (z ℚ< p) × p ∈ L-x
+        β = pr₁ (rounded-left-x z) z-Lx
+      α (inr z-Ly) = ∥∥-functor (λ (p , (l , p-Ly)) → p , l , ∣ inr p-Ly ∣) β
+       where
+        β : ∃ q ꞉ ℚ  , (z ℚ< q) × q ∈ L-y
+        β = pr₁ (rounded-left-y z) z-Ly
+      
+    II : ∃ p ꞉ ℚ , (z ℚ< p) × p ∈ L-z → z ∈ L-z
+    II = ∥∥-rec (∈-is-prop L-z z) α
+     where
+      α : Σ p ꞉ ℚ , (z ℚ< p) × p ∈ L-z → z ∈ L-z
+      α (p , (l , p-Lz)) = ∥∥-functor β p-Lz
+       where
+        β : p ∈ L-x ∔ p ∈ L-y → z ∈ L-x ∔ z ∈ L-y
+        β (inl p-Lx) = inl (γ ∣ p , (l , p-Lx) ∣)
+         where
+          γ : ∃ p ꞉ ℚ , (z ℚ< p) × p ∈ L-x → z ∈ L-x
+          γ = pr₂ (rounded-left-x z)
+        β (inr p-Ly) = inr (γ ∣ p , (l , p-Ly) ∣)
+         where
+          γ : ∃ q ꞉ ℚ , (z ℚ< q) × q ∈ L-y → z ∈ L-y
+          γ = pr₂ (rounded-left-y z)
+  
+  rounded-right-z : rounded-right R-z
+  rounded-right-z z = I , II
+   where
+    I : z ∈ R-z → ∃ q ꞉ ℚ , (q ℚ< z) × q ∈ R-z
+    I (z-Rx , z-Ry) = ∥∥-functor α (binary-choice by-rounded-x by-rounded-y)
+     where
+      by-rounded-x : ∃ a ꞉ ℚ , (a ℚ< z) × a ∈ R-x
+      by-rounded-x = pr₁ (rounded-right-x z) z-Rx
+      by-rounded-y : ∃ b ꞉ ℚ , (b ℚ< z) × b ∈ R-y
+      by-rounded-y = pr₁ (rounded-right-y z) z-Ry
+
+      α : (Σ a ꞉ ℚ , (a ℚ< z) × a ∈ R-x) × (Σ b ꞉ ℚ , (b ℚ< z) × b ∈ R-y) → Σ c ꞉ ℚ , (c ℚ< z) × c ∈ R-z
+      α ((a , (l₁ , a-Rx)) , b , (l₂ , b-Ry)) = β (ℚ-trichotomous fe a b)
+       where
+        β : (a ℚ< b) ∔ (a ≡ b) ∔ (b ℚ< a) → Σ c ꞉ ℚ , (c ℚ< z) × c ∈ R-z
+        β (inl a<b)       = b , (l₂ , (by-rounded-x2 ∣ a , (a<b , a-Rx) ∣ , b-Ry))
+         where
+          by-rounded-x2 : ∃ a ꞉ ℚ , (a ℚ< b) × a ∈ R-x → b ∈ R-x
+          by-rounded-x2 = pr₂ (rounded-right-x b)
+        β (inr (inl a=b)) = a , (l₁ , (a-Rx , (transport (_∈ R-y) (a=b ⁻¹) b-Ry)))
+        β (inr (inr b<a)) = a , (l₁ , (a-Rx , (by-rounded-y2 ∣ b , (b<a , b-Ry) ∣)))
+         where
+          by-rounded-y2 : (∃ b ꞉ ℚ , (b ℚ< a) × b ∈ R-y) → a ∈ R-y
+          by-rounded-y2 = pr₂ (rounded-right-y a)
+    
+    II : ∃ q ꞉ ℚ , (q ℚ< z) × q ∈ R-z → z ∈ R-z
+    II exists-q = i , ii
+     where
+      i : z ∈ R-x
+      i = α (∥∥-functor β exists-q)
+       where
+        α : (∃ q ꞉ ℚ , (q ℚ< z) × q ∈ R-x) → z ∈ R-x
+        α = pr₂ (rounded-right-x z)
+        β : Σ q ꞉ ℚ , (q ℚ< z) × q ∈ R-z → Σ q ꞉ ℚ , (q ℚ< z) × q ∈ R-x
+        β (q , (l , (q-Rx , _))) = q , l , q-Rx
+      ii : z ∈ R-y
+      ii = α (∥∥-functor β exists-q)
+       where
+        α : ∃ q ꞉ ℚ , (q ℚ< z) × q ∈ R-y → z ∈ R-y
+        α = pr₂ (rounded-right-y z)
+        β : Σ q ꞉ ℚ , (q ℚ< z) × q ∈ R-z → Σ q ꞉ ℚ , (q ℚ< z) × q ∈ R-y
+        β (q , (l , (_ , q-Ry))) = q , l , q-Ry 
+  
+  disjoint-z : disjoint L-z R-z
+  disjoint-z p q (p-Lz , (q-Rx , q-Ry)) = ∥∥-rec (ℚ<-is-prop p q) I p-Lz
+   where
+    I : p ∈ L-x ∔ p ∈ L-y → p ℚ< q
+    I (inl p-Lx) = disjoint-x p q (p-Lx , q-Rx)
+    I (inr p-Ly) = disjoint-y p q (p-Ly , q-Ry)
+  
+  located-z : located L-z R-z
+  located-z p q l = ∥∥-rec ∨-is-prop α (located-x p q l)
+   where
+    α : p ∈ L-x ∔ q ∈ R-x → p ∈ L-z ∨ q ∈ R-z
+    α (inl p-Lx) = ∣ inl ∣ inl p-Lx ∣ ∣
+    α (inr q-Rx) = ∥∥-functor β (located-y p q l)
+     where
+      β : p ∈ L-y ∔ q ∈ R-y → p ∈ L-z ∔ q ∈ R-z
+      β (inl p-Ly) = inl ∣ inr p-Ly ∣
+      β (inr q-Ry) = inr (q-Rx , q-Ry)
 
 _#_ : (x y : ℝ) → 𝓤₀ ̇
 x # y = (x < y) ∨ (y < x)
@@ -213,10 +363,13 @@ ral-lemma α β n e = ((rec 2/3 (λ k → k ℚ* 2/3) n ℚ* 2/3) ℚ* α) ≡�
      f = (ℚ-mult-left-id fe 2/3) ⁻¹
   I (succ n) = refl
 
+{-
 exists-2/3-n : (x y p : ℚ) → x ℚ< y → zero-ℚ ℚ< p → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) ℚ* (y ℚ-- x)) ℚ< p)
 exists-2/3-n x y p l₁ l₂ = {!!} , {!!}
 
-ℝ-arithmetically-located : (((L , R) , inhabited-left , inhabited-right , rounded-left , rounded-right , disjoint , located) : ℝ)
+
+
+ℝ-arithmetically-located : (((L , R) , _) : ℝ)
                           → (p : ℚ)
                           → zero-ℚ ℚ< p
                           → ∃ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (zero-ℚ ℚ< (y ℚ-- x)) × ((y ℚ-- x) ℚ< p)
@@ -361,7 +514,7 @@ exists-2/3-n x y p l₁ l₂ = {!!} , {!!}
             (r ℚ+ (q ℚ+ (ℚ- (r ℚ+ s)))) ℚ+ s          ≡⟨ ap (λ - → (r ℚ+ -) ℚ+ s) (pr₂ (pr₂ i) ⁻¹) ⟩
             (r ℚ+ k) ℚ+ s ∎
 
---Binary Naturals file needs to be worked on. Also embedding to the rational numbers
+
 
 _+_ : ℝ → ℝ → ℝ
 ((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) + ((L-y , R-y) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) =
@@ -550,6 +703,8 @@ _+_ : ℝ → ℝ → ℝ
                      q ℚ+ zero-ℚ        ≡⟨ ℚ-zero-right-neutral fe q ⟩
                      q                  ∎
 
+-}
+{-
 ℝ+-comm : (a b : ℝ) → a + b ≡ b + a
 ℝ+-comm ((Lx , Rx) , _) ((Ly , Ry) , _) = to-subtype-≡ (λ (L , R)  → isCut-is-prop L R) I
  where
@@ -567,3 +722,8 @@ _+_ : ℝ → ℝ → ℝ
 
 ℝ+-comm' : (a b : ℝ) → a + b ≡ b + a
 ℝ+-comm' ((Lx , Rx) , _) ((Ly , Ry) , _) = to-subtype-≡ {!!} {!subset-extensionality!}
+-}
+
+
+
+

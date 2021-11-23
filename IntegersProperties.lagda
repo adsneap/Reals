@@ -824,6 +824,11 @@ abs-removes-neg-sign (pos zero)     = refl
 abs-removes-neg-sign (pos (succ x)) = refl
 abs-removes-neg-sign (negsucc x)    = refl
 
+absℤ-removes-neg-sign : (x : ℤ) → absℤ x ≡ absℤ (- x)
+absℤ-removes-neg-sign (pos zero)     = refl
+absℤ-removes-neg-sign (pos (succ x)) = refl
+absℤ-removes-neg-sign (negsucc x)    = refl
+
 abs-over-mult : (a b : ℤ) → abs (a * b) ≡ abs a ℕ* abs b
 abs-over-mult (pos x) (pos b) = I
  where
@@ -863,6 +868,50 @@ abs-over-mult (negsucc x) (negsucc b) = I
       abs (pos (succ x) * pos (succ b))         ≡⟨ ap abs (pos-multiplication-equiv-to-ℕ (succ x) (succ b)) ⟩
       (succ x) ℕ* (succ b)                      ≡⟨ refl ⟩
       abs (negsucc x) ℕ* abs (negsucc b)       ∎
+
+pos-abs-is-equal : (x : ℕ) → absℤ (pos x) ≡ pos x
+pos-abs-is-equal x = refl
+
+abs-over-mult' : (x y : ℤ) → absℤ (x * y) ≡ absℤ x * absℤ y
+abs-over-mult' (pos x) (pos y) = I
+ where
+  I : absℤ (pos x * pos y) ≡ absℤ (pos x) * absℤ (pos y)
+  I = absℤ (pos x * pos y) ≡⟨ ap absℤ (pos-multiplication-equiv-to-ℕ x y) ⟩
+      absℤ (pos (x ℕ* y))  ≡⟨ by-definition ⟩
+      pos (x ℕ* y)         ≡⟨ pos-multiplication-equiv-to-ℕ x y ⁻¹ ⟩
+      pos x * pos y        ≡⟨ by-definition ⟩
+      absℤ (pos x) * absℤ (pos y) ∎
+abs-over-mult' (pos x) (negsucc y) = I
+ where
+  I : absℤ (pos x * negsucc y) ≡ absℤ (pos x) * absℤ (negsucc y)
+  I = absℤ (pos x * negsucc y)        ≡⟨ ap absℤ (subtraction-dist-over-mult (pos x) (pos (succ y))) ⟩
+      absℤ (- pos x * pos (succ y))   ≡⟨ ap (λ z → absℤ (- z)) (pos-multiplication-equiv-to-ℕ x (succ y)) ⟩
+      absℤ (- pos (x ℕ* succ y))      ≡⟨ absℤ-removes-neg-sign (pos (x ℕ* succ y)) ⁻¹ ⟩
+      absℤ (pos (x ℕ* succ y))        ≡⟨ by-definition ⟩
+      pos (x ℕ* succ y)               ≡⟨ pos-multiplication-equiv-to-ℕ x (succ y) ⁻¹ ⟩
+      pos x * pos (succ y)            ≡⟨ by-definition ⟩
+      absℤ (pos x) * absℤ (negsucc y) ∎
+abs-over-mult' (negsucc x) (pos y) = I
+ where
+  I : absℤ (negsucc x * pos y) ≡ absℤ (negsucc x) * absℤ (pos y)
+  I = absℤ (negsucc x * pos y)      ≡⟨ ap absℤ (ℤ*-comm (negsucc x) (pos y)) ⟩
+      absℤ (pos y * negsucc x)      ≡⟨ ap absℤ (subtraction-dist-over-mult (pos y) (pos (succ x))) ⟩
+      absℤ (- pos y * pos (succ x)) ≡⟨ ap (λ z → absℤ (- z)) (pos-multiplication-equiv-to-ℕ y (succ x)) ⟩
+      absℤ (- pos (y ℕ* succ x))    ≡⟨ absℤ-removes-neg-sign (pos (y ℕ* succ x)) ⁻¹ ⟩
+      absℤ (pos (y ℕ* succ x))      ≡⟨ by-definition ⟩
+      pos (y ℕ* succ x)             ≡⟨ pos-multiplication-equiv-to-ℕ y (succ x) ⁻¹ ⟩
+      pos y * pos (succ x)          ≡⟨ ℤ*-comm (pos y) (pos (succ x)) ⟩
+      pos (succ x) * pos y          ≡⟨ by-definition ⟩ 
+      absℤ (negsucc x) * absℤ (pos y) ∎
+abs-over-mult' (negsucc x) (negsucc y) = I
+ where
+  I : absℤ (negsucc x * negsucc y) ≡ absℤ (negsucc x) * absℤ (negsucc y)
+  I = absℤ (negsucc x * negsucc y)        ≡⟨ ap absℤ (minus-times-minus-is-positive (pos (succ x)) (pos (succ y))) ⟩
+      absℤ (pos (succ x) * pos (succ y))  ≡⟨ ap absℤ (pos-multiplication-equiv-to-ℕ (succ x) (succ y)) ⟩
+      absℤ (pos (succ x ℕ* succ y))       ≡⟨ by-definition ⟩
+      pos (succ x ℕ* succ y)              ≡⟨ pos-multiplication-equiv-to-ℕ (succ x) (succ y) ⁻¹ ⟩
+      pos (succ x) * pos (succ y)         ≡⟨ by-definition ⟩
+      absℤ (negsucc x) * absℤ (negsucc y) ∎
 
 open Groups -- TypeTopology
 

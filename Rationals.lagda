@@ -1,4 +1,5 @@
-Andrew Sneap - 27th April 2021
+
+\Andrew Sneap - 27th April 2021
 
 I link to this module within the Rationals section of my report.
 
@@ -56,7 +57,6 @@ open NaturalNumbers-Properties --TypeTopology
 open Integers renaming (_*_ to _ℤ*_ ; _+_ to _ℤ+_ ; -_ to ℤ-_)
 open IntegersProperties
 
-
 -- 
 
 toℚlemma : ((x , a) : ℚₙ) → Σ ((x' , a') , p) ꞉ ℚ , (Σ h ꞉ ℕ , (x ≡ (pos (succ h)) ℤ* x') × (succ a ≡ (succ h) ℕ* succ a'))
@@ -109,7 +109,6 @@ open UF-Base --TypeTopology
 
 ℚ≡-to-ℚₙ≡ : ((p , α) (q , β) : ℚ) → (p , α) ≡ (q , β) → p ≡ q
 ℚ≡-to-ℚₙ≡ (p , α) (q , β) e = pr₁ (from-Σ-≡ e)
-
 
 open IntegersOrder renaming (_<_ to _ℤ<_ ; _>_ to _ℤ>_)
 
@@ -380,11 +379,11 @@ _<_ : ℚ → ℚ → 𝓤₀ ̇
 ℚ<-trans (p , α) (q , β) (c , γ) x y = ℚₙ-trans p q c x y
 
 _≤_ : ℚ → ℚ → 𝓤₀ ̇
-(p , ψ) ≤ (q , ζ) = p ℚₙ≤ q
-
+p ≤ q = (p < q) ∔ (p ≡ q)
+{-
 ℚ≤-is-prop : (p q : ℚ) → is-prop (p ≤ q)
-ℚ≤-is-prop (p , ψ) (q , η) = ℚₙ≤-is-prop p q
-
+ℚ≤-is-prop (p , ψ) (q , η) = -- ℚₙ≤-is-prop p q
+-}
 <-lemma : (p q : ℚₙ) → p ℚₙ< q → toℚ p < toℚ q 
 <-lemma (x , a) (y , b) l = ordering-right-cancellable (x' ℤ* pos (succ b')) (y' ℤ* (pos (succ a'))) (pos (succ h ℕ* succ h')) IV V
  where
@@ -503,7 +502,7 @@ _≤_ : ℚ → ℚ → 𝓤₀ ̇
   f (inl z)       = inl z
   f (inr (inl z)) = inr (inl (ℚ-trichotomous-lemma fe ((x , a) , α) ((y , b) , β) z))
   f (inr (inr z)) = inr (inr z)
-
+{-
 ℚ-dichotomous : Fun-Ext → (p q : ℚ) → (p ≤ q) ∔ (q < p)
 ℚ-dichotomous fe p q = I (ℚ-trichotomous fe p q)
  where
@@ -511,7 +510,7 @@ _≤_ : ℚ → ℚ → 𝓤₀ ̇
   I (inl x)       = inl (inl x)
   I (inr (inl x)) = inl (inr (ℚ≡-to-ℚₙ≡ p q x))
   I (inr (inr x)) = inr x
-
+-}
 located-property : Fun-Ext → (p q x : ℚ) → p < q → (p < x) ∔ (x < q) 
 located-property fe p q x l = f (ℚ-trichotomous fe x q)
  where
@@ -821,7 +820,7 @@ toℚ-over-minus fe (x , a) = IV
   I = lr-implication (equiv-equality fe ((ℤ- x , a) ℚₙ+ (ℤ- y , b)) (((ℤ- x') , a') ℚₙ+ ((ℤ- y') , b')))
 
   II : (- ((x , a) , p)) + (- ((y , b) , q)) ≡ - (((x , a) , p) + ((y , b) , q))
-  II = ((- ((x , a) , p)) + (- ((y , b) , q)))                                                       ≡⟨ refl ⟩
+  II = ((- ((x , a) , p)) + (- ((y , b) , q)))                                                      ≡⟨ refl ⟩
        (toℚ ((ℤ- x) , a) + toℚ ((ℤ- y) , b))                                                        ≡⟨ toℚ-over-addition fe (ℤ- x , a) (ℤ- y , b) ⁻¹  ⟩
        toℚ ((ℤ- x , a) ℚₙ+ (ℤ- y , b))                                                              ≡⟨ I refl ⟩
        toℚ (((ℤ- x') , a') ℚₙ+ ((ℤ- y') , b'))                                                      ≡⟨ ap₂ (λ α β → toℚ (α ℤ+ β ,  pred (succ a' ℕ* succ b'))) (subtraction-dist-over-mult' x' (pos (succ b'))) (subtraction-dist-over-mult' y' (pos (succ a'))) ⟩
@@ -1016,6 +1015,19 @@ open FieldAxioms
   III : (q + r) < (q + s)
   III = transport₂ _<_ (ℚ+-comm r q) (ℚ+-comm s q) II
 
+ℚ<-adding-zero : (p q : ℚ) → zero-ℚ < p → zero-ℚ < q → zero-ℚ < (p + q)
+ℚ<-adding-zero p q l₁ l₂ = ℚ<-adding zero-ℚ p zero-ℚ q l₁ l₂
+
+ℚ<-not-itself : (p : ℚ) → ¬ (p < p)
+ℚ<-not-itself ((x , a) , p) (negsucc k , gtz , e) = 𝟘-elim gtz
+ℚ<-not-itself ((x , a) , p) (pos 0 , gtz , e) = 𝟘-elim gtz
+ℚ<-not-itself ((x , a) , p) (pos (succ k) , gtz , e) = 𝟘-elim (zero-not-positive k (pos-lc II ⁻¹))
+ where
+  I : x ℤ* pos (succ a) ℤ+ pos (succ k) ≡ x ℤ* pos (succ a) ℤ+ pos 0
+  I = e
+  II : pos (succ k) ≡ pos 0
+  II = ℤ+-lc (pos (succ k)) (pos 0) (x ℤ* pos (succ a)) e
+
 ℚ<-subtraction : Fun-Ext → (r p q : ℚ) → p < q → (r + (p + (- q))) < r
 ℚ<-subtraction fe r p q l = transport ((r + (p + (- q))) <_) (ℚ-zero-right-neutral fe r) IV
  where
@@ -1111,6 +1123,65 @@ open FieldAxioms
       pos (succ x) ℤ* pos 1 ∎
 
 
+
+{- 
+lim : (f : ℕ → ℚ) → 𝓤₀ ̇ 
+lim f = ∀ (ε : ℕ) → (n : ℕ) →  Σ N ꞉ ℕ , ((N ℕ< n) → f n ℚ< toℚ (pos ε , zero))
+
+conv : (f : ℕ → ℚ) → 𝓤₀ ̇
+conv f = ∀ (ε : ℚ) → zero-ℚ ℚ< ε → (n : ℕ) → Σ N ꞉ ℕ , ((N ℕ< n) → f n ℚ< ε)
+
+sandwich' : (f g : ℕ → ℚ) → (Σ M ꞉ ℕ , ((m : ℕ) → (M ℕ< m) → (f m ℚ< g m))) → conv g → conv f
+sandwich' f g (n' , h) conv-g = I
+ where
+  I : conv f
+  I ε l n = II (conv-g ε l n) 
+   where
+    II : (Σ N ꞉ ℕ , (N ℕ< n → g n ℚ< ε)) → Σ N ꞉ ℕ , (N ℕ< n → f n ℚ< ε)
+    II (N , α) = N , III
+     where
+      III : _ ℕ< n → f n ℚ< ε
+      III l₂ = ℚ<-trans (f n) (g n) ε (h n {!!}) (α l₂)
+
+sandwich : (f g : ℕ → ℚ) → ((n : ℕ) → f n ℚ< g n) → lim g → lim f 
+sandwich f g h g-holds = I
+ where
+  I : ∀ (ε : ℕ) → (n : ℕ) →  Σ N ꞉ ℕ , ((N ℕ< n) → f n ℚ< toℚ (pos ε , zero))
+  I ε n = II (g-holds ε n)
+   where
+    II : Σ N ꞉ ℕ , (N ℕ< n → g n ℚ< toℚ (pos ε , zero)) → Σ N ꞉ ℕ , ((N ℕ< n) → f n ℚ< toℚ (pos ε , zero))
+    II (N , l₂) = N , III
+     where
+      III : N ℕ< n → f n ℚ< toℚ (pos ε , zero)
+      III l = ℚ<-trans (f n) (g n) (toℚ (pos ε , zero)) (h n) (l₂ l)
+
+1/n : ℕ → ℚ
+1/n zero = toℚ (pos 2 , 0)
+1/n (succ n) = toℚ (pos 1 , n)
+
+two-thirds-goes-down : lim ⟨2/3⟩^_
+two-thirds-goes-down = sandwich (⟨2/3⟩^_) 1/n I II
+ where
+  I : (n : ℕ) → (⟨2/3⟩^ n) ℚ< 1/n n
+  I = induction base step
+   where
+    base : (⟨2/3⟩^ 0) ℚ< 1/n 0
+    base = (pos 1) , (⋆ , refl)
+
+    step : (k : ℕ) → (⟨2/3⟩^ k) ℚ< 1/n k → (⟨2/3⟩^ succ k) ℚ< 1/n (succ k)
+    step zero IH     = (pos 1) , (⋆ , refl)
+    step (succ k) IH = {!!}
+  II : lim 1/n
+  II = λ ε n → {!!} , {!!}
+-}
+
+
+
+
+{-
+ℚ-lim : (a : (ℕ → ℚ)) → {!!}
+ℚ-lim = {!!}
+-}
 
 -- approximate-half : Σ h ꞉ ℚ , (zero-ℚ < (h + h)) × ((h + h) < 1ℚ)
 -- approximate-half = {!!}

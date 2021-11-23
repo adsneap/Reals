@@ -190,6 +190,7 @@ trisect fe x y l = ((x + ((y + (- x)) * 1/3)) , (x + ((y + (- x)) * 2/3))) , I ,
 
 
 
+
 {-
 log-result : (q : ℚ) → (m : ℕ) → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * q) < toℚ (pos m , 0))
 log-result q = {!!}

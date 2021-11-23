@@ -26,6 +26,8 @@ x * succ y = x + x * y
 
 infixl 32 _*_
 
+ 
+
 zero-right-is-zero : (x : ℕ) → x * 0 ≡ 0 
 zero-right-is-zero x = refl
 
