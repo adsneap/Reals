@@ -1,3 +1,4 @@
+
 Andrew Sneap - 27th April 2021
 
 This file contains an index of the modules I have produced as part of
@@ -24,27 +25,41 @@ import NaturalsOrderExtended
 import NaturalsMultiplication
 import NaturalsDivision
 import HCF
-import Integers
-import IntegersProperties
+
+import IntegersB
+import IntegersAbs
+import IntegersAddition
 import IntegersOrder
 import IntegersDivision
 import IntegersHCF
+import IntegersMultiplication
+import IntegersNegation
+
 import ncRationals
+import ncRationalsOperations
+import ncRationalsOrder
+
 import FieldAxioms
+
 import Rationals
---import LogarithmsWork
---import NewDedekindReals
---import DedekindReals
+import RationalsAbs
+import RationalsAddition
+import RationalsField
+-- import RationalsLimits
+import RationalsMinMax
+import RationalsMultiplication
+import RationalsNegation
+import RationalsOrder
+
+import DedekindReals
+-- import DedekindRealsProperties
+
+--import MetricSpaces -- This will require addition of the reals to complete
+import MetricSpaceAltDef
+import MetricSpaceRationals
+
+--import MetricSpaceDedekindReals
+
 
 \end{code}
 
-The following imports are not correctly formatted, and not relevant to
-my project.
-
-\begin{code]
-
--- import IntegersQuotient
--- import NaturalNumbersSequences
--- import TwinPrimesConjecture
-
-\end{code}

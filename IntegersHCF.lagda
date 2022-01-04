@@ -13,16 +13,20 @@ import NaturalsOrder --TypeTopology
 import UF-Base --TypeTopology
 import UF-Subsingletons --TypeTopology
 
-import Integers
+open import IntegersB
+open import IntegersAddition
+open import IntegersNegation
+
 import IntegersDivision
-import IntegersProperties
+open import IntegersMultiplication
+open import IntegersAbs
 import NaturalsDivision
 import NaturalsMultiplication 
 import HCF
 
 module IntegersHCF where
 
-open Integers
+
 open IntegersDivision
 
 ℤ-is-common-divisor : (d x y : ℤ) → 𝓤₀ ̇
@@ -36,7 +40,6 @@ open UF-Subsingletons --TypeTopology
 ℤ-is-hcf : (d : ℕ) → (x y : ℤ) → 𝓤₀ ̇
 ℤ-is-hcf d x y = ℤ-is-common-divisor (pos d) x y × ((f : ℕ) → ℤ-is-common-divisor (pos f) x y → pos f ∣ pos d)
 
-open IntegersProperties
 open HCF
 open NaturalsAddition renaming (_+_ to _ℕ+_) --TypeTopology
 open NaturalsDivision renaming (_∣_ to _ℕ∣_)
@@ -105,7 +108,7 @@ open NaturalsOrder --TypeTopology
                pos (succ n) * (y + (- pos q * x) + (pos q) * x) + pos r * x                   ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x) + z) + pos r * x) (ℤ*-comm (pos q) x) ⟩
                pos (succ n) * (y + (- pos q * x) + x * pos q) + pos r * x                     ≡⟨ ap (_+ pos r * x) (distributivity-mult-over-ℤ' (y + (- pos q * x)) (x * pos q) (pos (succ n))) ⟩
                pos (succ n) * (y + (- pos q * x)) + pos (succ n) * (x * pos q) + pos r * x    ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x)) + z + pos r * x ) (ℤ*-comm (pos (succ n)) (x * pos q)) ⟩
-               pos (succ n) * (y + (- pos q * x)) + (x * pos q) * pos (succ n) + pos r * x    ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x)) + z + pos r * x ) (ℤ*-assoc x (pos q) (pos (succ n)) ⁻¹) ⟩ 
+               pos (succ n) * (y + (- pos q * x)) + (x * pos q) * pos (succ n) + pos r * x    ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x)) + z + pos r * x ) (ℤ*-assoc x (pos q) (pos (succ n))) ⟩ 
                pos (succ n) * (y + (- pos q * x)) + x * (pos q * pos (succ n)) + pos r * x    ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x)) + z + pos r * x ) (ℤ*-comm x (pos q * pos (succ n))) ⟩
                pos (succ n) * (y + (- pos q * x)) + (pos q * pos (succ n)) * x + pos r * x    ≡⟨ ℤ+-assoc (pos (succ n) * (y + (- pos q * x))) ((pos q + pos q * pos n) * x) (pos r * x) ⟩
                pos (succ n) * (y + (- pos q * x)) + ((pos q * pos (succ n)) * x + pos r * x)  ≡⟨ ap (λ z → pos (succ n) * (y + (- pos q * x)) + z) (distributivity-mult-over-ℤ (pos q * pos (succ n)) (pos r) x ⁻¹) ⟩
@@ -140,8 +143,8 @@ coprime-with-division a b c coprime (α , αₚ) = I (coprime-bezout a b coprime
   I ((x , y) , e₁) = pos-div-to-nat-div a c IV
    where 
     II : pos a * (x * pos c) + (pos b * pos c) * y ≡ pos c
-    II = pos a * (x * pos c) + (pos b * pos c) * y ≡⟨ ap₂ _+_ (ℤ*-assoc (pos a) x (pos c)) (ℤ*-comm (pos b * pos c) y) ⟩
-         pos a * x * pos c + y * (pos b * pos c)   ≡⟨ ap (λ - → pos a * x * pos c + -) (ℤ*-assoc y (pos b) (pos c)) ⟩
+    II = pos a * (x * pos c) + (pos b * pos c) * y ≡⟨ ap₂ _+_ (ℤ*-assoc (pos a) x (pos c) ⁻¹) (ℤ*-comm (pos b * pos c) y) ⟩
+         pos a * x * pos c + y * (pos b * pos c)   ≡⟨ ap (λ - → pos a * x * pos c + -) (ℤ*-assoc y (pos b) (pos c) ⁻¹) ⟩
          pos a * x * pos c + y * pos b * pos c     ≡⟨ distributivity-mult-over-ℤ (pos a * x) (y * pos b) (pos c) ⁻¹ ⟩
          (pos a * x + y * pos b) * pos c           ≡⟨ ap (λ - → (pos a * x + -) * pos c) (ℤ*-comm y (pos b)) ⟩
          (pos a * x + pos b * y) * pos c           ≡⟨ ap (_* pos c) (e₁ ⁻¹) ⟩

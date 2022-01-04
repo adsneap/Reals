@@ -2,6 +2,9 @@ Martin Escardo, 2012, 2018.
 
 Compact ordinals, discrete ordinals and their relationships.
 
+A 4-page abstract of a talk at Types'2019:
+https://www.cs.bham.ac.uk/~mhe/papers/compact-ordinals-Types-2019-abstract.pdf
+
 Begun December 2012, based on earlier work, circa 2010.
 
 Most of the work has been done later, and coded in July 2018 after a
@@ -220,7 +223,7 @@ And hence they are totally separated:
 
 \begin{code}
 
-Κ-is-totally-separated ν = retract-totally-separated
+Κ-is-totally-separated ν = retract-of-totally-separated
                              (Κ-Cantor-retract ν)
                              (Cantor-is-totally-separated fe₀)
 \end{code}
@@ -247,7 +250,7 @@ many interesting properties, formulated above and proved below.
 
 Δ-is-discrete One       = 𝟙-is-discrete
 Δ-is-discrete (Add ν μ) = Σ-is-discrete
-                           (+discrete 𝟙-is-discrete 𝟙-is-discrete)
+                           (+-is-discrete 𝟙-is-discrete 𝟙-is-discrete)
                           (dep-cases (λ _ → Δ-is-discrete ν)
                           (λ _ → Δ-is-discrete μ))
 Δ-is-discrete (Mul ν μ) = Σ-is-discrete (Δ-is-discrete ν) (λ _ → Δ-is-discrete μ)

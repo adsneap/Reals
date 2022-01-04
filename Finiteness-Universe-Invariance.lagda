@@ -12,6 +12,7 @@ There is also a proof in Egbert Rijke's book (to appear).
 
 open import SpartanMLTT
 open import Fin
+open import Fin-Properties
 open import UF-Subsingletons renaming (⊤Ω to ⊤)
 open import UF-Equiv
 open import UF-EquivalenceExamples
@@ -44,7 +45,7 @@ module constructions (X₀ : 𝓤₀ ̇ ) where
 Recall that Lift : (𝓥 : Universe) → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇ is the unique map with
 Lift 𝓥 X ≃ X, and that Lift 𝓥 is an embedding of the universe 𝓤 into
 the universe 𝓤 ⊔ 𝓥, meaning that it has subsingleton fibers. This
-relies univalence, which we are assuming in this file.
+relies on univalence, which we are assuming in this file.
 
 \begin{code}
 

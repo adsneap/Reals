@@ -8,25 +8,21 @@ I link to this module within the Natural Numbers section of my report.
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) -- TypeTopology
 
-import NaturalsAddition -- TypeTopology
-import NaturalNumbers-Properties --TypeTopology
-import NaturalsOrder --TypeTopology
-import UF-Base --TypeTopology
+open import NaturalsAddition -- TypeTopology
+open import NaturalNumbers-Properties --TypeTopology
+open import NaturalsOrder --TypeTopology
+open import UF-Base --TypeTopology
 
-import MoreNaturalProperties
-import NaturalsOrderExtended
+open import MoreNaturalProperties
+open import NaturalsOrderExtended
 
 module NaturalsMultiplication where
-
-open NaturalsAddition --TypeTopology
 
 _*_ : (x y : ℕ) → ℕ
 x * 0      = 0
 x * succ y = x + x * y
 
 infixl 32 _*_
-
- 
 
 zero-right-is-zero : (x : ℕ) → x * 0 ≡ 0 
 zero-right-is-zero x = refl
@@ -144,8 +140,6 @@ mult-rearrangement x y z = x * (y * z)         ≡⟨ mult-associativity x y z �
                            y * x * z           ≡⟨ mult-associativity y x z ⟩
                            y * (x * z) ∎
 
-open MoreNaturalProperties 
-
 pos-mult-is-succ : (x y : ℕ) → Σ z ꞉ ℕ , succ z ≡ succ x * succ y
 pos-mult-is-succ x = induction base step
  where
@@ -162,10 +156,7 @@ pos-mult-is-succ x = induction base step
         succ x + succ z                 ≡⟨ ap (succ x +_) IH ⟩
         succ x + (succ x + succ x * k)  ≡⟨ refl ⟩
         succ x * succ (succ k) ∎
-
-open NaturalsOrder --TypeTopology
-open NaturalsOrderExtended
-
+        
 ordering-multiplication-compatible : (m n k : ℕ) → m < n → m * succ k < n * succ k
 ordering-multiplication-compatible m n = induction base step
  where
@@ -208,8 +199,6 @@ mult-left-cancellable x y z r = mult-right-cancellable x y z lemma₀
            succ z * y ≡⟨ mult-commutativity (succ z) y  ⟩
            y * succ z ∎
 
-open UF-Base --TypeTopology
-
 mult-cancellable : (x y z : ℕ) → (x * succ z ≡ y * succ z)
                                 ∔ (succ z * x ≡ succ z * y)
                                 ∔ (succ z * x ≡ y * succ z)
@@ -238,8 +227,6 @@ product-less-than-cancellable x = induction base step
 
 less-than-pos-mult : (x y z : ℕ) → x < y → x < y * succ z
 less-than-pos-mult x y z l = <-+ x y (y * z) l
-
-open NaturalNumbers-Properties --TypeTopology
 
 ℕ-positive-multiplication-not-zero : (x y : ℕ) → ¬ (succ x * succ y ≡ 0)
 ℕ-positive-multiplication-not-zero x = induction base step

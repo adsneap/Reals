@@ -1,31 +1,26 @@
 Andrew Sneap - 27th April 2021
 
-I link to this module within the Natural Numbers section of my report.
-
+In this file I define common divisors, and HCF's, along with a proof that the Euclidean Algorithm produces HCF's.
 \begin{code}
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
 
-import NaturalsAddition --TypeTopology
-import NaturalNumbers-Properties --TypeTopology
-import NaturalsOrder --TypeTopoology
-import UF-FunExt --TypeTopology
-import UF-Subsingletons --TypeTopology
-import UF-Subsingletons-FunExt --TypeTopology
-
-import NaturalsDivision
-import NaturalsMultiplication
-import NaturalsOrderExtended
-import MoreNaturalProperties
+open import NaturalsAddition --TypeTopology
+open import NaturalNumbers-Properties --TypeTopology
+open import NaturalsOrder --TypeTopoology
+open import UF-Base --TypeTopology
+open import UF-FunExt --TypeTopology
+open import UF-Subsingletons --TypeTopology
+open import UF-Subsingletons-FunExt --TypeTopology
+ 
+open import NaturalsDivision
+open import NaturalsMultiplication
+open import NaturalsOrderExtended
+open import MoreNaturalProperties
 
 module HCF where
-
-open NaturalNumbers-Properties -- TypeTopology
-open UF-Subsingletons -- TypeTopology
-
-open NaturalsDivision
 
 is-common-divisor : (d x y : ℕ) → 𝓤₀ ̇
 is-common-divisor d x y = (d ∣ x) × (d ∣ y)
@@ -38,9 +33,6 @@ is-hcf d x y = (is-common-divisor d x y) × ((f : ℕ) →  is-common-divisor f 
 
 is-hcf-gives-is-common-divisor : (d x y : ℕ) → is-hcf d x y → is-common-divisor d x y
 is-hcf-gives-is-common-divisor d x y (a , p) = a
-
-open UF-FunExt --TypeTopology
-open UF-Subsingletons-FunExt --TypeTopology
 
 is-hcf-is-prop : Fun-Ext → (d x y : ℕ) → is-prop (is-hcf (succ d) x y)
 is-hcf-is-prop fe d x y p q = ×-is-prop (is-common-divisor-is-prop d x y) g p q
@@ -69,13 +61,6 @@ has-hcf-is-prop fe x y (a , p , p') (b , q , q') = to-subtype-≡ I II
 
     β : succ b ∣ succ a
     β = p' (succ b) q
-
-open NaturalsAddition --TypeTopology
-open NaturalsOrder --TypeTopoology
-
-open MoreNaturalProperties
-open NaturalsMultiplication
-open NaturalsOrderExtended
 
 hcflemma : (a b c d : ℕ) → a * b ≡ a * c + d → a ∣ d
 hcflemma a b c d e = subtraction-gives-factor (dichotomy-split (≥-dichotomy b c))
@@ -155,7 +140,10 @@ coprime-is-prop : Fun-Ext → (a b : ℕ) → is-prop (coprime a b)
 coprime-is-prop fe a b = is-hcf-is-prop fe zero a b
 
 divbyhcf : (a b : ℕ) → Σ h ꞉ ℕ , Σ x ꞉ ℕ , Σ y ꞉ ℕ , ((h * x ≡ a) × (h * y ≡ b)) × coprime x y
-divbyhcf zero     b = b , (zero , (1 , ((refl , refl) , ((zero , refl) , 1 , refl) , (λ x → pr₂))))
+divbyhcf zero     b = b , (zero , (1 , ((refl , refl) , ((zero , refl) , 1 , refl) , I)))
+ where
+  I : (f : ℕ) → is-common-divisor f 0 1 → f ∣ 1
+  I f (_ , β) = β
 divbyhcf (succ a) b = I (HCF (succ a) b)
  where
   I : Σ c ꞉ ℕ , is-hcf c (succ a) b → Σ h ꞉ ℕ , Σ x ꞉ ℕ , Σ y ꞉ ℕ , ((h * x ≡ (succ a)) × (h * y ≡ b)) × coprime x y 
@@ -199,4 +187,48 @@ hcf-unique a b (h , h-icd , f) (h' , h'-icd , f') = ∣-anti h h' I II
   II : h' ∣ h
   II = f h' h'-icd
 
+\end{code}
+
+Sketch code to formalise rationals stuff 
+
+\begin{code}
+
+HCF' : (a b : ℕ) → Σ h ꞉ ℕ , is-hcf (succ h) a (succ b)
+HCF' a b = I (HCF a (succ b))
+ where
+  I : (Σ h ꞉ ℕ , is-hcf h a (succ b)) → Σ h ꞉ ℕ , is-hcf (succ h) a (succ b)
+  I (zero , ((α , αₚ) , β , βₚ) , γ) = 𝟘-elim (zero-not-positive b (zero-left-is-zero β ⁻¹ ∙ βₚ))
+  I (succ h , α) = h , α
+
+hcf' : (a b : ℕ) → ℕ
+hcf' a b = pr₁ (HCF' a b)
+
+new-numerator : Fun-Ext → (x a : ℕ) → Σ x' ꞉ ℕ , x ≡ succ (hcf' x a) * x'
+new-numerator fe x a = I (HCF' x a)
+ where
+  I : (Σ h ꞉ ℕ , is-hcf (succ h) x (succ a)) → Σ x' ꞉ ℕ , x ≡ succ (hcf' x a) * x'
+  I (h , ((α , αₚ) , β , βₚ) , γ) = α ,(transport (λ - → succ - * α ≡ x) h-is-hcf αₚ ⁻¹)
+   where
+    h-is-hcf' : h , ((α , αₚ) , β , βₚ) , γ ≡ HCF' x a
+    h-is-hcf' = has-hcf-is-prop fe x (succ a) (h , (((α , αₚ) , β , βₚ) , γ)) (HCF' x a)
+    
+    h-is-hcf : h ≡ pr₁ (HCF' x a)
+    h-is-hcf = (pr₁ (from-Σ-≡ h-is-hcf'))
+    
+new-denominator : Fun-Ext → (x a : ℕ) → Σ a' ꞉ ℕ , succ a ≡ succ (hcf' x a) * succ a'
+new-denominator fe x a = I (HCF' x a)
+ where
+  I : (Σ h ꞉ ℕ , is-hcf (succ h) x (succ a)) → Σ a' ꞉ ℕ , succ a ≡ succ (hcf' x a) * succ a'
+  I (h , ((α , αₚ) , 0 , βₚ) , γ) = 𝟘-elim (positive-not-zero a (βₚ ⁻¹))
+  I (h , ((α , αₚ) , succ β , βₚ) , γ) = β , transport (λ - → succ a ≡ succ - * succ β) h-is-hcf (βₚ ⁻¹)
+   where
+    h-is-hcf' : h , ((α , αₚ) , succ β , βₚ) , γ ≡ HCF' x a
+    h-is-hcf' = has-hcf-is-prop fe x (succ a) (h , ((α , αₚ) , succ β , βₚ) , γ) (HCF' x a)
+
+    h-is-hcf : h ≡ pr₁ (HCF' x a)
+    h-is-hcf = pr₁ (from-Σ-≡ h-is-hcf')
+{-
+divbyhcf-gives-coprime : (x a : ℕ) → {!!}
+divbyhcf-gives-coprime = {!!}
+-}
 \end{code}

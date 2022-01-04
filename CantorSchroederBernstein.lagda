@@ -1,8 +1,12 @@
+Martin Escardo, 22nd and 24th January 2020, with further additions
+after that.
+
 The Cantor-Schröder-Bernstein for homotopy types, or ∞-groupoids, in Agda
 -------------------------------------------------------------------------
 
-Martin Escardo, 22nd and 24th January 2020, with further additions
-after that.
+An unformalized version of this file was published in
+the Journal of Homotopy and Related Structures, Springer, 28th June 2021.
+https://doi.org/10.1007/s40062-021-00284-6
 
 There are two parts, which assume function extensionality but not
 univalence or the existence of propositional truncations (any
@@ -1019,7 +1023,7 @@ dlemma : (P : 𝓥 ̇ )
        → is-prop P
        → ℕ ≃ P + ℕ
 dlemma P csb i = csb ℕ-is-discrete
-                  (+discrete (props-are-discrete i) ℕ-is-discrete)
+                  (+-is-discrete (props-are-discrete i) ℕ-is-discrete)
                   (econstruction-ℕ P i)
 
 discrete-CSB-gives-dBKS⁺ : discrete-Cantor-Schröder-Bernstein 𝓤₀ 𝓥 → dBKS⁺ 𝓥
@@ -1176,7 +1180,7 @@ We now consider the propositional version of BKS⁺:
  discrete-wCSB-gives-BKS⁺ w P i = γ
   where
    s : ∥ ℕ ≃ P + ℕ ∥
-   s = w ℕ-is-discrete (+discrete (props-are-discrete i) ℕ-is-discrete) (econstruction-ℕ P i)
+   s = w ℕ-is-discrete (+-is-discrete (props-are-discrete i) ℕ-is-discrete) (econstruction-ℕ P i)
 
    γ : is-Rosolini P
    γ = ∥∥-functor (rlemma P i) s

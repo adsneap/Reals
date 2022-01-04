@@ -1,20 +1,20 @@
 Andrew Sneap - 27th April 2021
 
-I link to this module within the Natural Numbers sections of my report.
+In this file I prove some properties related to the order of Natural Numbers.
+
+I build upon the work in the NaturalsOrder file.
 
 \begin{code}
 {-# OPTIONS --without-K --exact-split --safe #-}
 
 open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
-import DecidableAndDetachable --TypeTopology
-import NaturalsAddition --TypeTopology
-import NaturalsOrder --TypeTopology
+open import DecidableAndDetachable --TypeTopology
+open import NaturalsAddition --TypeTopology
+open import NaturalsOrder --TypeTopology
+open import UF-Base
 
 module NaturalsOrderExtended where
-
-open NaturalsAddition --TypeTopology
-open NaturalsOrder --TypeTopology
 
 ≤-trans₂ : (x y u v : ℕ) → x ≤ y → y ≤ u → u ≤ v → x ≤ v
 ≤-trans₂ x y u v l₁ l₂ = ≤-trans x u v I
@@ -42,8 +42,6 @@ nat-order-trichotomous (succ x) (succ y) = tri-split (nat-order-trichotomous x y
 ≤-n-monotone-right : (x y z : ℕ) → x ≤ y → (x + z) ≤ (y + z)
 ≤-n-monotone-right x y 0        l = l
 ≤-n-monotone-right x y (succ n) l = ≤-n-monotone-right x y n l
-
-open import UF-Base
 
 ≤-n-monotone-left : (x y z : ℕ) → x ≤ y → (z + x) ≤ (z + y)
 ≤-n-monotone-left x y z l = transport₂ _≤_ (addition-commutativity x z) (addition-commutativity y z) (≤-n-monotone-right x y z l)
@@ -85,6 +83,11 @@ not-less-or-equal-is-bigger 0        y        l = l (zero-minimal y)
 not-less-or-equal-is-bigger (succ x) 0        l = zero-minimal x
 not-less-or-equal-is-bigger (succ x) (succ y) l = not-less-or-equal-is-bigger x y l
 
+≤-dichotomous : (x y : ℕ) → x ≤ y ∔ y ≤ x
+≤-dichotomous zero     y        = inl *
+≤-dichotomous (succ x) zero     = inr *
+≤-dichotomous (succ x) (succ y) = ≤-dichotomous x y
+
 ≥-dichotomy : (x y : ℕ) → x ≥ y ∔ x ≤ y
 ≥-dichotomy 0        y        = inr (zero-minimal y)
 ≥-dichotomy (succ x) 0        = inl (zero-minimal (succ x))
@@ -113,8 +116,6 @@ subtraction'' (succ x) (succ y) l = z , ap succ e
   e : succ z + x ≡ y
   e = pr₂ I
 
-open DecidableAndDetachable --TypeTopology
-
 least-element-unique : {A : ℕ → 𝓤 ̇} → (σ : detachable A)
                                       → ((α , αₚ) : Σ k ꞉ ℕ , A k × ((z : ℕ) → A z → k ≤ z))
                                       → ((β , βₚ) : Σ n ꞉ ℕ , A n × ((z : ℕ) → A z → n ≤ z))
@@ -138,6 +139,12 @@ order-split 0        0        = inr (zero-minimal 0)
 order-split 0        (succ y) = inl (zero-minimal (succ y))
 order-split (succ x) 0        = inr (zero-minimal (succ x))
 order-split (succ x) (succ y) = order-split x y
+
+\end{code}
+
+In the following functions, following a similar strategy employed in NaturalsOrder to prove bounded minimisation, I implement bounded maximisation of properties of Natural Numbers. That is, given a property of the natural numbers, and a proof that the property holds for some n : ℕ, I can produce a maximal m such that the property holds for m.
+
+\begin{code}
 
 bounded-maximisation : (A : ℕ → 𝓤 ̇) → detachable A
                      → (k : ℕ)

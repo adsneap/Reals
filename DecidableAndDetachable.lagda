@@ -24,11 +24,113 @@ We look at decidable propositions and subsets (using the terminogy
 ¬¬-elim (inl a) f = a
 ¬¬-elim (inr g) f = 𝟘-elim(f g)
 
+empty-decidable : {X : 𝓤 ̇ } → is-empty X → decidable X
+empty-decidable = inr
+
 𝟘-decidable : decidable (𝟘 {𝓤})
-𝟘-decidable = inr 𝟘-elim
+𝟘-decidable = empty-decidable 𝟘-elim
 
 pointed-decidable : {X : 𝓤 ̇ } → X → decidable X
 pointed-decidable = inl
+
+\end{code}
+
+Digression: https://twitter.com/EgbertRijke/status/1429443868450295810
+
+"decidable" is almost a monad, except that it is not even functorial:
+
+\begin{code}
+
+module EgbertRijkeTwitterDiscussion-22-August-2021-not-a-monad where
+
+  open import UF-Equiv
+
+  T : 𝓤 ̇ → 𝓤 ̇
+  T = decidable
+
+  η : (X : 𝓤 ̇ ) → X → T X
+  η X = inl
+
+  μ : (X : 𝓤 ̇ ) → T (T X) → T X
+  μ X (inl d) = d
+  μ X (inr u) = inr (λ x → u (inl x))
+
+  T-is-nonempty : (X : 𝓤 ̇ ) → is-nonempty (T X)
+  T-is-nonempty X u = u (inr (λ x → u (inl x)))
+
+  μη : (X : 𝓤 ̇ ) → μ X ∘ η (T X) ∼ id
+  μη X (inl x) = refl
+  μη X (inr u) = refl
+
+  ημ : (X : 𝓤 ̇ ) → η (T X) ∘ μ X ∼ id
+  ημ X (inl (inl x)) = refl
+  ημ X (inl (inr u)) = refl
+  ημ X (inr u) = 𝟘-elim (u (inr (λ x → u (inl x))))
+
+  μ-is-invertible : (X : 𝓤 ̇ ) → invertible (μ X)
+  μ-is-invertible X = η (T X) , ημ X , μη X
+
+  μ-≃ : (X : 𝓤 ̇ ) → T (T X) ≃ T X
+  μ-≃ X = qinveq (μ X) (μ-is-invertible X)
+
+  raw-T-algebras-are-non-empty : {X : 𝓤 ̇ } (α : T X → X) → is-nonempty X
+  raw-T-algebras-are-non-empty α u = u (α (inr u))
+
+  retraction-of-η-is-section : {A : 𝓤 ̇ } (α : T A → A)
+                             → α ∘ η A ∼ id
+                             → η A ∘ α ∼ id
+  retraction-of-η-is-section α h (inl a) = ap inl (h a)
+  retraction-of-η-is-section α h (inr u) = 𝟘-elim (raw-T-algebras-are-non-empty α u)
+
+  section-of-η-is-retraction : {A : 𝓤 ̇ } (α : T A → A)
+                             → η A ∘ α ∼ id
+                             → α ∘ η A ∼ id
+  section-of-η-is-retraction α k a = inl-lc (k (inl a))
+
+  η⁻¹ : {A : 𝓤 ̇ } → is-nonempty A → (T A → A)
+  η⁻¹ ϕ (inl a) = a
+  η⁻¹ ϕ (inr u) = 𝟘-elim (ϕ u)
+
+  η⁻¹-is-retraction : {A : 𝓤 ̇ } (ϕ : is-nonempty A) → η⁻¹ ϕ ∘ η A ∼ id
+  η⁻¹-is-retraction ϕ a = refl
+
+  η⁻¹-is-section : {A : 𝓤 ̇ } (ϕ : is-nonempty A) → η A ∘ η⁻¹ ϕ ∼ id
+  η⁻¹-is-section ϕ = retraction-of-η-is-section (η⁻¹ ϕ) (η⁻¹-is-retraction ϕ)
+
+  η-invertible-gives-non-empty : {X : 𝓤 ̇ } → invertible (η X) → is-nonempty X
+  η-invertible-gives-non-empty (α , _ , _) = raw-T-algebras-are-non-empty α
+
+  nonempty-gives-η-invertible : {X : 𝓤 ̇ } → is-nonempty X → invertible (η X)
+  nonempty-gives-η-invertible {𝓤} {X} ϕ = η⁻¹ ϕ , η⁻¹-is-retraction ϕ , η⁻¹-is-section ϕ
+
+  η-≃ : (X : 𝓤 ̇ ) → is-nonempty X → X ≃ T X
+  η-≃ X ϕ = qinveq (η X) (nonempty-gives-η-invertible ϕ)
+
+  retractions-of-η-are-invertible : {A : 𝓤 ̇ } (α : T A → A)
+                                  → α ∘ η A ∼ id
+                                  → invertible α
+  retractions-of-η-are-invertible {𝓤} {A} α h = η A , retraction-of-η-is-section α h , h
+
+  retractions-of-η-are-unique : {A : 𝓤 ̇ } (α : T A → A)
+                              → α ∘ η A ∼ id
+                              → (ϕ : is-nonempty A) → α ∼ η⁻¹ ϕ
+  retractions-of-η-are-unique α h ϕ (inl a) = h a
+  retractions-of-η-are-unique α h ϕ (inr u) = 𝟘-elim (ϕ u)
+
+  is-proto-algebra : 𝓤 ̇ → 𝓤 ̇
+  is-proto-algebra A = Σ α ꞉ (T A → A) , α ∘ η A ∼ id
+
+  proto-algebras-are-non-empty : {A : 𝓤 ̇ } → is-proto-algebra A → is-nonempty A
+  proto-algebras-are-non-empty (α , _) = raw-T-algebras-are-non-empty α
+
+  nonempty-types-are-proto-algebras : {A : 𝓤 ̇ } → is-nonempty A → is-proto-algebra A
+  nonempty-types-are-proto-algebras ϕ = η⁻¹ ϕ , η⁻¹-is-retraction ϕ
+
+\end{code}
+
+End of digression.
+
+\begin{code}
 
 𝟙-decidable : decidable (𝟙 {𝓤})
 𝟙-decidable = pointed-decidable *
@@ -196,5 +298,105 @@ module _ (pt : propositional-truncations-exist) where
   where
    h : (Σ x ꞉ X , p x ≡ ₀) → 𝟘
    h (x , r) = zero-is-not-one (r ⁻¹ ∙ α x)
+
+\end{code}
+
+Tom de Jong, 1 November 2021.
+
+We show that 𝟚 classifies decidable subsets.
+
+We start by defining the type Ωᵈ 𝓤 of decidable propositions in a type
+universe 𝓤 and we show that 𝟚 ≃ Ωᵈ 𝓤 (for any universe 𝓤).
+
+\begin{code}
+
+private
+ Ωᵈ : (𝓤 : Universe) → 𝓤 ⁺ ̇
+ Ωᵈ 𝓤 = Σ P ꞉ Ω 𝓤 , decidable (P holds)
+
+ ⟨_⟩ : Ωᵈ 𝓤 → 𝓤 ̇
+ ⟨ (P , i) , δ ⟩ = P
+
+open import UF-Equiv
+open import UF-Subsingletons-FunExt
+open import UF-FunExt
+open import UF-Lower-FunExt
+
+module _
+        {𝓤 : Universe}
+        (fe : funext 𝓤 𝓤)
+        (pe : propext 𝓤)
+       where
+
+ to-Ωᵈ-equality : (P Q : Ωᵈ 𝓤)
+                → (⟨ P ⟩ → ⟨ Q ⟩)
+                → (⟨ Q ⟩ → ⟨ P ⟩)
+                → P ≡ Q
+ to-Ωᵈ-equality ((P , i) , δ) ((Q , j) , ε) α β =
+  to-subtype-≡ σ (to-subtype-≡ τ (pe i j α β))
+  where
+   σ : (P : Ω 𝓤) → is-prop (decidable (P holds))
+   σ P = decidability-of-prop-is-prop (lower-funext 𝓤 𝓤 fe) (holds-is-prop P)
+   τ : (X : 𝓤 ̇) → is-prop (is-prop X)
+   τ _ = being-prop-is-prop fe
+
+ 𝟚-is-the-type-of-decidable-propositions : 𝟚 ≃ Ωᵈ 𝓤
+ 𝟚-is-the-type-of-decidable-propositions = qinveq f (g , η , ε)
+  where
+   -- Because of the definition of boolean-value above,
+   -- the map f (somewhat confusingly) sends ₀ to 𝟙 and ₁ to 𝟘.
+   f : 𝟚 → Ωᵈ 𝓤
+   f ₀ = ((𝟙 , 𝟙-is-prop) , inl *)
+   f ₁ = ((𝟘 , 𝟘-is-prop) , inr 𝟘-elim)
+   g : Ωᵈ 𝓤 → 𝟚
+   g (P , δ) = pr₁ (boolean-value δ)
+   η : g ∘ f ∼ id
+   η ₀ = refl
+   η ₁ = refl
+   ε : f ∘ g ∼ id
+   ε P = 𝟚-equality-cases ε₀ ε₁
+    where
+     lemma : (g P ≡ ₀ → ⟨ P ⟩)
+           × (g P ≡ ₁ → ¬ ⟨ P ⟩)
+     lemma = pr₂ (boolean-value (pr₂ P))
+     ε₀ : g P ≡ ₀
+        → (f ∘ g) P ≡ P
+     ε₀ e = to-Ωᵈ-equality (f (g P)) P
+             (λ _ → pr₁ lemma e)
+             (λ _ → back-transport (λ (b : 𝟚) → ⟨ f b ⟩) e *)
+     ε₁ : g P ≡ ₁
+        → (f ∘ g) P ≡ P
+     ε₁ e = to-Ωᵈ-equality (f (g P)) P
+             (λ (q : ⟨ f (g P) ⟩) → 𝟘-elim (transport (λ b → ⟨ f b ⟩) e q))
+             (λ (p : ⟨ P ⟩      ) → 𝟘-elim (pr₂ lemma e p))
+
+\end{code}
+
+The promised result now follows promptly using two general lemmas on
+equivalences.
+
+(Note that one direction of the equivalence ΠΣ-distr-≃ is sometimes known as
+"type-theoretic axiom of choice".)
+
+\begin{code}
+
+open import UF-Powerset
+open import UF-EquivalenceExamples
+
+is-decidable-subset : {X : 𝓤 ̇  } → (X → Ω 𝓣) → 𝓤 ⊔ 𝓣 ̇
+is-decidable-subset {𝓤} {𝓣} {X} A = (x : X) → decidable (x ∈ A)
+
+𝟚-classifies-decidable-subsets : funext 𝓤 (𝓣 ⁺) → funext 𝓣 𝓣
+                               → propext 𝓣
+                               → {X : 𝓤 ̇  }
+                               → (X → 𝟚)
+                               ≃ (Σ A ꞉ (X → Ω 𝓣) , is-decidable-subset A)
+𝟚-classifies-decidable-subsets {𝓤} {𝓣} fe fe' pe {X} =
+ (X → 𝟚)                                    ≃⟨ γ          ⟩
+ (X → Ωᵈ 𝓣)                                ≃⟨ ΠΣ-distr-≃ ⟩
+ (Σ A ꞉ (X → Ω 𝓣) , is-decidable-subset A) ■
+  where
+   γ = →cong' fe (lower-funext 𝓤 (𝓣 ⁺) fe)
+        (𝟚-is-the-type-of-decidable-propositions fe' pe)
 
 \end{code}

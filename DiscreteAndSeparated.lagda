@@ -26,7 +26,7 @@ is-isolated : {X : 𝓤 ̇ } → X → 𝓤 ̇
 is-isolated x = ∀ y → decidable (x ≡ y)
 
 is-perfect : 𝓤 ̇ → 𝓤 ̇
-is-perfect X = ¬ (Σ x ꞉ X , is-isolated x)
+is-perfect X = is-empty (Σ x ꞉ X , is-isolated x)
 
 is-isolated' : {X : 𝓤 ̇ } → X → 𝓤 ̇
 is-isolated' x = ∀ y → decidable (y ≡ x)
@@ -82,15 +82,15 @@ props-are-discrete i x y = inl (i x y)
    step (inl r) = inl (ap succ r)
    step (inr f) = inr (λ s → f (succ-lc s))
 
-+discrete : {X : 𝓤 ̇ } {Y : 𝓥 ̇ }
++-is-discrete : {X : 𝓤 ̇ } {Y : 𝓥 ̇ }
           → is-discrete X → is-discrete Y → is-discrete (X + Y)
-+discrete d e (inl x) (inl x') =
++-is-discrete d e (inl x) (inl x') =
     Cases (d x x')
      (λ (p : x ≡ x') → inl (ap inl p))
      (λ (n : ¬ (x ≡ x')) → inr (contrapositive inl-lc n))
-+discrete d e (inl x) (inr y) = inr +disjoint
-+discrete d e (inr y) (inl x) = inr +disjoint'
-+discrete d e (inr y) (inr y') =
++-is-discrete d e (inl x) (inr y) = inr +disjoint
++-is-discrete d e (inr y) (inl x) = inr +disjoint'
++-is-discrete d e (inr y) (inr y') =
     Cases (e y y')
      (λ (p : y ≡ y') → inl (ap inr p))
      (λ (n : ¬ (y ≡ y')) → inr (contrapositive inr-lc n))
@@ -479,16 +479,16 @@ discrete-exponential-has-decidable-emptiness-of-exponent : {X : 𝓤 ̇ } {Y : �
                                                          → funext 𝓤 𝓥
                                                          → (Σ y₀ ꞉ Y , Σ y₁ ꞉ Y , y₀ ≢ y₁)
                                                          → is-discrete (X → Y)
-                                                         → decidable (¬ X)
+                                                         → decidable (is-empty X)
 discrete-exponential-has-decidable-emptiness-of-exponent {𝓤} {𝓥} {X} {Y} fe (y₀ , y₁ , ne) d = γ
  where
   a : decidable ((λ _ → y₀) ≡ (λ _ → y₁))
   a = d (λ _ → y₀) (λ _ → y₁)
 
-  f : decidable ((λ _ → y₀) ≡ (λ _ → y₁)) → decidable (¬ X)
+  f : decidable ((λ _ → y₀) ≡ (λ _ → y₁)) → decidable (is-empty X)
   f (inl p) = inl g
    where
-    g : ¬ X
+    g : is-empty X
     g x = ne q
      where
       q : y₀ ≡ y₁
@@ -496,10 +496,10 @@ discrete-exponential-has-decidable-emptiness-of-exponent {𝓤} {𝓥} {X} {Y} f
 
   f (inr ν) = inr (contrapositive g ν)
    where
-    g : ¬ X → (λ _ → y₀) ≡ (λ _ → y₁)
+    g : is-empty X → (λ _ → y₀) ≡ (λ _ → y₁)
     g ν = dfunext fe (λ x → 𝟘-elim (ν x))
 
-  γ : decidable (¬ X)
+  γ : decidable (is-empty X)
   γ = f a
 
 \end{code}

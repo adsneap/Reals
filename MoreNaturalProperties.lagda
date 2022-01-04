@@ -1,6 +1,6 @@
 Andrew Sneap - 27th April 2021
 
-I link to this module within the NaturalNumbers section of my report.
+In this file I prove some common properties of Naturals Numbers and addition of Natural Numbers
 
 \begin{code}
 
@@ -8,8 +8,8 @@ I link to this module within the NaturalNumbers section of my report.
 
 open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
-import NaturalsAddition --TypeTopology
-import NaturalNumbers-Properties --Type Topology
+open import NaturalsAddition --TypeTopology
+open import NaturalNumbers-Properties --TypeTopology
 
 module MoreNaturalProperties where
 
@@ -44,8 +44,6 @@ succ-left x = induction base step
                 succ (k + x)  ≡⟨ succ-left k x ⁻¹ ⟩
                 succ k + x ∎
 
-open NaturalNumbers-Properties --TypeTopology
-
 addition-left-cancellable : (x y z : ℕ) → z + x ≡ z + y → x ≡ y
 addition-left-cancellable x y = induction base step
  where
@@ -75,12 +73,7 @@ addition-right-cancellable x y z r = addition-left-cancellable x y z lemma₀
            x + z      ≡⟨ r                          ⟩
            y + z      ≡⟨ addition-commutativity y z ⟩ 
            z + y ∎
-{-
-ap₂addition : (x y u v : ℕ) → x ≡ y → u ≡ v → x + u ≡ y + v
-ap₂addition x y u v e₁ e₂ = x + u      ≡⟨ ap (_+ u) e₁ ⟩
-                           y + u      ≡⟨ ap (y +_) e₂ ⟩ 
-                           y + v ∎
--}
+
 sum-to-zero-gives-zero : (x y : ℕ) → x + y ≡ 0 → y ≡ 0
 sum-to-zero-gives-zero x 0        e = refl
 sum-to-zero-gives-zero x (succ y) e = have positive-not-zero (x + y) which-contradicts e

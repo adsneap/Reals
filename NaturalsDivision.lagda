@@ -1,6 +1,6 @@
 Andrew Sneap - 27th April 2021
 
-I link to this module the Natural Numbers section of my report.
+In this file I define the division operator on Natural Numbers, and prove the division theorem.
 
 \begin{code}
 
@@ -8,36 +8,27 @@ I link to this module the Natural Numbers section of my report.
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
 
-import NaturalsAddition --TypeTopology
-import NaturalNumbers-Properties -- TypeTopology
-import NaturalsOrder
-import UF-Base --TypeTopology
-import UF-Miscelanea -- TypeTopology
-import UF-Subsingletons -- TypeTopology
+open import NaturalsAddition --TypeTopology
+open import NaturalNumbers-Properties -- TypeTopology
+open import NaturalsOrder --TypeTopology
+open import UF-Base --TypeTopology
+open import UF-Miscelanea -- TypeTopology
+open import UF-Subsingletons -- TypeTopology
 
-import MoreNaturalProperties
-import NaturalsMultiplication
-import NaturalsOrderExtended --TypeTopology
+open import MoreNaturalProperties
+open import NaturalsMultiplication
+open import NaturalsOrderExtended 
 
 module NaturalsDivision where
 
-open NaturalNumbers-Properties --TypeTopology
-open NaturalsMultiplication 
-
 _∣_ : ℕ → ℕ → 𝓤₀ ̇
 x ∣ y = Σ a ꞉ ℕ , (x * a ≡ y)
-
-open UF-Miscelanea --TypeTopology
-open UF-Subsingletons --TypeTopology
 
 _∣_-is-prop : (x y : ℕ) → is-prop (succ x ∣ y)
 _∣_-is-prop x y (a , p) (b , p') = to-subtype-≡ (λ _ → ℕ-is-set) (mult-left-cancellable a b x (p ∙ p' ⁻¹))
 
 zero-does-not-divide-positive : (x : ℕ) → ¬(0 ∣ succ x)
 zero-does-not-divide-positive x (a , p) = positive-not-zero x (p ⁻¹ ∙ zero-left-is-zero a)
-
-open NaturalsOrder --TypeTopology
-open NaturalsOrderExtended
 
 ∣-anti-lemma : (x y z : ℕ) → x < y → x < z → x < y * z
 ∣-anti-lemma x y = induction base step
@@ -121,8 +112,6 @@ product-one-gives-one x y r = tri-split (nat-order-trichotomous x 1)
       y * b  ≡⟨ ap (y *_) b-is-1 ⟩
       y      ∎
 
-open NaturalsAddition --TypeTopology
-
 ∣-respects-addition : (x y z : ℕ) → x ∣ y → x ∣ z → x ∣ (y + z)
 ∣-respects-addition x y z (a , p) (b , q) = (a + b , I)
  where
@@ -131,8 +120,6 @@ open NaturalsAddition --TypeTopology
       x * a + x * b ≡⟨ ap (_+ x * b) p                    ⟩
       y + x * b     ≡⟨ ap (y +_) q                        ⟩
       y + z         ∎
-
-open UF-Base --TypeTopology
 
 ∣-respects-multiples : (a b c k l : ℕ) → a ∣ b → a ∣ c → a ∣ (k * b + l * c)
 ∣-respects-multiples a b c k l (x , p) (y , q) = (k * x + l * y , I)
@@ -165,8 +152,6 @@ open UF-Base --TypeTopology
 
 divisiontheorem : (a d : ℕ) → 𝓤₀ ̇
 divisiontheorem a d = Σ q ꞉ ℕ , Σ r ꞉ ℕ , (a ≡ q * d + r) × (r < d)
-
-open MoreNaturalProperties
 
 division : (a d : ℕ) → divisiontheorem a (succ d)
 division a d = induction base step a
