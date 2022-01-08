@@ -4,6 +4,7 @@ Andrew Sneap
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
 
+open import UF-Base --TypeTopology
 open import UF-FunExt --TypeTopology
 
 open import NaturalsOrderExtended
@@ -100,8 +101,8 @@ embedding-ℕ-to-ℚ n = toℚ (pos n , 0)
 embedding-1/ℕ-to-ℚ : ℕ → ℚ
 embedding-1/ℕ-to-ℚ n = toℚ (pos 1 , n)
 
-always-a-smaller-ε : (ε : ℚ) → 0ℚ < ε → Σ n ꞉ ℕ , (embedding-ℕ-to-ℚ n < ε)
-always-a-smaller-ε = {!!}
+-- always-a-smaller-ε : (ε : ℚ) → 0ℚ < ε → Σ n ꞉ ℕ , (embedding-ℕ-to-ℚ n < ε)
+-- always-a-smaller-ε = {!!}
 
 open import NaturalsDivision
 open import NaturalsAddition renaming (_+_ to _ℕ+_)
@@ -111,18 +112,34 @@ open import IntegersMultiplication renaming (_*_ to _ℤ*_)
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 
 ⟨1/sn⟩-converges : 0ℚ limit-of ⟨1/sn⟩
-⟨1/sn⟩-converges ((pos 0 , a) , ε)        l = 𝟘-elim {!l!}
-⟨1/sn⟩-converges ((negsucc x , a) , ε)    l = 𝟘-elim {!l!}
-⟨1/sn⟩-converges ((pos (succ x) , a) , ε) l = q ℕ+ 1 , I
+⟨1/sn⟩-converges ((pos 0 , a) , ε)        l = 𝟘-elim {!!}
+⟨1/sn⟩-converges ((negsucc x , a) , ε)    l = 𝟘-elim {!!}
+⟨1/sn⟩-converges ((pos (succ x) , a) , ε) l = q ℕ+ 1 , conclusion 
  where
   rough-N : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (a ≡ q ℕ* succ x ℕ+ r) × (r ℕ< succ x)
   rough-N = division a x
   q = pr₁ rough-N
-  I : (n : ℕ) → (q ℕ+ 1) ℕ≤ n → ℚ-metric fe (⟨1/sn⟩ n) 0ℚ < ((pos (succ x) , a) , ε)
-  I n l' = {!!}
+  r = pr₁ (pr₂ rough-N)
+  
+  I : a ℕ< (succ x ℕ* (q ℕ+ 1))
+  I = transport₂ _ℕ<_ ii iii i
+   where
+    i : (q ℕ* succ x ℕ+ r) ℕ< (q ℕ* succ x ℕ+ succ x)
+    i = <-n-monotone-left r (succ x) (q ℕ* succ x) (pr₂ (pr₂ (pr₂ rough-N)))
+
+    ii : q ℕ* succ x ℕ+ r ≡ a -- a ≡ q ℕ* succ x ℕ+ r
+    ii = pr₁ (pr₂ (pr₂ rough-N)) ⁻¹
+
+    iii : q ℕ* succ x ℕ+ succ x ≡ succ x ℕ* (q ℕ+ 1)
+    iii = q ℕ* succ x ℕ+ succ x      ≡⟨ ap₂ _ℕ+_ (mult-commutativity q (succ x)) (mult-right-id (succ x) ⁻¹) ⟩
+          succ x ℕ* q ℕ+ succ x ℕ* 1 ≡⟨ distributivity-mult-over-nat (succ x) q 1 ⁻¹ ⟩
+          succ x ℕ* (q ℕ+ 1) ∎
+  
+  conclusion : (n : ℕ) → (q ℕ+ 1) ℕ≤ n → ℚ-metric fe (⟨1/sn⟩ n) 0ℚ < ((pos (succ x) , a) , ε)
+  conclusion 0 l' = 𝟘-elim l'
+  conclusion (succ n) l' = {!!}
    where    
     
-
 limits-lemma : (k : ℕ) → ((pos 1 , succ k) ℚₙ* (pos 2 , 2)) ℚₙ≤ (pos 1 , succ (succ k))
 limits-lemma k = k , I
  where
@@ -193,14 +210,5 @@ limits-lemma k = k , I
 
 ⟨2/3⟩^n-converges : 0ℚ limit-of ⟨2/3⟩^_
 ⟨2/3⟩^n-converges = sandwich-theorem 0ℚ 0f ⟨2/3⟩^_ ⟨1/sn⟩ ⟨2/3⟩^n-squeezed 0f-converges ⟨1/sn⟩-converges
-
-
-
-
-
-
-
-
-
 
 \end{code}

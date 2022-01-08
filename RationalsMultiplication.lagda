@@ -8,8 +8,12 @@ open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
 
 open import UF-Base hiding (_≈_) --TypeTopology
 open import UF-FunExt --TypeTopology
+open import NaturalNumbers-Properties -- TypeTopology
 
+open import IntegersAbs
 open import IntegersB
+open import IntegersMultiplication renaming (_*_ to _ℤ*_)
+open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import ncRationals
 open import ncRationalsOperations renaming (_*_ to _ℚₙ*_ ; _+_ to _ℚₙ+_)
 open import Rationals
@@ -152,6 +156,54 @@ toℚ-* fe p q = equiv→equality fe (p ℚₙ* q) (p' ℚₙ* q') conclusion
        p * (q + r) ≡⟨ I ⟩
        p * q + p * r ≡⟨ ap₂ _+_ (ℚ*-comm p q) (ℚ*-comm p r) ⟩
        q * p + r * p ∎
+
+multiplicative-inverse : Fun-Ext → (q : ℚ) → ¬ (q ≡ 0ℚ) → ℚ 
+multiplicative-inverse fe ((pos 0        , a) , p) nz = 𝟘-elim (nz (numerator-zero-is-zero fe (((pos 0 , a) , p)) refl))
+multiplicative-inverse fe ((pos (succ x) , a) , p) nz = toℚ ((pos (succ a)) , x)
+multiplicative-inverse fe ((negsucc x    , a) , p) nz = toℚ ((negsucc  a) , x)
+
+division-by-self-is-one : Fun-Ext → ((x , a) : ℚₙ) → x ≡ pos (succ a) → toℚ (x , a) ≡ 1ℚ
+division-by-self-is-one fe (negsucc x    , a) e = 𝟘-elim (neg-not-positive e)
+division-by-self-is-one fe (pos 0        , a) e = 𝟘-elim (zero-not-positive a (pos-lc e))
+division-by-self-is-one fe (pos (succ x) , a) e = I II
+ where
+  I : (pos (succ x) , a) ≈ (pos 1 , 0) → toℚ (pos (succ x) , a) ≡ toℚ (pos 1 , 0)
+  I = lr-implication (equiv-equality fe (pos (succ x) , a) (pos (succ 0) , 0))
+
+  II : (pos (succ x) , a) ≈ (pos 1 , 0)
+  II = pos (succ x) ≡⟨ e ⟩
+       pos (succ a) ≡⟨ ℤ-mult-left-id (pos (succ a)) ⁻¹ ⟩
+       pos 1 ℤ* pos (succ a) ∎
+
+ℚ*-inverse-product-is-one : (fe : Fun-Ext) → (q : ℚ) → (nz : ¬ (q ≡ 0ℚ)) → q * multiplicative-inverse fe q nz ≡ 1ℚ
+ℚ*-inverse-product-is-one fe ((pos zero     , a) , p) nz = 𝟘-elim (nz (numerator-zero-is-zero fe ((pos zero , a) , p) refl))
+ℚ*-inverse-product-is-one fe ((pos (succ x) , a) , p) nz = γ
+ where
+  ψ : pos (succ x) ℤ* pos (succ a) ≡ pos (succ (pred (succ a ℕ* succ x)))
+  ψ = pos (succ x) ℤ* pos (succ a) ≡⟨ ℤ*-comm (pos (succ x)) (pos (succ a)) ⟩
+      pos (succ a) ℤ* pos (succ x) ≡⟨ denom-setup a x ⁻¹ ⟩
+      pos (succ (pred (succ a ℕ* succ x))) ∎
+
+  γ : ((pos (succ x) , a) , p) * toℚ ((pos (succ a)) , x) ≡ 1ℚ
+  γ = ((pos (succ x) , a) , p) * toℚ ((pos (succ a)) , x)    ≡⟨ ap (_* toℚ (pos (succ a) , x)) (toℚ-toℚₙ fe (((pos (succ x) , a) , p))) ⟩
+      toℚ (pos (succ x) , a) * toℚ (pos (succ a) , x)        ≡⟨ toℚ-* fe (pos (succ x) , a) (pos (succ a) , x) ⁻¹ ⟩
+      toℚ ((pos (succ x) , a) ℚₙ* (pos (succ a) , x))        ≡⟨ refl ⟩
+      toℚ ((pos (succ x) ℤ* pos (succ a)) , (pred (succ a ℕ* succ x))) ≡⟨ division-by-self-is-one fe ((pos (succ x) ℤ* pos (succ a)) , (pred (succ a ℕ* succ x))) ψ ⟩
+      toℚ (pos 1 , 0)                                        ≡⟨ refl ⟩
+      1ℚ                                                     ∎
+ℚ*-inverse-product-is-one fe ((negsucc x    , a) , p) nz = γ
+ where
+  ψ : negsucc x ℤ* negsucc a ≡ pos (succ (pred (succ a ℕ* succ x)))
+  ψ = negsucc x ℤ* negsucc a       ≡⟨ minus-times-minus-is-positive (pos (succ x)) (pos (succ a)) ⟩
+      pos (succ x) ℤ* pos (succ a) ≡⟨ ℤ*-comm (pos (succ x)) (pos (succ a)) ⟩
+      pos (succ a) ℤ* pos (succ x) ≡⟨ denom-setup a x ⁻¹ ⟩
+      pos (succ (pred (succ a ℕ* succ x))) ∎
+ 
+  γ : (((negsucc x , a) , p) * toℚ ((negsucc  a) , x)) ≡ 1ℚ
+  γ = ((negsucc x , a) , p) * toℚ (negsucc a , x) ≡⟨ ap (_* toℚ (negsucc a , x)) (toℚ-toℚₙ fe ((negsucc x , a) , p)) ⟩
+      (toℚ (negsucc x , a) * toℚ (negsucc a , x)) ≡⟨ toℚ-* fe (negsucc x , a) (negsucc a , x) ⁻¹ ⟩
+      toℚ ((negsucc x , a) ℚₙ* (negsucc a , x))   ≡⟨ division-by-self-is-one fe (negsucc x ℤ* negsucc a , pred (succ a ℕ* succ x)) ψ ⟩
+      1ℚ ∎
 
 ⟨2/3⟩^_ : ℕ → ℚ
 ⟨2/3⟩^ 0         = toℚ (pos 1 , 0)

@@ -543,7 +543,15 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
           - (- y) ≡⟨ II ⟩
           - (- x) ≡⟨ ℚ-minus-minus fe x ⁻¹ ⟩
           x ∎
-  
+{-
+ℚ<-mult-inverse-swap : (fe : Fun-Ext)
+                     → (p q : ℚ)
+                     → (pnz : p ≢ 0ℚ)
+                     → (qnz : q ≢ 0ℚ)
+                     → p < q
+                     → multiplicative-inverse fe p pnz < multiplicative-inverse fe q qnz
+ℚ<-mult-inverse-swap fe p q pnz qnz l = {!!}
+  -}
 ℚ-equal-or-less-than-is-prop : Fun-Ext → (x y : ℚ) → is-prop ((x ≡ y) ∔ (y < x))
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inl r) = ap inl (ℚ-is-set fe l r)
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inr r) = 𝟘-elim (ℚ<-not-itself y ((transport (y <_) l r)))
@@ -665,5 +673,7 @@ trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
       d * 2/3 + (x - x)     ≡⟨ ap₂ _+_ (ℚ*-comm d 2/3) (ℚ-inverse-sum-to-zero fe x) ⟩
       2/3 * d + 0ℚ          ≡⟨ ℚ-zero-right-neutral fe (2/3 * d) ⟩
       2/3 * d ∎
+
+
 
 \end{code}

@@ -261,5 +261,15 @@ numerator-zero-is-zero fe ((pos zero , a) , icd , f) e = to-subtype-≡ (is-in-l
     II = ∣-anti (succ a) 1 (f (succ a) ((0 , refl) , 1 , refl)) (pr₂ icd)
 numerator-zero-is-zero fe ((pos (succ x) , a) , p) e = 𝟘-elim (positive-not-zero x (pos-lc e))
 
+toℚ-toℚₙ : Fun-Ext → ((r , p) : ℚ) → (r , p) ≡ toℚ r
+toℚ-toℚₙ fe (r , p) = II
+ where
+  rp' = toℚ r
+  r' = pr₁ (toℚ r)
+  r'lt = pr₂ (toℚ r)
+  I = equiv-with-lowest-terms-is-equal r r' (≈-toℚ r) p r'lt
+  II : r , p ≡ pr₁ (pr₁ (toℚlemma r)) , pr₂ (pr₁ (toℚlemma r))
+  II = to-subtype-≡ (is-in-lowest-terms-is-prop fe) I
+
 
 
