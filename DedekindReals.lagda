@@ -3,7 +3,7 @@ Andrew Sneap
 
 \begin{code}
 
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe #-}
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
 

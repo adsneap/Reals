@@ -542,6 +542,7 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
     III = y ≡⟨ ℚ-minus-minus fe y ⟩
           - (- y) ≡⟨ II ⟩
           - (- x) ≡⟨ ℚ-minus-minus fe x ⁻¹ ⟩
+
           x ∎
 {-
 ℚ<-mult-inverse-swap : (fe : Fun-Ext)
@@ -551,7 +552,7 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
                      → p < q
                      → multiplicative-inverse fe p pnz < multiplicative-inverse fe q qnz
 ℚ<-mult-inverse-swap fe p q pnz qnz l = {!!}
-  -}
+-}
 ℚ-equal-or-less-than-is-prop : Fun-Ext → (x y : ℚ) → is-prop ((x ≡ y) ∔ (y < x))
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inl r) = ap inl (ℚ-is-set fe l r)
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inr r) = 𝟘-elim (ℚ<-not-itself y ((transport (y <_) l r)))
