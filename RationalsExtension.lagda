@@ -10,11 +10,13 @@ open import UF-FunExt -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
 open import UF-Powerset --TypeTopology
 open import UF-Subsingletons --TypeTopology
+open import UF-Subsingletons-FunExt --TypeTopology
 
 open import Rationals
 open import RationalsOrder
 
 module RationalsExtension
+  (pe : Prop-Ext)
   (pt : propositional-truncations-exist)
   (fe : Fun-Ext)
   -- (pe : propext 𝓤₀)
@@ -22,7 +24,7 @@ module RationalsExtension
 
 open PropositionalTruncation pt
 
-open import DedekindReals pt fe 
+open import DedekindReals pe pt fe 
 
 
 \end{code}
@@ -66,11 +68,10 @@ order-preserving-and-bijection f g f-preserves-order f-g-bijection = γ
 The code without the unneeded assumption. 
 \begin{code}
 
-order-preserving-and-bijection' : (f : ℚ → ℚ)
-                               → (g : ℚ → ℚ) 
-                               → ((p q : ℚ) → p < q ⇔ f p < f q)
-                               → ((r : ℚ) → (f (g r) ≡ r))
-                               → ((p q : ℚ) → p < q ⇔ g p < g q)
+order-preserving-and-bijection' : (f g : ℚ → ℚ) 
+                                → ((p q : ℚ) → p < q ⇔ f p < f q)
+                                → ((r : ℚ) → (f (g r) ≡ r))
+                                → ((p q : ℚ) → p < q ⇔ g p < g q)
 order-preserving-and-bijection' f g f-preserves-order f-g-bijection = γ
  where
   γ : (p q : ℚ) → (p < q) ⇔ (g p < g q)
@@ -202,11 +203,91 @@ f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabit
     II = pr₁ I
     III : g p ∈ L ∨ g q ∈ R
     III = located-x (g p) (g q) (II l)
- 
+
+diagram-commutes : (f g : ℚ → ℚ) 
+                 → (f-order-preserving : ((p q : ℚ) → p < q ⇔ f p < f q))
+                 → (f-g-bijective : ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r)))
+                 → (q : ℚ) → (f-bar f g f-order-preserving f-g-bijective ∘ embedding-ℚ-to-ℝ) q ≡ (embedding-ℚ-to-ℝ ∘ f) q
+diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar f g f-order-preserving f-g-bijective ∘ embedding-ℚ-to-ℝ) q) ((embedding-ℚ-to-ℝ ∘ f) q) I II III IV
+ where
+  I : (a : ℚ) → g a < q → a < f q 
+  I a b = transport (_< f q) ii i
+   where
+    i : f (g a) < f q
+    i = (pr₁ (f-order-preserving (g a) q)) b
+    ii : f (g a) ≡ a
+    ii = pr₂ (f-g-bijective a)
+  II : (a : ℚ) → a < f q → g a < q
+  II a b = transport (g a <_) ii i
+   where
+    i : g a < g (f q)
+    i = (pr₁ (order-preserving-and-bijection f g f-order-preserving f-g-bijective a (f q))) b
+    ii : g (f q) ≡ q
+    ii = pr₁ (f-g-bijective q)
+  III : (a : ℚ) → q < g a → f q < a
+  III a b = transport (f q <_) ii i
+   where
+    i : f q < f (g a)
+    i = (pr₁ (f-order-preserving q (g a))) b
+    ii : f (g a) ≡ a
+    ii = pr₂ (f-g-bijective a)
+  IV : (a : ℚ) → f q < a → q < g a
+  IV a b = transport (_< g a) ii i
+   where
+    i : g (f q) < g a
+    i = (pr₁ (order-preserving-and-bijection f g f-order-preserving f-g-bijective (f q) a)) b
+    ii : g (f q) ≡ q
+    ii = pr₁ (f-g-bijective q)
+
+open import RationalsAddition
+
+ℚ-succ : ℚ → ℚ 
+ℚ-succ q = q + 1ℚ
+
+open import RationalsNegation
+
+ℚ-pred : ℚ → ℚ
+ℚ-pred q = q - 1ℚ
+
+this : (p : ℚ) → p + 1ℚ + -1ℚ ≡ p
+this p =   p + 1ℚ + -1ℚ   ≡⟨ ℚ+-assoc fe p 1ℚ (- 1ℚ) ⟩
+           p + (1ℚ - 1ℚ)  ≡⟨ ap (p +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
+           p + 0ℚ         ≡⟨ ℚ-zero-right-neutral fe p ⟩ p ∎
+
+ℚ-succ-ext : ℝ → ℝ
+ℚ-succ-ext = f-bar ℚ-succ ℚ-pred I II
+ where
+  I : (p q : ℚ) → (p < q) ⇔ (ℚ-succ p < ℚ-succ q)
+  I p q = i , ii
+   where
+    i : p < q → ℚ-succ p < ℚ-succ q
+    i l = ℚ<-addition-preserves-order p q 1ℚ l
+    ii : ℚ-succ p < ℚ-succ q → p < q
+    ii l = transport₂ _<_ iv v iii
+     where
+      iii : (p + 1ℚ + (- 1ℚ)) < (q + 1ℚ + (- 1ℚ))
+      iii = ℚ<-addition-preserves-order (p + 1ℚ) (q + 1ℚ) (- 1ℚ) l
+      iv : p + 1ℚ + (-1ℚ) ≡ p
+      iv = this p
+      v : (q + 1ℚ + (- 1ℚ)) ≡ q
+      v =  this q
+  II : (r : ℚ) → (ℚ-pred (ℚ-succ r) ≡ r) × (ℚ-succ (ℚ-pred r) ≡ r)
+  II r = i , ii
+   where
+    i : ℚ-pred (ℚ-succ r) ≡ r
+    i = this r
+    ii : ℚ-succ (ℚ-pred r) ≡ r
+    ii = ℚ-succ (ℚ-pred r) ≡⟨ by-definition ⟩
+         r - 1ℚ + 1ℚ       ≡⟨ ℚ+-assoc fe r (- 1ℚ) 1ℚ ⟩
+         r + ((- 1ℚ) + 1ℚ) ≡⟨ ap (r +_) (ℚ+-comm (- 1ℚ) 1ℚ) ⟩
+         r + (1ℚ + (- 1ℚ)) ≡⟨ ap (r +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
+         r + 0ℚ ≡⟨ ℚ-zero-right-neutral fe r ⟩
+         r ∎
+
 single-extension : (f : ℚ → ℝ) → (ℝ → ℝ)
 single-extension f = {!!}
 
-embed : (ℚ → ℚ) → (ℝ → ℝ)
+embed : (ℚ → ℚ) → (ℝ → ℝ) 
 embed = single-extension ∘ (embedding-ℚ-to-ℝ ∘_)
 
 

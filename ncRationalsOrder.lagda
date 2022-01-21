@@ -10,6 +10,7 @@ open import NaturalNumbers-Properties --Type Topology
 open import UF-Base --TypeTopology
 open import UF-Subsingletons --TypeTopology
 
+open import IntegersAbs
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
@@ -187,6 +188,17 @@ p ℚₙ> q = q ℚₙ< p
 
 2/3ℚₙ≤1 : (pos 2 , 2) ℚₙ≤ (pos 1 , 0)
 2/3ℚₙ≤1 = 1 , refl
+
+negative-not-greater-than-zero : (x a : ℕ) → ¬ ((pos 0 , 0) ℚₙ<( negsucc x , a)) 
+negative-not-greater-than-zero x a (n , l) = neg-not-positive (I ⁻¹)
+ where
+  I : pos (succ n) ≡ negsucc x ℤ* pos 1
+  I = pos (succ n) ≡⟨ ℤ-zero-left-neutral (pos (succ n)) ⁻¹ ⟩
+      pos 0 ℤ+ pos (succ n) ≡⟨ ap (_ℤ+ pos (succ n)) (ℤ-zero-left-is-zero (pos (succ a)) ⁻¹) ⟩
+      pos 0 ℤ* pos (succ a) ℤ+ pos (succ n) ≡⟨ ℤ-right-succ (pos 0 ℤ* pos (succ a)) (pos n) ⟩
+      succℤ (pos 0 ℤ* pos (succ a) ℤ+ pos n) ≡⟨ ℤ-left-succ (pos 0 ℤ* pos (succ a)) (pos n) ⁻¹ ⟩
+      succℤ (pos 0 ℤ* pos (succ a)) ℤ+ pos n ≡⟨ l ⟩
+      negsucc x ℤ* pos 1 ∎
 
 
 

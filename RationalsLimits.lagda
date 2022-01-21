@@ -113,7 +113,7 @@ open import IntegersAddition renaming (_+_ to _ℤ+_)
 
 ⟨1/sn⟩-converges : 0ℚ limit-of ⟨1/sn⟩
 ⟨1/sn⟩-converges ((pos 0 , a) , ε)        l = 𝟘-elim (ℚ<-not-itself 0ℚ (transport (0ℚ <_) (numerator-zero-is-zero fe ((pos 0 , a) , ε) refl) l))
-⟨1/sn⟩-converges ((negsucc x , a) , ε)    l = 𝟘-elim {!!}
+⟨1/sn⟩-converges ((negsucc x , a) , ε)    l = 𝟘-elim (negative-not-greater-than-zero x a l)
 ⟨1/sn⟩-converges ((pos (succ x) , a) , ε) l = q ℕ+ 1 , conclusion 
  where
   rough-N : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (a ≡ q ℕ* succ x ℕ+ r) × (r ℕ< succ x)
@@ -135,14 +135,12 @@ open import IntegersAddition renaming (_+_ to _ℤ+_)
           succ x ℕ* q ℕ+ succ x ℕ* 1 ≡⟨ distributivity-mult-over-nat (succ x) q 1 ⁻¹ ⟩
           succ x ℕ* (q ℕ+ 1) ∎
 
-
-  
   conclusion : (n : ℕ) → (q ℕ+ 1) ℕ≤ n → ℚ-metric fe (⟨1/sn⟩ n) 0ℚ < ((pos (succ x) , a) , ε)
   conclusion 0 l' = 𝟘-elim l'
   conclusion (succ n) l' = {!!}
    where
      II : toℚ ((pos (succ a)) , x) < toℚ (pos (succ n) , 0)
-     II = toℚ-< (pos (succ a) , x) {!pos (succ n) , 0!} {!!}
+     II = toℚ-< (pos (succ a) , x) (pos (succ n) , 0) {!!}
     
 limits-lemma : (k : ℕ) → ((pos 1 , succ k) ℚₙ* (pos 2 , 2)) ℚₙ≤ (pos 1 , succ (succ k))
 limits-lemma k = k , I

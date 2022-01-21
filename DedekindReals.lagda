@@ -14,12 +14,13 @@ open import UF-Powerset -- TypeTopology
 open import UF-Retracts --TypeTopology
 open import UF-Subsingletons --TypeTopology
 open import UF-Subsingletons-FunExt --TypeTopology
-open import UF-Univalence --TypeTopology
+-- open import UF-Univalence --TypeTopology
 
 open import Rationals
 open import RationalsOrder renaming (_<_ to _ℚ<_)
 
 module DedekindReals
+         (pe : Prop-Ext)
          (pt : propositional-truncations-exist)
          (fe : Fun-Ext)
        where
@@ -29,10 +30,8 @@ open PropositionalTruncation pt
 ℚ-subset-of-propositions : 𝓤₁ ̇
 ℚ-subset-of-propositions = 𝓟 ℚ
 
-
---Powersets are sets
-ℚ-subset-of-propositions-is-set : Univalence → is-set ℚ-subset-of-propositions
-ℚ-subset-of-propositions-is-set univ = powersets-are-sets' univ
+ℚ-subset-of-propositions-is-set : is-set ℚ-subset-of-propositions
+ℚ-subset-of-propositions-is-set = powersets-are-sets fe pe
 
 inhabited-left : (L : ℚ-subset-of-propositions) → 𝓤₀ ̇
 inhabited-left L = (∃ p ꞉ ℚ , p ∈ L) 
@@ -116,11 +115,8 @@ isCut-is-prop L R = ×-is-prop (inhabited-left-is-prop L)
 ℝ : 𝓤₁ ̇
 ℝ = Σ (L , R) ꞉ ℚ-subset-of-propositions × ℚ-subset-of-propositions , isCut L R
 
-ℝ-is-set : Univalence → is-set ℝ
-ℝ-is-set univ = Σ-is-set (×-is-set (ℚ-subset-of-propositions-is-set univ) (ℚ-subset-of-propositions-is-set univ)) δ
- where
-  δ : ((L , R) : ℚ-subset-of-propositions × ℚ-subset-of-propositions) → is-set (isCut L R)
-  δ (L , R)= props-are-sets (isCut-is-prop L R)
+ℝ-is-set : is-set ℝ
+ℝ-is-set = Σ-is-set (×-is-set ℚ-subset-of-propositions-is-set ℚ-subset-of-propositions-is-set) λ (L , R) → props-are-sets (isCut-is-prop L R)
 
 embedding-ℚ-to-ℝ : ℚ → ℝ
 embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
@@ -184,5 +180,13 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
            → (Rx ≡ Ry)
            → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
 ℝ-equality ((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) e₁  e₂ = to-subtype-≡ (λ (L , R) → isCut-is-prop L R) (to-×-≡' (e₁ , e₂))
+
+ℝ-equality' : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ)
+           → (Lx ⊆ Ly)
+           → (Ly ⊆ Lx)
+           → (Rx ⊆ Ry)
+           → (Ry ⊆ Rx)
+           → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
+ℝ-equality' x y a b c d = ℝ-equality x y (subset-extensionality pe fe a b) (subset-extensionality pe fe c d)
 
 \end{code}

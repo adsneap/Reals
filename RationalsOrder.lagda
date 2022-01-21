@@ -542,7 +542,6 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
     III = y ≡⟨ ℚ-minus-minus fe y ⟩
           - (- y) ≡⟨ II ⟩
           - (- x) ≡⟨ ℚ-minus-minus fe x ⁻¹ ⟩
-
           x ∎
 {-
 ℚ<-mult-inverse-swap : (fe : Fun-Ext)
