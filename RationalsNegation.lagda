@@ -239,3 +239,13 @@ toℚ-neg fe (x , a) = IV
       - toℚ (x' , a') * toℚ (y' , b')      ≡⟨ ap₂ (λ z z' → - (z * z')) (pr₂ xa ⁻¹) (pr₂ yb ⁻¹) ⟩
       - ((x , a) , α) * ((y , b) , β)      ∎
 
+toℚ-subtraction : Fun-Ext → (p q : ℚₙ) → toℚ p - toℚ q ≡ toℚ (p ℚₙ+ (ℚₙ- q))
+toℚ-subtraction fe p q = II
+ where
+  I : toℚ (p ℚₙ+ (ℚₙ- q)) ≡ toℚ p + toℚ (ℚₙ- q)
+  I = toℚ-+ fe p (ℚₙ- q)
+  II : toℚ p - toℚ q ≡ toℚ (p ℚₙ+ (ℚₙ- q))
+  II = toℚ p - toℚ q       ≡⟨ ap (toℚ p +_) (toℚ-neg fe q) ⟩
+       toℚ p + toℚ (ℚₙ- q) ≡⟨ I ⁻¹ ⟩
+       toℚ (p ℚₙ+ (ℚₙ- q)) ∎
+

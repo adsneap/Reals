@@ -13,7 +13,7 @@ open import IntegersAbs hiding (abs)
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
-open import IntegersOrder hiding (_<_ ; _≤_)
+open import IntegersOrder renaming (_≤_ to _ℤ≤_) hiding (_<_)
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import ncRationals
 open import ncRationalsOperations renaming (abs to ℚₙ-abs) renaming (-_ to ℚₙ-_) hiding (_+_)
@@ -73,6 +73,24 @@ toℚ-abs fe (x , a) = conclusion
   
   conclusion : abs (toℚ (x , a)) ≡ toℚ (ℚₙ-abs (x , a))
   conclusion = helper I
+
+abs-of-pos-is-pos : Fun-Ext → (p : ℚ) → 0ℚ ≤ p → abs p ≡ p
+abs-of-pos-is-pos fe ((pos x , a) , α) l = I
+ where
+  I : abs ((pos x , a) , α) ≡ (pos x , a) , α
+  I = abs ((pos x , a) , α)    ≡⟨ by-definition ⟩
+      toℚ (ℚₙ-abs (pos x , a)) ≡⟨ by-definition ⟩
+      toℚ (pos x , a)          ≡⟨ toℚ-toℚₙ fe ((pos x , a) , α) ⁻¹ ⟩
+      ((pos x , a) , α) ∎
+abs-of-pos-is-pos fe ((negsucc x , a) , α) l = 𝟘-elim (III II)
+ where
+  I : (pos 0 ℤ* pos (succ a)) ℤ≤ (negsucc x ℤ* pos 1)
+  I = l
+  II : pos 0 ℤ≤ negsucc x
+  II = transport₂ _ℤ≤_ (ℤ-zero-left-is-zero (pos (succ a))) (ℤ-zero-right-neutral (negsucc x)) I
+  III : ¬ (pos 0 ℤ≤ negsucc x) 
+  III (k , e) = pos-not-negative (ℤ-zero-left-neutral (pos k) ⁻¹ ∙ e)
+  
 
 ℚ-abs-neg-equals-pos : Fun-Ext → (q : ℚ) → abs q ≡ abs (- q)
 ℚ-abs-neg-equals-pos fe (q , p) = conclusion

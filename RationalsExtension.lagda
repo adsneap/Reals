@@ -19,13 +19,11 @@ module RationalsExtension
   (pe : Prop-Ext)
   (pt : propositional-truncations-exist)
   (fe : Fun-Ext)
-  -- (pe : propext 𝓤₀)
  where
 
 open PropositionalTruncation pt
 
 open import DedekindReals pe pt fe 
-
 
 \end{code}
 

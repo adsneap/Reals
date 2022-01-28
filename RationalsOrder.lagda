@@ -1,3 +1,4 @@
+
 Andrew Sneap - 11th November 2021
 
 \begin{code}
@@ -468,6 +469,32 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
        q * r + ((- p * r) + p * r) ≡⟨ ap (q * r +_) (ℚ-inverse-sum-to-zero' fe (p * r)) ⟩
        q * r + 0ℚ                  ≡⟨ ℚ-zero-right-neutral fe (q * r) ⟩
        q * r ∎
+
+ℚ<-difference-positive : (fe : Fun-Ext) → (p q : ℚ) → p < q → 0ℚ < q - p
+ℚ<-difference-positive fe p q l = transport (_< q - p) (ℚ-inverse-sum-to-zero fe p) I
+ where
+  I : p - p < q - p
+  I = ℚ<-addition-preserves-order p q (- p) l
+
+ℚ<-pos-multiplication-preserves-order' : Fun-Ext → (p q r : ℚ) → p < q → 0ℚ < r → p * r < q * r
+ℚ<-pos-multiplication-preserves-order' fe p q r l₁ l₂ = transport₂ _<_ III IV II
+ where
+  I : 0ℚ < ((q - p) * r)
+  I = ℚ<-pos-multiplication-preserves-order (q - p) r (ℚ<-difference-positive fe p q l₁) l₂
+  
+  II : (0ℚ + p * r) < ((q - p) * r + p * r)
+  II = ℚ<-addition-preserves-order 0ℚ ((q - p) * r) (p * r) I
+
+  III : 0ℚ + p * r ≡ p * r
+  III = ℚ-zero-left-neutral fe (p * r)
+
+  IV : ((q - p) * r) + p * r ≡ q * r
+  IV = (q - p) * r + p * r         ≡⟨ ap (_+ p * r) (ℚ-distributivity' fe r q (- p)) ⟩
+       q * r + (- p) * r + p * r   ≡⟨ ℚ+-assoc fe (q * r) ((- p) * r) (p * r) ⟩
+       q * r + ((- p) * r + p * r) ≡⟨ ap (λ z → (q * r) + (z + p * r)) (ℚ-subtraction-dist-over-mult fe p r) ⟩
+       q * r + ((- p * r) + p * r) ≡⟨ ap (q * r +_) (ℚ-inverse-sum-to-zero' fe (p * r)) ⟩
+       q * r + 0ℚ                  ≡⟨ ℚ-zero-right-neutral fe (q * r) ⟩
+       q * r ∎
  
 ℚ≤-trans : Fun-Ext → (p q r : ℚ) → p ≤ q → q ≤ r → p ≤ r
 ℚ≤-trans fe p q r l₁ l₂ = I (ℚ≤-split fe p q l₁) (ℚ≤-split fe q r l₂)
@@ -543,15 +570,35 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
           - (- y) ≡⟨ II ⟩
           - (- x) ≡⟨ ℚ-minus-minus fe x ⁻¹ ⟩
           x ∎
-{-
-ℚ<-mult-inverse-swap : (fe : Fun-Ext)
-                     → (p q : ℚ)
-                     → (pnz : p ≢ 0ℚ)
-                     → (qnz : q ≢ 0ℚ)
-                     → p < q
-                     → multiplicative-inverse fe p pnz < multiplicative-inverse fe q qnz
-ℚ<-mult-inverse-swap fe p q pnz qnz l = {!!}
--}
+
+multiplicative-inverse-preserves-pos : (fe : Fun-Ext) → (p : ℚ) → 0ℚ < p → (nz : ¬ (p ≡ 0ℚ)) → 0ℚ < multiplicative-inverse fe p nz
+multiplicative-inverse-preserves-pos fe ((pos 0 , a) , α) l nz = 𝟘-elim (nz (numerator-zero-is-zero fe ((pos zero , a) , α) by-definition))
+multiplicative-inverse-preserves-pos fe ((pos (succ x) , a) , α) l nz = toℚ-< (pos 0 , 0) (pos (succ a) , x) (a , I)
+ where
+  I : succℤ (pos 0 ℤ* pos (succ x)) ℤ+ pos a ≡ pos (succ a) ℤ* pos 1
+  I = succℤ (pos 0 ℤ* pos (succ x)) ℤ+ pos a ≡⟨ ℤ-left-succ (pos 0 ℤ* pos (succ x)) (pos a) ⟩
+      succℤ (pos 0 ℤ* pos (succ x) ℤ+ pos a) ≡⟨ ℤ-right-succ (pos 0 ℤ* pos (succ x)) (pos a) ⁻¹ ⟩
+      pos 0 ℤ* pos (succ x) ℤ+ pos (succ a)  ≡⟨ ap (_ℤ+ pos (succ a)) (ℤ-zero-left-is-zero (pos (succ x))) ⟩
+      pos 0 ℤ+ pos (succ a) ≡⟨ ℤ-zero-left-neutral (pos (succ a)) ⟩
+      pos (succ a) ≡⟨ ℤ-mult-right-id (pos (succ a)) ⟩
+      pos (succ a) ℤ* pos 1 ∎
+multiplicative-inverse-preserves-pos fe ((negsucc x , a) , α) l nz = 𝟘-elim (ℚ<-not-itself ((negsucc x , a) , α) (ℚ<-trans (((negsucc x , a) , α)) 0ℚ (((negsucc x , a) , α)) I l))
+ where
+  I : ((negsucc x , a) , α) < 0ℚ
+  I = transport (_< 0ℚ) (toℚ-toℚₙ fe ((negsucc x , a) , α) ⁻¹) (toℚ-< (negsucc x , a) (pos 0 , 0) II)
+   where
+    II : (negsucc x , a) ℚₙ< (pos 0 , 0)
+    II = x , III
+     where
+      III : succℤ (negsucc x ℤ* pos 1) ℤ+ pos x ≡ pos 0 ℤ* pos (succ a)
+      III = succℤ (negsucc x ℤ* pos 1) ℤ+ pos x ≡⟨ ℤ-left-succ (negsucc x ℤ* pos 1) (pos x) ⟩
+            succℤ (negsucc x ℤ* pos 1 ℤ+ pos x) ≡⟨ by-definition ⟩
+            negsucc x ℤ* pos 1 ℤ+ pos (succ x)  ≡⟨ ap (_ℤ+ pos (succ x)) (ℤ-mult-right-id (negsucc x)) ⟩
+            negsucc x ℤ+ pos (succ x)           ≡⟨ ℤ-sum-of-inverse-is-zero' (pos (succ x)) ⟩
+            pos 0                               ≡⟨ ℤ-zero-left-is-zero (pos (succ a)) ⁻¹ ⟩
+            pos 0 ℤ* pos (succ a)               ∎
+
+
 ℚ-equal-or-less-than-is-prop : Fun-Ext → (x y : ℚ) → is-prop ((x ≡ y) ∔ (y < x))
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inl r) = ap inl (ℚ-is-set fe l r)
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inr r) = 𝟘-elim (ℚ<-not-itself y ((transport (y <_) l r)))
@@ -591,12 +638,6 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
    where
     III : x ≡ x → ℚ-trichotomous fe x x ≡ inr e
     III z = l ∙ ap inr (ℚ-equal-or-less-than-is-prop fe x x k e)
-
-ℚ<-difference-positive : (fe : Fun-Ext) → (p q : ℚ) → p < q → 0ℚ < q - p
-ℚ<-difference-positive fe p q l = transport (_< q - p) (ℚ-inverse-sum-to-zero fe p) I
- where
-  I : p - p < q - p
-  I = ℚ<-addition-preserves-order p q (- p) l
 
 trisect : Fun-Ext → (x y : ℚ) → x < y → Σ (x' , y') ꞉ ℚ × ℚ , (x < x') × (x' < y') × (y' < y) × (y - x' ≡ 2/3 * (y - x)) × (y' - x ≡ 2/3 * (y - x))
 trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
@@ -673,7 +714,6 @@ trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
       d * 2/3 + (x - x)     ≡⟨ ap₂ _+_ (ℚ*-comm d 2/3) (ℚ-inverse-sum-to-zero fe x) ⟩
       2/3 * d + 0ℚ          ≡⟨ ℚ-zero-right-neutral fe (2/3 * d) ⟩
       2/3 * d ∎
-
 
 
 \end{code}

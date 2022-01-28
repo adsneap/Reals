@@ -3,11 +3,19 @@ Andrew Sneap
 \begin{code}
 
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import UF-Base -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-Powerset -- TypeTopology
+open import UF-Subsingletons -- TypeTopology
+open import NaturalNumbers-Properties --TypeTopology
 
+open import MetricSpaceRationals
+open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_)
 open import Rationals
+open import RationalsAbs
+open import RationalsAddition
+open import RationalsLimits
 open import RationalsMultiplication
 open import RationalsNegation
 open import RationalsOrder
@@ -15,12 +23,68 @@ open import RationalsOrder
 module DedekindRealsProperties
         (fe : Fun-Ext)
         (pt : propositional-truncations-exist)
+        (pe : Prop-Ext)
       where
-open import DedekindReals pt fe
+open import DedekindReals pe pt fe
 open PropositionalTruncation pt
 
 exists-2/3-n : (x y p : ℚ) → x < y → 0ℚ < p → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * (y - x)) < p)
-exists-2/3-n x y p l₁ l₂ = {!!} , {!!}
+exists-2/3-n x y (p , α) l₁ l₂ = V use-limit
+ where
+  p-convert : p , α ≡ toℚ p
+  p-convert = toℚ-toℚₙ fe (p , α)
+  I : ¬ (y - x ≡ 0ℚ)
+  I e = ℚ<-not-itself x (transport (x <_) δ l₁)
+   where
+    δ : y ≡ x
+    δ = y                  ≡⟨ ℚ-zero-right-neutral fe y ⁻¹ ⟩
+        y + 0ℚ             ≡⟨ ap (y +_) (ℚ-inverse-sum-to-zero fe x ⁻¹) ⟩
+        y + (x - x)        ≡⟨ ap (y +_) (ℚ+-comm x (- x)) ⟩
+        y + ((- x) + x)    ≡⟨ ℚ+-assoc fe y (- x) x ⁻¹ ⟩
+        y - x + x          ≡⟨ ap (_+ x) e ⟩
+        0ℚ + x             ≡⟨ ℚ-zero-left-neutral fe x ⟩
+        x                  ∎
+
+  II : 0ℚ < y - x
+  II = ℚ<-difference-positive fe x y l₁
+
+  z = multiplicative-inverse fe (y - x) I
+  
+  III : 0ℚ < multiplicative-inverse fe (y - x) I
+  III = multiplicative-inverse-preserves-pos fe (y - x) II I
+     
+  IV : 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)
+  IV = ℚ<-pos-multiplication-preserves-order (toℚ p) (multiplicative-inverse fe (y - x) I) (transport (0ℚ <_) p-convert l₂) III
+
+  use-limit : Σ N ꞉ ℕ , ((n : ℕ) → N ℕ≤ n → ℚ-metric fe (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I))
+  use-limit = ⟨2/3⟩^n-converges fe (toℚ p * multiplicative-inverse fe (y - x) I) IV
+
+  V : (Σ N ꞉ ℕ , ((n : ℕ) → N ℕ≤ n → ℚ-metric fe (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)))
+     → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * (y - x)) < (p , α))
+  V (N , f) = (succ N) , transport₂ _<_ VIII IX VII
+   where
+    abstract
+     VI : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)
+     VI = f (succ N) (≤-succ N)
+     VII : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ  * (y - x) < (toℚ p * multiplicative-inverse fe (y - x) I) * (y - x)
+     VII = ℚ<-pos-multiplication-preserves-order' fe (ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ) ((toℚ p * multiplicative-inverse fe (y - x) I)) (y - x) VI II
+     VIII : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ * (y - x) ≡ ((⟨2/3⟩^ (succ N)) * (y - x))
+     VIII = ap (_* (y - x)) i
+      where
+       i : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ ≡ (⟨2/3⟩^ (succ N))
+       i = ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ ≡⟨ by-definition ⟩
+           abs ((⟨2/3⟩^ succ N) - 0ℚ)     ≡⟨ ap (λ β → abs ((⟨2/3⟩^ succ N) + β) ) (ℚ-minus-zero-is-zero ⁻¹) ⟩
+           abs ((⟨2/3⟩^ succ N) + 0ℚ)     ≡⟨ ap abs (ℚ-zero-right-neutral fe ((⟨2/3⟩^ succ N))) ⟩
+           abs (⟨2/3⟩^ succ N)            ≡⟨ abs-of-pos-is-pos fe (⟨2/3⟩^ succ N) (ℚ<-coarser-than-≤ 0ℚ (⟨2/3⟩^ succ N) (⟨2/3⟩^n-positive fe (succ N))) ⟩
+           (⟨2/3⟩^ succ N) ∎
+     IX : (toℚ p * multiplicative-inverse fe (y - x) I) * (y - x) ≡ (p , α)
+     IX = toℚ p * multiplicative-inverse fe (y - x) I * (y - x)     ≡⟨ ap (λ γ → γ * (multiplicative-inverse fe (y - x) I) * (y - x)) (p-convert ⁻¹) ⟩
+          (p , α) * multiplicative-inverse fe (y - x) I * (y - x)   ≡⟨ ℚ*-assoc fe (p , α) (multiplicative-inverse fe (y - x) I) (y - x) ⟩
+          (p , α) * (multiplicative-inverse fe (y - x) I * (y - x)) ≡⟨ ap ((p , α) *_) (ℚ*-comm ((multiplicative-inverse fe (y - x) I)) (y - x)) ⟩
+          (p , α) * ((y - x) * multiplicative-inverse fe (y - x) I) ≡⟨ ap ((p , α) *_) (ℚ*-inverse-product-is-one fe (y - x) I) ⟩
+          (p , α) * 1ℚ ≡⟨ ℚ-mult-right-id fe (p , α) ⟩
+          p , α ∎
+
 
 ral-lemma : (α β : ℚ) → (n : ℕ) → β ≡ 2/3 * α → ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡ (rec 2/3 (λ k → k * 2/3) n * β)
 ral-lemma α β n e = ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡⟨ refl ⟩

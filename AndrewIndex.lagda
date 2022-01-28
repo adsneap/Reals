@@ -44,16 +44,16 @@ import FieldAxioms
 import Rationals
 import RationalsAbs
 import RationalsAddition
-import RationalsExtension
+-- import RationalsExtension
 import RationalsField
--- import RationalsLimits
+import RationalsLimits
 import RationalsMinMax
 import RationalsMultiplication
 import RationalsNegation
 import RationalsOrder
 
 import DedekindReals
--- import DedekindRealsProperties
+import DedekindRealsProperties
 
 --import MetricSpaces -- This will require addition of the reals to complete
 import MetricSpaceAltDef
