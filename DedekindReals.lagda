@@ -189,4 +189,62 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
            → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
 ℝ-equality' x y a b c d = ℝ-equality x y (subset-extensionality pe fe a b) (subset-extensionality pe fe c d)
 
+ℝ-left-cut-equal-gives-right-cut-equal : (((Lx , Rx) , _) ((Ly , Ry) , _) : ℝ) → Lx ≡ Ly → Rx ≡ Ry
+ℝ-left-cut-equal-gives-right-cut-equal ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) left-cut-equal = I left-subsets
+ where
+  left-subsets : (Lx ⊆ Ly) × (Ly ⊆ Lx)
+  left-subsets = ⊆-refl-consequence Lx Ly left-cut-equal
+  I : (Lx ⊆ Ly) × (Ly ⊆ Lx) → Rx ≡ Ry
+  I (Lx⊆Ly , Ly⊆Lx) = subset-extensionality pe fe Rx⊆Ry Ry⊆Rx
+   where
+    Rx⊆Ry : Rx ⊆ Ry
+    Rx⊆Ry q q-Rx = ∥∥-rec q-Ry-is-prop II obtain-q'
+     where
+      q-Ry-is-prop : is-prop (q ∈ Ry)
+      q-Ry-is-prop = ∈-is-prop Ry q
+      obtain-q' : ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Rx
+      obtain-q' = (pr₁ (rounded-right-x q)) q-Rx
+      II : (Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Rx) → q ∈ Ry
+      II (q' , (q'<q , q'-Rx)) = ∥∥-rec q-Ry-is-prop III use-located
+       where
+        use-located : q' ∈ Ly ∨ q ∈ Ry
+        use-located = located-y q' q q'<q
+        III : q' ∈ Ly ∔ q ∈ Ry → q ∈ Ry
+        III (inl q'-Ly) = 𝟘-elim (ℚ<-not-itself q' from-above)
+         where
+          get-contradiction : q' ∈ Lx
+          get-contradiction = Ly⊆Lx q' q'-Ly
+          from-above : q' ℚ< q'
+          from-above = disjoint-x q' q' (get-contradiction , q'-Rx)
+        III (inr q'-Ry) = q'-Ry
+    Ry⊆Rx : Ry ⊆ Rx
+    Ry⊆Rx q q-Ry = ∥∥-rec q-Rx-is-prop II obtain-q'
+     where
+      q-Rx-is-prop : is-prop (q ∈ Rx)
+      q-Rx-is-prop = ∈-is-prop Rx q
+      obtain-q' : ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Ry
+      obtain-q' = (pr₁ (rounded-right-y q)) q-Ry
+      II : Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Ry → q ∈ Rx
+      II (q' , (q'<q , q'-Ry))  = ∥∥-rec q-Rx-is-prop III use-located
+       where
+        use-located : q' ∈ Lx ∨ q ∈ Rx
+        use-located = located-x q' q q'<q
+        III : q' ∈ Lx ∔ q ∈ Rx → q ∈ Rx
+        III (inl q'-Lx) = 𝟘-elim (ℚ<-not-itself q' from-above)
+         where
+          get-contradiction : q' ∈ Ly
+          get-contradiction = Lx⊆Ly q' q'-Lx
+          from-above : q' ℚ< q'
+          from-above = disjoint-y q' q' (get-contradiction , q'-Ry) 
+        III (inr q-Rx) = q-Rx
+
+ℝ-equality-from-left-cut : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ) → Lx ≡ Ly → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
+ℝ-equality-from-left-cut x y left-cut-equal = ℝ-equality x y left-cut-equal right-cut-equal
+ where
+  right-cut-equal : pr₂ (pr₁ x) ≡ pr₂ (pr₁ y)
+  right-cut-equal = ℝ-left-cut-equal-gives-right-cut-equal x y left-cut-equal
+
+ℝ-equality-from-left-cut' : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ) → Lx ⊆ Ly → Ly ⊆ Lx → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
+ℝ-equality-from-left-cut' x y s t = ℝ-equality-from-left-cut x y (subset-extensionality pe fe s t)
+
 \end{code}

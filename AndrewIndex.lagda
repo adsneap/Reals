@@ -18,6 +18,8 @@ buffer view by typing "C-x 1" in the buffer you want to see.
 
 \begin{code}
 
+{-# OPTIONS --without-K --exact-split #-}
+
 module AndrewIndex where
 
 import MoreNaturalProperties

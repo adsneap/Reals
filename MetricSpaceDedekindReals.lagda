@@ -9,6 +9,7 @@ open import UF-Powerset -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
 open import UF-Subsingletons -- TypeTopology
 
+open import DedekindRealsProperties
 open import MetricSpaceAltDef
 open import RationalsAddition
 open import Rationals
@@ -19,79 +20,101 @@ open import RationalsOrder
 module MetricSpaceDedekindReals
         (pt : propositional-truncations-exist)
         (fe : Fun-Ext)
-        (pe : propext 𝓤₀)
+        (pe : Prop-Ext)
  where
 
 open PropositionalTruncation pt
 
-open import DedekindReals pt fe
+open import DedekindReals pe pt fe
 open import MetricSpaceRationals fe
 open import RationalsMinMax fe
 
 B-ℝ : (x y : ℝ) → (ε : ℚ) → 0ℚ < ε → 𝓤₀ ̇
 B-ℝ ((Lx , Rx) , _) ((Ly , Ry) , _) ε l =
  ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε l
-{-
-ℝ-m1a : m1a ℝ B-ℝ
-ℝ-m1a ((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) f = 𝟘-elim { 𝓤₁ } { 𝓤₀ } (∥∥-rec 𝟘-is-prop I (f 1ℚ {!!}))
+
+ℝ-m1a-lemma : (((Lx , Rx) , _) ((Ly , Ry) , _) : ℝ) → ((ε : ℚ) → (ε>0 : 0ℚ < ε) → ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε ε>0) → Lx ⊆ Ly
+ℝ-m1a-lemma ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) f k kLx = ∥∥-rec Ly-is-prop α obtain-k'
  where
-  I : (Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) 1ℚ {!!}) → 𝟘
-  I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = third second
+  Ly-is-prop : is-prop (k ∈ Ly)
+  Ly-is-prop = (∈-is-prop Ly k)
+
+  obtain-k' : ∃ k' ꞉ ℚ , (k < k') × k' ∈ Lx
+  obtain-k' = (pr₁ (rounded-left-x k)) kLx
+
+  α : Σ k' ꞉ ℚ , (k < k') × k' ∈ Lx → k ∈ Ly
+  α (k' , (k<k' , k'-Lx)) = ∥∥-rec Ly-is-prop i obtain-info
    where
-    first : 0ℚ ≤ abs (ℚ-metric (min p u) (max q v))
-    first = ℚ-abs-is-positive (ℚ-metric (min p u) (max q v))
-    second : (0ℚ < abs (ℚ-metric (min p u) (max q v))) ∔ (0ℚ ≡ abs (ℚ-metric (min p u) (max q v)))
-    second = ℚ≤-split fe 0ℚ (abs (ℚ-metric (min p u) (max q v))) first
-    third : (0ℚ < abs (ℚ-metric (min p u) (max q v))) ∔ (0ℚ ≡ abs (ℚ-metric (min p u) (max q v))) → 𝟘
-    third (inl l) = {!!}
+    ε : ℚ
+    ε = k' - k
+    ε>0 : 0ℚ < ε
+    ε>0 = ℚ<-difference-positive fe k k' k<k'
+
+    obtain-info : ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε ε>0
+    obtain-info = f ε ε>0
+
+    i : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx
+                                           × u ∈ Ly
+                                           × q ∈ Rx
+                                           × v ∈ Ry
+                                           × B-ℚ (min p u) (max q v) ε ε>0
+                                           → k ∈ Ly
+    i ((p , q , u , v) , p-Lx , u-Ly , q-Rx , v-Ry , metric)  = if-smaller-than-u ∣ u , (k<u , u-Ly) ∣
      where
-      II :  (∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) {!abs (ℚ-metric (min p u) (max q v))!} {!!})
-      II = f (abs (ℚ-metric (min p u) (max q v))) l
-    third (inr r) = {!!}
-  conclusion : ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
-  conclusion = ℝ-equality (((Lx , Rx) , isCutx)) (((Ly , Ry) , isCuty)) α β
-   where
-    α : Lx ≡ Ly
-    α = subset-extensionality pe fe γ δ
-     where
-      γ : Lx ⊆ Ly
-      γ k k-Lx = {!!}
-      δ : Ly ⊆ Lx
-      δ = {!!}
-    β : {!!}
-    β = {!!}
--}
-{-
+      from-abs : ((- ε) < (min p u - max q v)) × ((min p u - max q v) < ε)
+      from-abs = ℚ-abs-<-unpack fe (min p u - max q v) ε metric
+      add-max : ((- ε) + max q v) < (min p u - max q v + max q v)
+      add-max = ℚ<-addition-preserves-order (- ε) (min p u - max q v) (max q v) (pr₁ from-abs)
+      simplify-left : (- ε) + max q v ≡ k + (max q v - k')
+      simplify-left = (- ε) + max q v                ≡⟨ by-definition ⟩
+                      (- (k' - k)) + max q v         ≡⟨ ap (_+ max q v) (ℚ-minus-dist fe k' (- k) ⁻¹) ⟩
+                      (- k') + (- (- k)) + max q v   ≡⟨ ap (_+ max q v) (ℚ+-comm (- k') (- (- k))) ⟩
+                      (- (- k)) + (- k') + max q v   ≡⟨ ℚ+-assoc fe (- (- k)) (- k') (max q v) ⟩
+                      (- (- k)) + ((- k') + max q v) ≡⟨ ap₂ _+_ (ℚ-minus-minus fe k ⁻¹) (ℚ+-comm (- k') (max q v)) ⟩
+                      k + (max q v - k')             ∎
+      simplify-right : min p u - max q v + max q v ≡ min p u
+      simplify-right = min p u - max q v + max q v       ≡⟨ ℚ+-assoc fe (min p u) (- max q v) (max q v) ⟩
+                       min p u + ((- max q v) + max q v) ≡⟨ ap (min p u +_) (ℚ+-comm (- max q v) (max q v)) ⟩
+                       min p u + (max q v + (- max q v)) ≡⟨ ap (min p u +_) (ℚ-inverse-sum-to-zero fe (max q v)) ⟩
+                       min p u + 0ℚ ≡⟨ ℚ-zero-right-neutral fe (min p u) ⟩
+                       min p u ∎
+      simplify : (k + (max q v - k')) < min p u
+      simplify = transport₂ _<_ simplify-left simplify-right add-max
+      left-adds-positive : 0ℚ < max q v - k'
+      left-adds-positive = which-is-max (max-to-≤ q v)
+       where
+        k<q : k' < q
+        k<q = disjoint-x k' q (k'-Lx , q-Rx)
+        0<q-k' : 0ℚ < (q - k')
+        0<q-k' = ℚ<-difference-positive fe k' q k<q
+        which-is-max : (q ≤ v) × (max q v ≡ v)
+                     ∔ (v ≤ q) × (max q v ≡ q)
+                     → 0ℚ < (max q v - k')
+        which-is-max (inl (q≤v , e)) = ℚ<-difference-positive fe k' (max q v) (transport (k' <_) (e ⁻¹) k<v)
+         where    
+          k<v : k' < v
+          k<v = ℚ<-≤-trans fe k' q v k<q q≤v
+        which-is-max (inr (v≤q , e)) = ℚ<-difference-positive fe k' (max q v) (transport (k' <_) (e ⁻¹) k<q)
+      k-small : k < k + (max q v - k')
+      k-small = ℚ<-addition-preserves-order'' fe k (max q v - k') left-adds-positive
+      right-small : min p u ≤ u
+      right-small = min-split (min-to-≤ p u)
+       where
+        min-split : (p ≤ u) × (min p u ≡ p)
+                  ∔ (u ≤ p) × (min p u ≡ u)
+                  → min p u ≤ u
+        min-split (inl (p≤u , e)) = transport (_≤ u) (e ⁻¹) p≤u
+        min-split (inr (u≤p , e)) = transport (_≤ u) (e ⁻¹) (ℚ≤-refl u)
+      k<minpu : k < min p u
+      k<minpu = ℚ<-trans k (k + (max q v - k')) (min p u) k-small simplify
+      k<u : k < u
+      k<u = ℚ<-≤-trans fe k (min p u) u k<minpu right-small
+      if-smaller-than-u : ∃ u ꞉ ℚ , (k < u) × u ∈ Ly → k ∈ Ly
+      if-smaller-than-u = pr₂ (rounded-left-y k)
 
-m1b-lemma : (q ε : ℚ) → 0ℚ < q × q < ε → abs q < ε
-m1b-lemma q ε (l₁ , l₂) = {!!}
- where
-  I : 0ℚ < ε 
-  I = ℚ<-trans 0ℚ q ε l₁ l₂
-  II : ((- ε) < 0ℚ)
-  II = {!!}
-  III : (- ε) < q
-  III = ℚ<-trans (- ε) 0ℚ q II l₁
-  IV : abs q ≤ ε
-  IV = ℚ≤-to-abs fe q ε ((ℚ<-coarser-than-≤ (- ε) q III) , ℚ<-coarser-than-≤ q ε l₂) 
--- Since (- ε ℚ< zero-ℚ) and then by a function above
-
-
-
-ℝ-m1b : m1b ℝ B-ℝ
-ℝ-m1b ((L , R) , iscut) ε l = ∥∥-functor I (ℝ-arithmetically-located ((L , R) , iscut) ε l)
- where
-  I : (Σ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (0ℚ < (y - x)) × ((y - x) < ε)) → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ L × u ∈ L × q ∈ R × v ∈ R × B-ℚ (min p u) (max q v) ε l
-  I ((x , y) , Lx , Ry , (l₁ , l₂)) = (x , y , x , y) , Lx , Lx , Ry , Ry , transport₂ (λ α β → B-ℚ α β ε l) (min-refl x ⁻¹) (max-refl y ⁻¹) iii
-   where
-    i : ℚ-metric y x < ε 
-    i = ? -- m1b-lemma (y - x) ε (l₁ , l₂)
-    ii : ℚ-metric y x ≡ ℚ-metric x y
-    ii = ℚ-metric-commutes y x
-    iii : ℚ-metric x y < ε
-    iii = transport (_< ε) ii i
-
--}
+\end{code}
+It's useful to have the second condition before the first in order to abstract a proof in the first condition.
+\begin{code}
 
 ℝ-m2 : m2 ℝ B-ℝ
 ℝ-m2 ((Lx , Rx) , _) ((Ly , Ry) , _) ε l B = ∥∥-functor α B
@@ -99,6 +122,47 @@ m1b-lemma q ε (l₁ , l₂) = {!!}
   α : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε l
     → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Ly × u ∈ Lx × q ∈ Ry × v ∈ Rx × B-ℚ (min p u) (max q v) ε l
   α ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = (u , v , p , q) , uLy , pLx , vRy , qRx , transport₂ (λ α β → B-ℚ α β ε l) (min-comm p u) (max-comm q v) B
+  
+ℝ-m1a : m1a ℝ B-ℝ
+ℝ-m1a ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) f = ℝ-equality-from-left-cut' x y I II
+ where
+  x = ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
+  y = ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
+
+  I : Lx ⊆ Ly
+  I = ℝ-m1a-lemma x y f
+
+  II : Ly ⊆ Lx
+  II = ℝ-m1a-lemma y x (λ ε ε>0 → ℝ-m2 x y ε ε>0 (f ε ε>0))
+
+m1b-lemma : (q ε : ℚ) → 0ℚ < q × q < ε → abs q < ε
+m1b-lemma q ε (l₁ , l₂) = IV
+ where
+  I : 0ℚ < ε 
+  I = ℚ<-trans 0ℚ q ε l₁ l₂
+  II : ((- ε) < 0ℚ)
+  II = transport (- ε <_) ℚ-minus-zero-is-zero i
+   where
+    i : (- ε) < (- 0ℚ)
+    i = ℚ<-swap fe 0ℚ ε I
+  III : (- ε) < q
+  III = ℚ<-trans (- ε) 0ℚ q II l₁
+  IV : abs q < ε
+  IV = ℚ<-to-abs fe q ε (III , l₂) 
+
+ℝ-m1b : m1b ℝ B-ℝ
+ℝ-m1b ((L , R) , iscut) ε l = ∥∥-functor I (ℝ-arithmetically-located fe pt pe ((L , R) , iscut) ε l)
+ where
+  I : (Σ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (0ℚ < (y - x)) × ((y - x) < ε)) → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ L × u ∈ L × q ∈ R × v ∈ R × B-ℚ (min p u) (max q v) ε l
+  I ((x , y) , Lx , Ry , (l₁ , l₂)) = (x , y , x , y) , Lx , Lx , Ry , Ry , transport₂ (λ α β → B-ℚ α β ε l) (min-refl x ⁻¹) (max-refl y ⁻¹) iii
+   where
+    i : ℚ-metric y x < ε 
+    i = m1b-lemma (y - x) ε (l₁ , l₂)
+    ii : ℚ-metric y x ≡ ℚ-metric x y
+    ii = ℚ-metric-commutes y x
+    iii : ℚ-metric x y < ε
+    iii = transport (_< ε) ii i
+
 
 ℝ-m3 : m3 ℝ B-ℝ
 ℝ-m3 ((Lx , Rx) , iscutx) ((Ly , Ry) , iscuty) ε₁ ε₂ l₁ l₂ l₃ B = ∥∥-functor I B
@@ -106,7 +170,8 @@ m1b-lemma q ε (l₁ , l₂) = {!!}
   I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₁ l₁
     → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₂ l₂
   I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = (p , q , u , v) , pLx , uLy , qRx , vRy , ℚ<-trans (ℚ-metric (min p u) (max q v)) ε₁ ε₂ B l₃
-  
+
+{-
 ℝ-m4 : m4 ℝ B-ℝ
 ℝ-m4 ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
      ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
@@ -274,10 +339,11 @@ m1b-lemma q ε (l₁ , l₂) = {!!}
                                                                     , transport (_∈ Rx) (c' ⁻¹) q₁Rx
                                                                     , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
                                                                     , α
+-}                                                                   
      
 
 ℝ-metric-space : metric-space ℝ
-ℝ-metric-space = B-ℝ , {!!} , {!!} , ℝ-m2 , ℝ-m3 , ℝ-m4
+ℝ-metric-space = B-ℝ , ℝ-m1a , ℝ-m1b , ℝ-m2 , ℝ-m3 , {!!} -- ℝ-m4
 
 
 

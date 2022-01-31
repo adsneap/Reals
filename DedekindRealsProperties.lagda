@@ -2,6 +2,8 @@ Andrew Sneap
 
 \begin{code}
 
+{-# OPTIONS --without-K --exact-split #-}
+
 open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
 open import UF-Base -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
