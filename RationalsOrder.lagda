@@ -444,6 +444,9 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
     II : p + r ≡ q + r
     II = ap (_+ r) e
 
+ℚ≤-addition-preserves-order'' : Fun-Ext → (p q : ℚ) → 0ℚ ≤ q → p ≤ p + q
+ℚ≤-addition-preserves-order'' fe p q l = transport₂ _≤_ (ℚ-zero-left-neutral fe p) (ℚ+-comm q p) (ℚ≤-addition-preserves-order fe 0ℚ q p l)
+
 ℚ≤-difference-positive : (fe : Fun-Ext) → (p q : ℚ) → p ≤ q → 0ℚ ≤ q - p
 ℚ≤-difference-positive fe p q l = transport (_≤ q - p) (ℚ-inverse-sum-to-zero fe p) I
  where
@@ -715,5 +718,13 @@ trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
       2/3 * d + 0ℚ          ≡⟨ ℚ-zero-right-neutral fe (2/3 * d) ⟩
       2/3 * d ∎
 
+ℚ≤-anti : Fun-Ext → (p q : ℚ) → p ≤ q → q ≤ p → p ≡ q
+ℚ≤-anti fe p q l₁ l₂ = I (ℚ≤-split fe p q l₁) (ℚ≤-split fe q p l₂)
+ where
+  I : (p < q) ∔ (p ≡ q) → (q < p) ∔ (q ≡ p) → p ≡ q
+  I (inl l) (inl r) = 𝟘-elim (ℚ<-not-itself p (ℚ<-trans p q p l r))
+  I (inl l) (inr r) = r ⁻¹
+  I (inr e) (inl f) = e
+  I (inr e) (inr f) = e
 
 \end{code}

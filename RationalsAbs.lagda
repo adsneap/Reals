@@ -294,4 +294,6 @@ abs-of-pos-is-pos fe ((negsucc x , a) , α) l = 𝟘-elim (III II)
     β : (x + y) ≤ (abs x + abs y)
     β = ℚ≤-adding fe x (abs x) y (abs y) l₂ l₄
 
+
+
 \end{code}

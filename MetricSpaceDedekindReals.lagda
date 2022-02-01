@@ -170,180 +170,120 @@ m1b-lemma q ε (l₁ , l₂) = IV
   I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₁ l₁
     → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₂ l₂
   I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = (p , q , u , v) , pLx , uLy , qRx , vRy , ℚ<-trans (ℚ-metric (min p u) (max q v)) ε₁ ε₂ B l₃
-
-{-
 ℝ-m4 : m4 ℝ B-ℝ
 ℝ-m4 ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
      ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
      ((Lz , Rz) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z) ε₁ ε₂ l₁ l₂ B₁ B₂ = ∥∥-functor I (binary-choice B₁ B₂)
  where
+  ε : ℚ
+  ε = ε₁ + ε₂
+  ε>0 : 0ℚ < ε     
+  ε>0 = ℚ<-adding-zero ε₁ ε₂ l₁ l₂
+  
+  ε>ε₁ : ε₁ < ε
+  ε>ε₁ = ℚ<-addition-preserves-order'' fe ε₁ ε₂ l₂
+  ε>ε₂ : ε₂ < ε
+  ε>ε₂ = transport (ε₂ <_) (ℚ+-comm ε₂ ε₁) (ℚ<-addition-preserves-order'' fe ε₂ ε₁ l₁)
+
   I : (Σ (p₁ , q₁ , u₁ , v₁) ꞉ ℚ × ℚ × ℚ × ℚ , p₁ ∈ Lx × u₁ ∈ Ly × q₁ ∈ Rx × v₁ ∈ Ry × B-ℚ (min p₁ u₁) (max q₁ v₁) ε₁ l₁)
     × (Σ (p₂ , q₂ , u₂ , v₂) ꞉ ℚ × ℚ × ℚ × ℚ , p₂ ∈ Ly × u₂ ∈ Lz × q₂ ∈ Ry × v₂ ∈ Rz × B-ℚ (min p₂ u₂) (max q₂ v₂) ε₂ l₂)
-    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Lz × q ∈ Rx × v ∈ Rz × B-ℚ (min p u) (max q v) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
+    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Lz × q ∈ Rx × v ∈ Rz × B-ℚ (min p u) (max q v) ε ε>0
   I (((p₁ , q₁ , u₁ , v₁) , p₁Lx , u₁Ly , q₁Rx , v₁Ry , B₃) , ((p₂ , q₂ , u₂ , v₂) , p₂Ly , u₂Lz , q₂Ry , v₂Rz , B₄))
-   = (min p₁ p₂ , max q₁ q₂ , min u₁ u₂ , max v₁ v₂) , II (min-to-≤ p₁ p₂) (min-to-≤ u₁ u₂) (max-to-≤ q₁ q₂) (max-to-≤ v₁ v₂)
+   = (min p₁ p₂ , max q₁ q₂ , min u₁ u₂ , max v₁ v₂) , II , III , IV , V , VI
     where
-
-     III : (ℚ-metric (min p₁ u₁) (max q₁ v₁) + ℚ-metric (min p₂ u₂) (max q₂ v₂)) < (ε₁ + ε₂)
-     III = ℚ<-adding (ℚ-metric (min p₁ u₁) (max q₁ v₁)) ε₁ (ℚ-metric (min p₂ u₂) (max q₂ v₂)) ε₂ B₃ B₄
-
-     IV : ℚ-metric (min p₁ u₁ - max q₁ v₁) (max q₂ v₂ - min p₂ u₂) ≤ (ℚ-metric (min p₁ u₁) (max q₁ v₁) + ℚ-metric (min p₂ u₂) (max q₂ v₂))
-     IV = {!!}
-     {-
-     δ : min (min p₁ u₁) (min p₂ u₂) ≡ min (min p₁ p₂) (min u₁ u₂)
-     δ = {!!}
-     -}
-     ψ : max (max q₁ v₁) (max q₂ v₂) ≡ max (max q₁ q₂) (max v₁ v₂)
-     ψ = {!!}
-     {-
-     IV : ℚ-metric (min (min p₁ u₁) (min p₂ u₂)) (max (max q₁ v₁) (max q₂ v₂)) ≤ ℚ-metric (min p₁ u₁) (max q₁ v₁) + ℚ-metric (min p₂ u₂) (max q₂ v₂)
-     IV = {!!}
+     xyl = min p₁ u₁
+     xyr = max q₁ v₁
+     yzl = min p₂ u₂
+     yzr = max q₂ v₂
+     II : min p₁ p₂ ∈ Lx
+     II = i (min-to-≤ p₁ p₂)
       where
-       i : ℚ-metric (min (min p₁ u₁) (min p₂ u₂)) (max (max q₁ v₁) (max q₂ v₂)) ≡ ℚ-metric (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂))
-       i = ap₂ ℚ-metric δ ψ 
-     
-     V : ℚ-metric (min (min p₁ u₁) (min p₂ u₂)) (max (max q₁ v₁) (max q₂ v₂)) ≤ ℚ-metric (min p₁ u₁) (max q₁ v₁) + ℚ-metric (min p₂ u₂) (max q₂ v₂)
-       → B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-     V = {!!}
-     -}
-     
-
-     {-
-     γ : Σ a ꞉ ℚ , a ≡ min (min p₁ p₂) (min u₁ u₂)
-       → Σ b ꞉ ℚ , b ≡ max (max q₁ q₂) (max v₁ v₂)
-       → B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-     γ = {!!}
-     -}
-     α : B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-     α = {!!}
-      where 
-       {-
-       β : (min p₁ p₂ ≤ min u₁ u₂) × (min (min p₁ p₂) (min u₁ u₂) ≡ min p₁ p₂)
-         ∔ (min u₁ u₂ ≤ min p₁ p₂) × (min (min p₁ p₂) (min u₁ u₂) ≡ min u₁ u₂)
-         → (max q₁ q₂ ≤ max v₁ v₂) × (max (max q₁ q₂) (max v₁ v₂) ≡ max v₁ v₂)
-         ∔ (max v₁ v₂ ≤ max q₁ q₂) × (max (max q₁ q₂) (max v₁ v₂) ≡ max q₁ q₂)
-         → B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-       β (inl (a , a')) (inl (b , b')) = {!!} -- γ (min-to-≤ p₁ p₂) (max-to-≤ v₁ v₂)
+       i : (p₁ ≤ p₂) × (min p₁ p₂ ≡ p₁) ∔ (p₂ ≤ p₁) × (min p₁ p₂ ≡ p₂) → min p₁ p₂ ∈ Lx
+       i (inl (l , e)) = transport (_∈ Lx) (e ⁻¹) p₁Lx
+       i (inr (l , e)) = rounded-left-a Lx rounded-left-x (min p₁ p₂) p₁ (transport (_≤ p₁) (e ⁻¹) l) p₁Lx
+     III : min u₁ u₂ ∈ Lz
+     III = i (min-to-≤ u₁ u₂)
+      where
+       i : (u₁ ≤ u₂) × (min u₁ u₂ ≡ u₁) ∔ (u₂ ≤ u₁) × (min u₁ u₂ ≡ u₂) → min u₁ u₂ ∈ Lz
+       i (inl (l , e)) = rounded-left-a Lz rounded-left-z (min u₁ u₂) u₂ (transport (_≤ u₂) (e ⁻¹) l) u₂Lz
+       i (inr (l , e)) = transport (_∈ Lz) (e ⁻¹) u₂Lz
+     IV : max q₁ q₂ ∈ Rx
+     IV = i (max-to-≤ q₁ q₂)
+      where
+       i : (q₁ ≤ q₂) × (max q₁ q₂ ≡ q₂) ∔ (q₂ ≤ q₁) × (max q₁ q₂ ≡ q₁) → max q₁ q₂ ∈ Rx
+       i (inl (l , e)) = rounded-right-a Rx rounded-right-x q₁ (max q₁ q₂) (transport (q₁ ≤_ ) (e ⁻¹) l) q₁Rx
+       i (inr (l , e)) = transport (_∈ Rx) (e ⁻¹) q₁Rx
+     V : max v₁ v₂ ∈ Rz
+     V = i (max-to-≤ v₁ v₂)
+      where
+       i : (v₁ ≤ v₂) × (max v₁ v₂ ≡ v₂) ∔ (v₂ ≤ v₁) × (max v₁ v₂ ≡ v₁) → max v₁ v₂ ∈ Rz
+       i (inl (l , e)) = transport (_∈ Rz) (e ⁻¹) v₂Rz
+       i (inr (l , e)) = rounded-right-a Rz rounded-right-z v₂ (max v₁ v₂) (transport (v₂ ≤_) (e ⁻¹) l) v₂Rz
+     VI : B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) ε ε>0
+     VI = transport₂ (λ α β → B-ℚ α β ε ε>0) (i ⁻¹) (ii ⁻¹) iii
+      where
+       i : min (min p₁ p₂) (min u₁ u₂) ≡ min xyl yzl
+       i = min (min p₁ p₂) (min u₁ u₂) ≡⟨ min-assoc p₁ p₂ (min u₁ u₂) ⟩
+           min p₁ (min p₂ (min u₁ u₂)) ≡⟨ ap (λ - → min p₁ -) (min-comm p₂ (min u₁ u₂)) ⟩
+           min p₁ (min (min u₁ u₂) p₂) ≡⟨ min-assoc p₁ (min u₁ u₂) p₂ ⁻¹ ⟩
+           min (min p₁ (min u₁ u₂)) p₂ ≡⟨ ap (λ z → min z p₂) (min-assoc p₁ u₁ u₂ ⁻¹) ⟩
+           min (min xyl u₂) p₂ ≡⟨ min-assoc xyl u₂ p₂  ⟩
+           min xyl (min u₂ p₂) ≡⟨ ap (λ - → min xyl -) (min-comm u₂ p₂) ⟩
+           min xyl yzl ∎
+       ii : max (max q₁ q₂) (max v₁ v₂) ≡ max xyr yzr
+       ii = max (max q₁ q₂) (max v₁ v₂) ≡⟨ max-assoc q₁ q₂ (max v₁ v₂) ⟩
+            max q₁ (max q₂ (max v₁ v₂)) ≡⟨ ap (λ - → max q₁ -) (max-comm q₂ (max v₁ v₂)) ⟩
+            max q₁ (max (max v₁ v₂) q₂) ≡⟨ max-assoc q₁ (max v₁ v₂) q₂ ⁻¹ ⟩
+            max (max q₁ (max v₁ v₂)) q₂ ≡⟨ ap (λ z → max z q₂) (max-assoc q₁ v₁ v₂ ⁻¹) ⟩
+            max (max xyr v₂) q₂ ≡⟨ max-assoc xyr v₂ q₂ ⟩
+            max xyr (max v₂ q₂) ≡⟨ ap (λ - → max xyr -) (max-comm v₂ q₂) ⟩
+            max xyr yzr ∎
+       iii : B-ℚ (min xyl yzl) (max xyr yzr) ε ε>0
+       iii = iv (min-to-≤ xyl yzl) (max-to-≤ xyr yzr)
         where
-       
-         
-         δ : {!!} → {!!}
-         δ i = transport (_< (ε₁ + ε₂)) i (ℚ<-adding (ℚ-metric (min p₁ u₁) (max q₁ v₁)) ε₁ (ℚ-metric (min p₂ u₂) (max q₂ v₂)) ε₂ B₃ B₄)
-         γ : (p₁ ≤ p₂) × (min p₁ p₂ ≡ p₁) ∔ (p₂ ≤ p₁) × (min p₁ p₂ ≡ p₂)
-           → (v₁ ≤ v₂) × (max v₁ v₂ ≡ v₂) ∔ (v₂ ≤ v₁) × (max v₁ v₂ ≡ v₁)
-           → B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-         γ (inl (c , c')) (inl (d , d')) = δ {!!} -- transport (_< (ε₁ + ε₂)) {!!} (ℚ<-adding (ℚ-metric (min p₁ u₁) (max q₁ v₁)) ε₁ (ℚ-metric (min p₂ u₂) (max q₂ v₂)) ε₂ B₃ B₄)
-         γ (inl (c , c')) (inr (d , d')) = {!!} -- transport (_< (ε₁ + ε₂)) {!!} (ℚ<-adding (ℚ-metric (min p₁ u₁) (max q₁ v₁)) ε₁ (ℚ-metric (min p₂ u₂) (max q₂ v₂)) ε₂ B₃ B₄)
-         γ (inr (c , c')) (inl (d , d')) = {!!}
-         γ (inr (c , c')) (inr (d , d')) = {!!}
-       β (inl (a , a')) (inr (b , b')) = {!!}
-       β (inr (a , a')) (inl (b , b')) = {!!}
-       β (inr (a , a')) (inr (b , b')) = {!!}
-     -}
-     help : {!!}
-     help = {!!}
-     
-     II : (p₁ ≤ p₂) × (min p₁ p₂ ≡ p₁) ∔ (p₂ ≤ p₁) × (min p₁ p₂ ≡ p₂)
-        → (u₁ ≤ u₂) × (min u₁ u₂ ≡ u₁) ∔ (u₂ ≤ u₁) × (min u₁ u₂ ≡ u₂)
-        → (q₁ ≤ q₂) × (max q₁ q₂ ≡ q₂) ∔ (q₂ ≤ q₁) × (max q₁ q₂ ≡ q₁)
-        → (v₁ ≤ v₂) × (max v₁ v₂ ≡ v₂) ∔ (v₂ ≤ v₁) × (max v₁ v₂ ≡ v₁)
-        → min p₁ p₂ ∈ Lx ×  min u₁ u₂ ∈ Lz × max q₁ q₂ ∈ Rx ×  max v₁ v₂ ∈ Rz
-        × B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-     II (inl (a , a')) (inl (b , b')) (inl (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , X (min-to-≤ (min p₁ p₂) (min u₁ u₂)) (max-to-≤ (max q₁ q₂) (max v₁ v₂))
-      where
-       X : (min p₁ p₂ ≤ min u₁ u₂) × (min (min p₁ p₂) (min u₁ u₂) ≡ min p₁ p₂)
-         ∔ (min u₁ u₂ ≤ min p₁ p₂) × (min (min p₁ p₂) (min u₁ u₂) ≡ min u₁ u₂)
-         → (max q₁ q₂ ≤ max v₁ v₂) × (max (max q₁ q₂) (max v₁ v₂) ≡ max v₁ v₂)
-         ∔ (max v₁ v₂ ≤ max q₁ q₂) × (max (max q₁ q₂) (max v₁ v₂) ≡ max q₁ q₂)
-         → B-ℚ (min (min p₁ p₂) (min u₁ u₂)) (max (max q₁ q₂) (max v₁ v₂)) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₂)
-       X (inl (e , e')) (inl (f , f')) = {!!}
-       X (inl x) (inr x₁) = {!!}
-       X (inr x) (inl x₁) = {!!}
-       X (inr x) (inr x₁) = {!!}
-     II (inl (a , a')) (inl (b , b')) (inl (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) (rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz)
-                                                                    , α
-     II (inl (a , a')) (inl (b , b')) (inr (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inl (a , a')) (inl (b , b')) (inr (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inl (a , a')) (inr (b , b')) (inl (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inl (a , a')) (inr (b , b')) (inl (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inl (a , a')) (inr (b , b')) (inr (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inl (a , a')) (inr (b , b')) (inr (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) p₁Lx
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inr (a , a')) (inl (b , b')) (inl (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inr (a , a')) (inl (b , b')) (inl (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inr (a , a')) (inl (b , b')) (inr (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inr (a , a')) (inl (b , b')) (inr (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) (rounded-left-a Lz rounded-left-z u₁ u₂ b u₂Lz)
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inr (a , a')) (inr (b , b')) (inl (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inr (a , a')) (inr (b , b')) (inl (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) (rounded-right-a Rx rounded-right-x q₁ q₂ c q₁Rx)
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
-     II (inr (a , a')) (inr (b , b')) (inr (c , c')) (inl (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) v₂Rz
-                                                                    , α
-     II (inr (a , a')) (inr (b , b')) (inr (c , c')) (inr (d , d')) = transport (_∈ Lx) (a' ⁻¹) (rounded-left-a Lx rounded-left-x p₂ p₁ a p₁Lx)
-                                                                    , transport (_∈ Lz) (b' ⁻¹) u₂Lz
-                                                                    , transport (_∈ Rx) (c' ⁻¹) q₁Rx
-                                                                    , transport (_∈ Rz) (d' ⁻¹) ((rounded-right-a Rz rounded-right-z v₂ v₁ d v₂Rz))
-                                                                    , α
--}                                                                   
-     
+         iv : (xyl ≤ yzl) × (min xyl yzl ≡ xyl)
+            ∔ (yzl ≤ xyl) × (min xyl yzl ≡ yzl)
+            → (xyr ≤ yzr) × (max xyr yzr ≡ yzr)
+            ∔ (yzr ≤ xyr) × (max xyr yzr ≡ xyr)
+            → B-ℚ (min xyl yzl) (max xyr yzr) ε ε>0
+         iv (inl (k₁ , e₁)) (inl (k₂ , e₂)) = transport₂ (λ α β → ℚ-metric α β < ε₁ + ε₂) (e₁ ⁻¹) (e₂ ⁻¹) from-inequalities
+          where
+           from-inequalities : ℚ-metric xyl yzr < (ε₁ + ε₂)
+           from-inequalities = inequality-chain-with-metric xyl xyr yzl yzr ε₁ ε₂ (v (min-to-≤ p₂ u₂) (max-to-≤ q₁ v₁)) k₂ B₃ B₄
+            where
+             v : (p₂ ≤ u₂) × (min p₂ u₂ ≡ p₂) ∔ (u₂ ≤ p₂) × (min p₂ u₂ ≡ u₂)
+               → (q₁ ≤ v₁) × (max q₁ v₁ ≡ v₁) ∔ (v₁ ≤ q₁) × (max q₁ v₁ ≡ q₁)
+               → min p₂ u₂ ≤ max q₁ v₁
+             v (inl (γ₁ , δ₁)) (inl (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ p₂ v₁ (disjoint-y p₂ v₁ (p₂Ly , v₁Ry)))
+             v (inl (γ₁ , δ₁)) (inr (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ p₂ q₁ (disjoint-y p₂ q₁ (p₂Ly , (rounded-right-a Ry rounded-right-y v₁ q₁ γ₂ v₁Ry))))
+             v (inr (γ₁ , δ₁)) (inl (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ u₂ v₁ (disjoint-y u₂ v₁ ((rounded-left-a Ly rounded-left-y u₂ p₂ γ₁ p₂Ly) , v₁Ry)))
+             v (inr (γ₁ , δ₁)) (inr (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ u₂ q₁ (disjoint-y u₂ q₁ ((rounded-left-a Ly rounded-left-y u₂ p₂ γ₁ p₂Ly) , (rounded-right-a Ry rounded-right-y v₁ q₁ γ₂ v₁Ry))))
+           
+         iv (inl (k₁ , e₁)) (inr (k₂ , e₂)) = ℚ<-trans (abs (min xyl yzl - (max xyr yzr))) ε₁ ε (transport (_< ε₁) (v ⁻¹) B₃) ε>ε₁
+          where
+          v : abs (min xyl yzl - max xyr yzr) ≡ abs (xyl - xyr)
+          v = ap₂ (λ α β → abs (α - β)) e₁ e₂
+         iv (inr (k₁ , e₁)) (inl (k₂ , e₂)) = ℚ<-trans (abs (min xyl yzl - (max xyr yzr))) ε₂ ε (transport (_< ε₂) (v ⁻¹) B₄) ε>ε₂
+          where
+           v : abs (min xyl yzl - max xyr yzr) ≡ abs (yzl - yzr)
+           v = ap₂ (λ α β → abs (α - β)) e₁ e₂
+         iv (inr (k₁ , e₁)) (inr (k₂ , e₂)) = transport (ℚ-metric (min xyl yzl) (max xyr yzr) <_) (ℚ+-comm ε₂ ε₁) v
+          where
+           from-inequalities : ℚ-metric yzl xyr < (ε₂ + ε₁)
+           from-inequalities = inequality-chain-with-metric yzl yzr xyl xyr ε₂ ε₁ (vi (min-to-≤ p₁ u₁) (max-to-≤ q₂ v₂)) k₂ B₄ B₃
+            where
+             vi : (p₁ ≤ u₁) × (min p₁ u₁ ≡ p₁) ∔ (u₁ ≤ p₁) × (min p₁ u₁ ≡ u₁)
+                → (q₂ ≤ v₂) × (max q₂ v₂ ≡ v₂) ∔ (v₂ ≤ q₂) × (max q₂ v₂ ≡ q₂)
+                → min p₁ u₁ ≤ max q₂ v₂
+             vi (inl (γ₁ , δ₁)) (inl (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ p₁ v₂ (disjoint-y p₁ v₂ ((rounded-left-a Ly rounded-left-y p₁ u₁ γ₁ u₁Ly) , (rounded-right-a Ry rounded-right-y q₂ v₂ γ₂ q₂Ry))))
+             vi (inl (γ₁ , δ₁)) (inr (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ p₁ q₂ (disjoint-y p₁ q₂ ((rounded-left-a Ly rounded-left-y p₁ u₁ γ₁ u₁Ly) , q₂Ry)))
+             vi (inr (γ₁ , δ₁)) (inl (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ u₁ v₂ (disjoint-y u₁ v₂ (u₁Ly , (rounded-right-a Ry rounded-right-y q₂ v₂ γ₂ q₂Ry))))
+             vi (inr (γ₁ , δ₁)) (inr (γ₂ , δ₂)) = transport₂ _≤_ (δ₁ ⁻¹) (δ₂ ⁻¹) (ℚ<-coarser-than-≤ u₁ q₂ (disjoint-y u₁ q₂ (u₁Ly , q₂Ry)))
+           v : ℚ-metric (min xyl yzl) (max xyr yzr) < (ε₂ + ε₁)
+           v = transport₂ (λ α β → ℚ-metric α β < ε₂ + ε₁) (e₁ ⁻¹) (e₂ ⁻¹) from-inequalities
 
 ℝ-metric-space : metric-space ℝ
-ℝ-metric-space = B-ℝ , ℝ-m1a , ℝ-m1b , ℝ-m2 , ℝ-m3 , {!!} -- ℝ-m4
+ℝ-metric-space = B-ℝ , ℝ-m1a , ℝ-m1b , ℝ-m2 , ℝ-m3 , ℝ-m4 
 
 
 
