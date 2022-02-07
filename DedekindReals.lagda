@@ -5,8 +5,9 @@ Andrew Sneap
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
+open import OrderNotation --TypeTopology
 open import UF-Base --TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
@@ -17,7 +18,7 @@ open import UF-Subsingletons-FunExt --TypeTopology
 -- open import UF-Univalence --TypeTopology
 
 open import Rationals
-open import RationalsOrder renaming (_<_ to _ℚ<_)
+open import RationalsOrder 
 
 module DedekindReals
          (pe : Prop-Ext)
@@ -46,52 +47,49 @@ inhabited-right-is-prop : (R : ℚ-subset-of-propositions) → is-prop (inhabite
 inhabited-right-is-prop R = ∃-is-prop
 
 rounded-left : (L : ℚ-subset-of-propositions) → 𝓤₀ ̇
-rounded-left L = (x : ℚ) → (x ∈ L ⇔ (∃ p ꞉ ℚ , (x ℚ< p) × p ∈ L))
+rounded-left L = (x : ℚ) → (x ∈ L ⇔ (∃ p ꞉ ℚ , (x < p) × p ∈ L))
 
 rounded-left-a : (L : ℚ-subset-of-propositions) → rounded-left L → (x y : ℚ) → x ≤ y → y ∈ L → x ∈ L
 rounded-left-a L r x y l y-L = II (ℚ≤-split fe x y l)
  where
-  I : (∃ p ꞉ ℚ , (x ℚ< p) × p ∈ L) → x ∈ L
+  I : (∃ p ꞉ ℚ , (x < p) × p ∈ L) → x ∈ L
   I = pr₂ (r x)
-  II : (x ℚ< y) ∔ (x ≡ y) → x ∈ L
+  II : (x < y) ∔ (x ≡ y) → x ∈ L
   II (inl l) = I ∣ y , (l , y-L) ∣
   II (inr r) = transport (_∈ L) (r ⁻¹) y-L
 
--- rounded-left-b : {!!}
--- rounded-left-b = {!!}
-
 rounded-right : (R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-rounded-right R = (x : ℚ) → x ∈ R ⇔ (∃ q ꞉ ℚ , (q ℚ< x) × q ∈ R)
+rounded-right R = (x : ℚ) → x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R)
 
 rounded-right-a : (R : ℚ-subset-of-propositions) → rounded-right R → (x y : ℚ) → x ≤ y → x ∈ R → y ∈ R
 rounded-right-a R r x y l x-R = II (ℚ≤-split fe x y l)
  where
-  I : (∃ p ꞉ ℚ , (p ℚ< y) × p ∈ R) → y ∈ R 
+  I : (∃ p ꞉ ℚ , (p < y) × p ∈ R) → y ∈ R 
   I = pr₂ (r y)
-  II : (x ℚ< y) ∔ (x ≡ y) → y ∈ R
+  II : (x < y) ∔ (x ≡ y) → y ∈ R
   II (inl r) = I ∣ x , (r , x-R) ∣
   II (inr r) = transport (_∈ R) r x-R
 
 rounded-left-is-prop : (L : ℚ-subset-of-propositions) → is-prop (rounded-left L)
 rounded-left-is-prop L = Π-is-prop fe δ
  where
-  δ : (x : ℚ) → is-prop (x ∈ L ⇔ (∃ p ꞉ ℚ , (x ℚ< p) × p ∈ L))
+  δ : (x : ℚ) → is-prop (x ∈ L ⇔ (∃ p ꞉ ℚ , (x < p) × p ∈ L))
   δ x = ×-is-prop (Π-is-prop fe (λ _ → ∃-is-prop)) (Π-is-prop fe (λ _ → ∈-is-prop L x))
 
 rounded-right-is-prop : (R : ℚ-subset-of-propositions) → is-prop (rounded-right R)
 rounded-right-is-prop R = Π-is-prop fe δ
  where
-  δ : (x : ℚ) → is-prop (x ∈ R ⇔ (∃ q ꞉ ℚ , (q ℚ< x) × q ∈ R))
+  δ : (x : ℚ) → is-prop (x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R))
   δ x = ×-is-prop (Π-is-prop fe (λ _ → ∃-is-prop)) (Π-is-prop fe (λ _ → ∈-is-prop R x))
 
 disjoint : (L R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-disjoint L R = (p q : ℚ) → p ∈ L × q ∈ R → p ℚ< q
+disjoint L R = (p q : ℚ) → p ∈ L × q ∈ R → p < q
 
 disjoint-is-prop : (L R : ℚ-subset-of-propositions) → is-prop (disjoint L R)
 disjoint-is-prop L R = Π₃-is-prop fe (λ x y _ → ℚ<-is-prop x y)
 
 located : (L R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-located L R = (p q : ℚ) → p ℚ< q → p ∈ L ∨ q ∈ R
+located L R = (p q : ℚ) → p < q → p ∈ L ∨ q ∈ R
 
 located-is-prop : (L R : ℚ-subset-of-propositions) → is-prop (located L R)
 located-is-prop L R = Π₃-is-prop fe (λ _ _ _ → ∨-is-prop)
@@ -127,8 +125,8 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
                               , located' 
  where
   L R : 𝓟 ℚ
-  L p = p ℚ< x , ℚ<-is-prop p x
-  R q = x ℚ< q , ℚ<-is-prop x q
+  L p = p < x , ℚ<-is-prop p x
+  R q = x < q , ℚ<-is-prop x q
 
   inhabited-left' : ∃ p ꞉ ℚ , p ∈ L
   inhabited-left' = ∣ ℚ-no-least-element x ∣ 
@@ -136,37 +134,37 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
   inhabited-right' : ∃ q ꞉ ℚ , q ∈ R
   inhabited-right' = ∣ ℚ-no-max-element x ∣
 
-  rounded-left' :  (p : ℚ) → (p ∈ L ⇔ (∃ p' ꞉ ℚ , (p ℚ< p') × p' ∈ L))
+  rounded-left' :  (p : ℚ) → (p ∈ L ⇔ (∃ p' ꞉ ℚ , (p < p') × p' ∈ L))
   rounded-left' p = α , β
    where
-    α : p ∈ L →  (∃ p' ꞉ ℚ , (p ℚ< p') × p' ∈ L)
-    α l = ∣ ℚ-dense p x l ∣
+    α : p ∈ L →  (∃ p' ꞉ ℚ , (p < p') × p' ∈ L)
+    α l = ∣ ℚ-dense fe p x l ∣
 
-    β :  (∃ p' ꞉ ℚ , (p ℚ< p') × p' ∈ L) → p ∈ L
+    β :  (∃ p' ꞉ ℚ , (p < p') × p' ∈ L) → p ∈ L
     β l = ∥∥-rec (ℚ<-is-prop p x) δ l
      where
-      δ : Σ p' ꞉ ℚ , (p ℚ< p') × p' ∈ L → p ℚ< x
+      δ : Σ p' ꞉ ℚ , (p < p') × p' ∈ L → p < x
       δ (p' , a , b) = ℚ<-trans p p' x a b
 
-  rounded-right' : (q : ℚ) → q ∈ R ⇔ (∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ R)
+  rounded-right' : (q : ℚ) → q ∈ R ⇔ (∃ q' ꞉ ℚ , (q' < q) × q' ∈ R)
   rounded-right' q = α , β
    where
-    α : q ∈ R → ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ R
-    α r = ∣ δ (ℚ-dense x q r) ∣
+    α : q ∈ R → ∃ q' ꞉ ℚ , (q' < q) × q' ∈ R
+    α r = ∣ δ (ℚ-dense fe x q r) ∣
      where
-      δ : (Σ q' ꞉ ℚ , (x ℚ< q') × (q' ℚ< q)) → Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ R
+      δ : (Σ q' ꞉ ℚ , (x < q') × (q' < q)) → Σ q' ꞉ ℚ , (q' < q) × q' ∈ R
       δ (q' , a , b) = q' , b , a
 
-    β : ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ R → q ∈ R
+    β : ∃ q' ꞉ ℚ , (q' < q) × q' ∈ R → q ∈ R
     β r = ∥∥-rec (ℚ<-is-prop x q) δ r
      where
-      δ : Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ R → x ℚ< q
+      δ : Σ q' ꞉ ℚ , (q' < q) × q' ∈ R → x < q
       δ (q' , a , b) = ℚ<-trans x q' q b a
 
-  disjoint' : (p q : ℚ) → p ∈ L × q ∈ R → p ℚ< q
+  disjoint' : (p q : ℚ) → p ∈ L × q ∈ R → p < q
   disjoint' p q (l , r) = ℚ<-trans p x q l r
 
-  located' : (p q : ℚ) → p ℚ< q → p ∈ L ∨ q ∈ R
+  located' : (p q : ℚ) → p < q → p ∈ L ∨ q ∈ R
   located' p q l = ∣ located-property fe p q x l ∣
 
 0ℝ : ℝ
@@ -202,9 +200,9 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
      where
       q-Ry-is-prop : is-prop (q ∈ Ry)
       q-Ry-is-prop = ∈-is-prop Ry q
-      obtain-q' : ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Rx
+      obtain-q' : ∃ q' ꞉ ℚ , (q' < q) × q' ∈ Rx
       obtain-q' = (pr₁ (rounded-right-x q)) q-Rx
-      II : (Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Rx) → q ∈ Ry
+      II : (Σ q' ꞉ ℚ , (q' < q) × q' ∈ Rx) → q ∈ Ry
       II (q' , (q'<q , q'-Rx)) = ∥∥-rec q-Ry-is-prop III use-located
        where
         use-located : q' ∈ Ly ∨ q ∈ Ry
@@ -214,7 +212,7 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
          where
           get-contradiction : q' ∈ Lx
           get-contradiction = Ly⊆Lx q' q'-Ly
-          from-above : q' ℚ< q'
+          from-above : q' < q'
           from-above = disjoint-x q' q' (get-contradiction , q'-Rx)
         III (inr q'-Ry) = q'-Ry
     Ry⊆Rx : Ry ⊆ Rx
@@ -222,9 +220,9 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
      where
       q-Rx-is-prop : is-prop (q ∈ Rx)
       q-Rx-is-prop = ∈-is-prop Rx q
-      obtain-q' : ∃ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Ry
+      obtain-q' : ∃ q' ꞉ ℚ , (q' < q) × q' ∈ Ry
       obtain-q' = (pr₁ (rounded-right-y q)) q-Ry
-      II : Σ q' ꞉ ℚ , (q' ℚ< q) × q' ∈ Ry → q ∈ Rx
+      II : Σ q' ꞉ ℚ , (q' < q) × q' ∈ Ry → q ∈ Rx
       II (q' , (q'<q , q'-Ry))  = ∥∥-rec q-Rx-is-prop III use-located
        where
         use-located : q' ∈ Lx ∨ q ∈ Rx
@@ -234,7 +232,7 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
          where
           get-contradiction : q' ∈ Ly
           get-contradiction = Lx⊆Ly q' q'-Lx
-          from-above : q' ℚ< q'
+          from-above : q' < q'
           from-above = disjoint-y q' q' (get-contradiction , q'-Ry) 
         III (inr q-Rx) = q-Rx
 
@@ -246,5 +244,22 @@ embedding-ℚ-to-ℝ x = (L , R) , inhabited-left'
 
 ℝ-equality-from-left-cut' : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ) → Lx ⊆ Ly → Ly ⊆ Lx → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
 ℝ-equality-from-left-cut' x y s t = ℝ-equality-from-left-cut x y (subset-extensionality pe fe s t)
+
+lower-cut-of : ℝ → ℚ-subset-of-propositions
+lower-cut-of ((L , R) , _) = L
+
+upper-cut-of : ℝ → ℚ-subset-of-propositions
+upper-cut-of ((L , R) , _) = R
+
+in-lower-cut : ℚ → ℝ → 𝓤₀ ̇
+in-lower-cut q ((L , R) , _) = q ∈ L
+
+in-upper-cut : ℚ → ℝ → 𝓤₀ ̇
+in-upper-cut q ((L , R) , _) = q ∈ R
+
+located-from-real : (((L , R) , _) : ℝ) → (p q : ℚ) → p < q → p ∈ L ∨ q ∈ R
+located-from-real ((L , R) , _ , _ , _ , _ , _ , located-y) = located-y 
+
+
 
 \end{code}

@@ -4,7 +4,9 @@ Andrew Sneap - 8th January 2022
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
+
+open import OrderNotation --TypeTopology
 open import UF-Base -- TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
@@ -282,10 +284,11 @@ this p =   p + 1ℚ + -1ℚ   ≡⟨ ℚ+-assoc fe p 1ℚ (- 1ℚ) ⟩
          r + 0ℚ ≡⟨ ℚ-zero-right-neutral fe r ⟩
          r ∎
 
+{-
 single-extension : (f : ℚ → ℝ) → (ℝ → ℝ)
 single-extension f = {!!}
 
 embed : (ℚ → ℚ) → (ℝ → ℝ) 
 embed = single-extension ∘ (embedding-ℚ-to-ℝ ∘_)
-
+-}
 

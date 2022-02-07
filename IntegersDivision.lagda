@@ -6,11 +6,12 @@ I link to this module within the Integers section of my report.
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalsAddition renaming (_+_ to _ℕ+_) --TypeTopology
 open import NaturalNumbers-Properties --TypeTopology
-open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_) --TypeTopology
+open import NaturalsOrder --TypeTopology
+open import OrderNotation --TypeTopology
 open import UF-Base --TypeTopology
 open import UF-Subsingletons --TypeTopology
 
@@ -85,11 +86,11 @@ pos-div-to-nat-div a zero (negsucc x , p) = zero , refl
 pos-div-to-nat-div zero (succ b) (negsucc x , p) = 𝟘-elim (positive-not-zero b (pos-lc (ℤ-zero-left-is-zero (negsucc x) ⁻¹ ∙ p) ⁻¹))
 pos-div-to-nat-div (succ a) (succ b) (negsucc x , p) = 𝟘-elim (product-positive-negative-not-positive (succ a) x b p)
 
-ℤ-division : (a : ℤ) → (d : ℕ) → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (a ≡ (q ℤ* (pos (succ d))) + (pos r)) × (r ℕ< (succ d))
+ℤ-division : (a : ℤ) → (d : ℕ) → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (a ≡ (q ℤ* (pos (succ d))) + (pos r)) × (r < (succ d))
 ℤ-division (pos a) d = f (division a d)
  where
-  f : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (a ≡ q ℕ* succ d ℕ+ r) × (r ℕ< succ d)
-    → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (pos a ≡ q ℤ* pos (succ d) + pos r) × (r ℕ< succ d)
+  f : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (a ≡ q ℕ* succ d ℕ+ r) × (r < succ d)
+    → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (pos a ≡ q ℤ* pos (succ d) + pos r) × (r < succ d)
   f (q , r , e , l) = (pos q) , r , (ap pos e ∙ I) , l
    where
     I : pos (q ℕ* succ d ℕ+ r) ≡ pos q ℤ* pos (succ d) + pos r
@@ -98,7 +99,7 @@ pos-div-to-nat-div (succ a) (succ b) (negsucc x , p) = 𝟘-elim (product-positi
         pos q ℤ* pos (succ d) + pos r ∎
 ℤ-division (negsucc a) d = f (division (succ a) d)
  where
-  f : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (succ a ≡ q ℕ* succ d ℕ+ r) × (r ℕ< succ d) → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (negsucc a ≡ q ℤ* pos (succ d) + pos r) × (r ℕ< succ d)
+  f : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (succ a ≡ q ℕ* succ d ℕ+ r) × (r < succ d) → Σ q ꞉ ℤ , Σ r ꞉ ℕ , (negsucc a ≡ q ℤ* pos (succ d) + pos r) × (r < succ d)
   f (zero , zero , e , l) = 𝟘-elim (positive-not-zero a I)
    where
     I : succ a ≡ zero

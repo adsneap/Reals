@@ -5,10 +5,11 @@ Andrew Sneap - 11th November 2021
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalNumbers-Properties
 open import MoreNaturalProperties
+open import OrderNotation
 open import NaturalsAddition renaming (_+_ to _ℕ+_)
 open import Plus-Properties
 open import UF-Base hiding (_≈_) --TypeTopology
@@ -19,7 +20,7 @@ open import IntegersAbs
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
-open import IntegersOrder renaming (_<_ to _ℤ<_ ; _≤_ to _ℤ≤_)
+open import IntegersOrder
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import ncRationals
 open import ncRationalsOperations renaming (_+_ to _ℚₙ+_ ; _*_ to _ℚₙ*_) hiding (-_)
@@ -29,14 +30,22 @@ open import RationalsAddition
 open import RationalsMultiplication
 open import RationalsNegation
 
-_≤_ : (p q : ℚ) → 𝓤₀ ̇
-(p , _) ≤ (q , _) = p ℚₙ≤ q
+_≤ℚ_ : (p q : ℚ) → 𝓤₀ ̇
+(p , _) ≤ℚ (q , _) = p ℚₙ≤ q
+
+instance
+ Order-ℚ-ℚ : Order ℚ ℚ
+ _≤_ {{Order-ℚ-ℚ}} = _≤ℚ_
 
 ℚ≤-is-prop : (p q : ℚ) → is-prop (p ≤ q)
 ℚ≤-is-prop (p , _) (q , _) = ℚₙ≤-is-prop p q
 
-_<_ : (p q : ℚ) → 𝓤₀ ̇
-(p , _) < (q , _) = p ℚₙ< q
+_<ℚ_ : (p q : ℚ) → 𝓤₀ ̇
+(p , _) <ℚ (q , _) = p ℚₙ< q
+
+instance
+ Strict-Order-ℚ-ℚ : Strict-Order ℚ ℚ
+ _<_ {{Strict-Order-ℚ-ℚ}} = _<ℚ_
 
 ℚ<-is-prop : (p q : ℚ) → is-prop (p < q)
 ℚ<-is-prop (p , _) (q , _) = ℚₙ<-is-prop p q
@@ -89,8 +98,8 @@ toℚ-< (x , a) (y , b) l = ordering-right-cancellable (x' ℤ* pos (succ b')) (
   IV : greater-than-zero (pos (succ h ℕ* succ h'))
   IV = transport (λ z → greater-than-zero z) (pos-multiplication-equiv-to-ℕ (succ h) (succ h')) III
 
-  V : ((x' ℤ* pos (succ b')) ℤ* pos (succ h ℕ* succ h')) ℤ< ((y' ℤ* pos (succ a')) ℤ* pos (succ h ℕ* succ h'))
-  V = transport₂ (λ z z' → z ℤ< z') VI VII l
+  V : ((x' ℤ* pos (succ b')) ℤ* pos (succ h ℕ* succ h')) < ((y' ℤ* pos (succ a')) ℤ* pos (succ h ℕ* succ h'))
+  V = transport₂ (λ z z' → z < z') VI VII l
    where
     VI : x ℤ* pos (succ b) ≡ x' ℤ* pos (succ b') ℤ* pos (succ h ℕ* succ h')
     VI = x ℤ* pos (succ b)                                         ≡⟨ ap₂ (λ z z' → z ℤ* z') α (ap pos β') ⟩
@@ -149,8 +158,8 @@ toℚ-≤ (x , a) (y , b) l = ℤ≤-ordering-right-cancellable (x' ℤ* pos (su
   III : greater-than-zero (pos (succ h ℕ* succ h'))
   III = transport (λ - → greater-than-zero -) (pos-multiplication-equiv-to-ℕ (succ h) (succ h')) (greater-than-zero-mult-trans (pos (succ h)) (pos (succ h')) ⋆ ⋆)
 
-  IV : (x' ℤ* pos (succ b') ℤ* pos (succ h ℕ* succ h')) ℤ≤ (y' ℤ* pos (succ a') ℤ* pos (succ h ℕ* succ h'))
-  IV = transport₂ (λ z z' → z ℤ≤ z') VI VII l
+  IV : (x' ℤ* pos (succ b') ℤ* pos (succ h ℕ* succ h')) ≤ (y' ℤ* pos (succ a') ℤ* pos (succ h ℕ* succ h'))
+  IV = transport₂ (λ z z' → z ≤ z') VI VII l
    where
     VI : x ℤ* pos (succ b) ≡ x' ℤ* pos (succ b') ℤ* pos (succ h ℕ* succ h')
     VI = x ℤ* pos (succ b)                                         ≡⟨ ap₂ (λ z z' → z ℤ* z') α (ap pos β') ⟩
@@ -188,11 +197,11 @@ toℚ-≤ (x , a) (y , b) l = ℤ≤-ordering-right-cancellable (x' ℤ* pos (su
   I : succℤ x ℤ* pos (succ a') ≡ x' ℤ* pos (succ a)
   I = ≈-toℚ ((succℤ x) , a)
 
-  II : (x ℤ* pos (succ a')) ℤ< (succℤ x ℤ* pos (succ a'))
+  II : (x ℤ* pos (succ a')) < (succℤ x ℤ* pos (succ a'))
   II = positive-multiplication-preserves-order x (succℤ x) (pos (succ a')) ⋆ (<-incrℤ x)
 
-  III : x ℤ* pos (succ a') ℤ< (x' ℤ* pos (succ a))
-  III = transport (x ℤ* pos (succ a') ℤ<_) I II
+  III : x ℤ* pos (succ a') < (x' ℤ* pos (succ a))
+  III = transport (x ℤ* pos (succ a') <_) I II
 
 ℚ-no-least-element : (q : ℚ) → Σ p ꞉ ℚ , p < q
 ℚ-no-least-element ((x , a) , α) = p , III
@@ -208,11 +217,11 @@ toℚ-≤ (x , a) (y , b) l = ℤ≤-ordering-right-cancellable (x' ℤ* pos (su
   I : predℤ x ℤ* pos (succ a') ≡ x' ℤ* pos (succ a)
   I = ≈-toℚ ((predℤ x) , a)
 
-  II : (predℤ x ℤ* pos (succ a')) ℤ< (x ℤ* pos (succ a'))
+  II : (predℤ x ℤ* pos (succ a')) < (x ℤ* pos (succ a'))
   II = positive-multiplication-preserves-order (predℤ x) x (pos (succ a')) ⋆ (<-predℤ x)
 
-  III : x' ℤ* pos (succ a) ℤ< (x ℤ* pos (succ a'))
-  III = transport (_ℤ< x ℤ* pos (succ a')) I II
+  III : x' ℤ* pos (succ a) < (x ℤ* pos (succ a'))
+  III = transport (_< x ℤ* pos (succ a')) I II
 
 ℚ-trichotomous-lemma : Fun-Ext → ((p , α) (q , β) : ℚ) → p ≈ q → p , α ≡ q , β
 ℚ-trichotomous-lemma fe (p , α) (q , β) e = to-subtype-≡ (λ - → is-in-lowest-terms-is-prop fe -) (equiv-with-lowest-terms-is-equal p q e α β)
@@ -220,9 +229,9 @@ toℚ-≤ (x , a) (y , b) l = ℤ≤-ordering-right-cancellable (x' ℤ* pos (su
 ℚ-trichotomous : Fun-Ext → (p q : ℚ) → (p < q) ∔ (p ≡ q) ∔ (q < p)
 ℚ-trichotomous fe ((x , a) , α) ((y , b) , β) = f (ℤ-trichotomous (x ℤ* pos (succ b)) (y ℤ* pos (succ a)))
  where
-  f : (x ℤ* pos (succ b)) ℤ< (y ℤ* pos (succ a))
+  f : (x ℤ* pos (succ b)) < (y ℤ* pos (succ a))
      ∔ (x ℤ* pos (succ b) ≡ y ℤ* pos (succ a))
-     ∔ (y ℤ* pos (succ a)) ℤ< (x ℤ* pos (succ b))
+     ∔ (y ℤ* pos (succ a)) < (x ℤ* pos (succ b))
     →  ((x , a) , α) < ((y , b) , β)
      ∔ ((x , a) , α ≡ (y , b) , β)
      ∔ ((y , b) , β) < ((x , a) , α)
@@ -253,133 +262,7 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
                    pred (2 ℕ* (succ a) ℕ+ 2 ℕ* 1)    ≡⟨ ap pred (distributivity-mult-over-nat 2 (succ a) 1 ⁻¹) ⟩
                    pred (2 ℕ+ (2 ℕ* (succ a)))       ≡⟨ refl ⟩
                    pred (2 ℕ* succ (succ a)) ∎
-
---This proof definitely needs improving
-ℚ-dense : (p q : ℚ) → p < q → Σ x ꞉ ℚ , (p < x) × (x < q)
-ℚ-dense ((x , a) , α) ((y , b) , β) l = midpoint , firstly , secondly
- where
-  midpoint : ℚ
-  midpoint = toℚ (half-ℚₙ ((x , a) ℚₙ+ (y , b)))
-
-  z : ℤ
-  z = pr₁ (pr₁ midpoint)
-  c : ℕ
-  c = pr₂ (pr₁ midpoint)
-
-  z' : ℤ
-  z' = pr₁ (half-ℚₙ ((x , a) ℚₙ+ (y , b)))
-
-  z'' : z' ≡ x ℤ* pos (succ b) ℤ+ y ℤ* pos (succ a)
-  z'' = refl
-
-  c' : ℕ
-  c' = pr₂ (half-ℚₙ ((x , a) ℚₙ+ (y , b)))
-
-  c'' : c' ≡ succ (2 ℕ* pred (succ a ℕ* succ b))
-  c'' = refl
-
-  I : (z' , c') ≈ (z , c)
-  I = ≈-toℚ (half-ℚₙ ((x , a) ℚₙ+ (y , b)))
-
-  II : z' ℤ* pos (succ c) ≡ z ℤ* pos (succ c')
-  II = I
-
-  III : Σ k ꞉ ℕ , succ k ≡ succ a ℕ* succ b
-  III = pos-mult-is-succ a b
-
-  k : ℕ
-  k = pr₁ III
-
-  a' b' k' c''' : ℤ
-  a' = pos (succ a)
-  b' = pos (succ b)
-  k' = pos (succ k)
-  c''' = pos (succ c')
-  
-  IV : (x : ℤ) →  x ℤ* pos (succ (succ (2 ℕ* pred (succ a ℕ* succ b)))) ≡ x ℤ* a' ℤ* b' ℤ+ x ℤ* (a') ℤ* b'
-  IV x = x ℤ* pos (succ (succ (2 ℕ* pred (succ a ℕ* succ b))))    ≡⟨ ap (λ - → x ℤ* pos (succ (succ (2 ℕ* pred -)))) ((pr₂ III) ⁻¹) ⟩
-       x ℤ* pos (succ (succ (2 ℕ* pred (succ k))))                ≡⟨ ap (λ - → x ℤ* pos (succ -)) (rounded-lemma₀ k) ⟩
-       x ℤ* pos (succ (pred (2 ℕ* succ k)))                       ≡⟨ ap (λ - → x ℤ* pos -) (succ-pred' (2 ℕ* succ k) λ w → ℕ-positive-multiplication-not-zero 1 k w) ⟩
-       x ℤ* pos (2 ℕ* succ k)                                     ≡⟨ ap (λ - → x ℤ* pos -) (mult-commutativity 2 (succ k)) ⟩
-       x ℤ* pos (succ k ℕ+ succ k)                                ≡⟨ ap (λ - → x ℤ* -) (pos-addition-equiv-to-ℕ (succ k) (succ k)  ⁻¹) ⟩
-       x ℤ* (k' ℤ+ k')                                            ≡⟨ distributivity-mult-over-ℤ' (k') (k') x ⟩
-       x ℤ* k' ℤ+ x ℤ* k'                                         ≡⟨ ap (λ - → x ℤ* pos - ℤ+ x ℤ* pos -) (pr₂ III) ⟩
-       x ℤ* pos (succ a ℕ* succ b) ℤ+ x ℤ* pos (succ a ℕ* succ b) ≡⟨ ap (λ - → (x ℤ* -) ℤ+ (x ℤ* -)) (pos-multiplication-equiv-to-ℕ (succ a) (succ b) ⁻¹) ⟩
-       x ℤ* (a' ℤ* b') ℤ+ x ℤ* (a' ℤ* b')                          ≡⟨ ap (λ - → - ℤ+ -) (ℤ*-assoc x a' b' ⁻¹) ⟩
-       x ℤ* a' ℤ* b' ℤ+ x ℤ* a' ℤ* b' ∎
-
-  V : (x ℤ* b' ℤ+ y ℤ* a') ℤ* a' ≡ x ℤ* a' ℤ* b' ℤ+ y ℤ* (a') ℤ* a'
-  V = (x ℤ* b' ℤ+ y ℤ* a') ℤ* a' ≡⟨ distributivity-mult-over-ℤ (x ℤ* b') ( y ℤ* a') (a') ⟩
-         x ℤ* b' ℤ* a' ℤ+ y ℤ* a' ℤ* a' ≡⟨ ap (λ - → - ℤ+ y ℤ* a' ℤ* a') (ℤ-mult-rearrangement x (b') (a'))  ⟩
-         x ℤ* a' ℤ* b' ℤ+ y ℤ* a' ℤ* a' ∎
-
-  VI : (x ℤ* a' ℤ* b' ℤ+ x ℤ* a' ℤ* b') ℤ< (x ℤ* a' ℤ* b' ℤ+ y ℤ* a' ℤ* a')
-  VI = ℤ<-adding'' (x ℤ* a' ℤ* b') (y ℤ* a' ℤ* a') (x ℤ* a' ℤ* b') ii
-   where
-    i : (x ℤ* b' ℤ* a') ℤ< (y ℤ* a' ℤ* a')
-    i = positive-multiplication-preserves-order (x ℤ* b') (y ℤ* a') (a') ⋆ l
-
-    ii : (x ℤ* a' ℤ* b') ℤ< (y ℤ* a' ℤ* a')
-    ii = transport (_ℤ< y ℤ* a' ℤ* a') (ℤ-mult-rearrangement x (b') (a')) i
-
-  VII : (x ℤ* pos (succ (succ (2 ℕ* pred (succ a ℕ* succ b))))) ℤ< ((x ℤ* b' ℤ+ y ℤ* a') ℤ* a')
-  VII = transport₂ _ℤ<_ (IV x ⁻¹) (V ⁻¹) VI
-
-  VIII : x ℤ* c''' ℤ< z' ℤ* a'
-  VIII = VII
-
-  IX : (x ℤ* c''' ℤ* pos (succ c)) ℤ< (z' ℤ* a' ℤ* pos (succ c)) 
-  IX = positive-multiplication-preserves-order (x ℤ* c''') (z' ℤ* a') (pos (succ c)) ⋆ VIII
-
-  X : (x ℤ* pos (succ c) ℤ* c''') ℤ< (z ℤ* a' ℤ* c''')
-  X = transport₂ _ℤ<_ i ii IX
-   where
-    i : x ℤ* c''' ℤ* pos (succ c) ≡ x ℤ* pos (succ c) ℤ* c'''
-    i = ℤ-mult-rearrangement x (c''') (pos (succ c)) 
-
-    ii : z' ℤ* a' ℤ* pos (succ c) ≡ z ℤ* a' ℤ* c'''
-    ii = z' ℤ* a' ℤ* pos (succ c) ≡⟨ ℤ-mult-rearrangement z' (a') (pos (succ c)) ⟩
-         z' ℤ* pos (succ c) ℤ* a' ≡⟨ ap (_ℤ* a') II ⟩
-         z ℤ* c''' ℤ* a' ≡⟨ ℤ-mult-rearrangement z (c''') (a') ⟩
-         z ℤ* a' ℤ* c''' ∎
-
-  firstly : (x ℤ* pos (succ c)) ℤ< (z ℤ* a')
-  firstly = ordering-right-cancellable (x ℤ* pos (succ c)) (z ℤ* a') (c''') ⋆ X
-
-  XI : x ℤ* b' ℤ* b' ℤ+ y ℤ* a' ℤ* b' ≡ (x ℤ* (b') ℤ+ y ℤ* a') ℤ* b'
-  XI = x ℤ* b' ℤ* b' ℤ+ y ℤ* a' ℤ* b' ≡⟨ distributivity-mult-over-ℤ (x ℤ* b') ( y ℤ* a') (b') ⁻¹ ⟩
-         (x ℤ* b' ℤ+ y ℤ* a') ℤ* b' ∎
-
-  XII : y ℤ* a' ℤ* b' ℤ+ y ℤ* (a') ℤ* b' ≡ y ℤ* pos (succ (succ (2 ℕ* pred (succ a ℕ* (succ b)))))
-  XII = IV y ⁻¹
-
-  XIII : x ℤ* b' ℤ* b' ℤ+ y ℤ* a' ℤ* b' ℤ< y ℤ* a' ℤ* b' ℤ+ y ℤ* a' ℤ* b'
-  XIII = ℤ<-adding' (x ℤ* b' ℤ* b') (y ℤ* a' ℤ* b') (y ℤ* a' ℤ* b') i
-   where
-    i : (x ℤ* b' ℤ* b') ℤ< (y ℤ* a' ℤ* b')
-    i = positive-multiplication-preserves-order (x ℤ* b') (y ℤ* a') (b') ⋆ l
-
-  XIV : (z' ℤ* b') ℤ< (y ℤ* c''')
-  XIV = transport₂ _ℤ<_ XI XII XIII
-
-  XV : (z' ℤ* b' ℤ* pos (succ c)) ℤ< (y ℤ* c''' ℤ* pos (succ c))
-  XV = positive-multiplication-preserves-order (z' ℤ* b') (y ℤ* c''') (pos (succ c)) ⋆ XIV
-
-  XVI : (z ℤ* b') ℤ* c''' ℤ< (y ℤ* pos (succ c)) ℤ* c'''
-  XVI = transport₂ _ℤ<_ i ii XV
-   where
-    i : z' ℤ* b' ℤ* pos (succ c) ≡ z ℤ* b' ℤ* c'''
-    i = z' ℤ* b' ℤ* pos (succ c) ≡⟨ ℤ-mult-rearrangement z' (b') (pos (succ c)) ⟩
-        z' ℤ* pos (succ c) ℤ* b' ≡⟨ ap (_ℤ* b') II ⟩
-        z ℤ* c''' ℤ* b' ≡⟨ ℤ-mult-rearrangement z (c''') (b') ⟩
-        z ℤ* b' ℤ* c''' ∎
-
-    ii : y ℤ* c''' ℤ* pos (succ c) ≡ y ℤ* pos (succ c) ℤ* c'''
-    ii = ℤ-mult-rearrangement y (c''') (pos (succ c))
-
-  secondly : (z ℤ* b') ℤ< (y ℤ* pos (succ c))
-  secondly = ordering-right-cancellable (z ℤ* b') (y ℤ* pos (succ c)) (c''') ⋆ XVI
-
+                   
 ℚ-zero-less-than-positive : (x y : ℕ) → 0ℚ < toℚ ((pos (succ x)) , y)
 ℚ-zero-less-than-positive x y = toℚ-< (pos 0 , 0) (pos (succ x) , y) (x , I)
  where
@@ -412,6 +295,18 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
 
 ℚ<-addition-preserves-order'' : Fun-Ext → (p q : ℚ) → 0ℚ < q → p < p + q
 ℚ<-addition-preserves-order'' fe p q l = transport₂ _<_ (ℚ-zero-left-neutral fe p) (ℚ+-comm q p) (ℚ<-addition-preserves-order 0ℚ q p l)
+
+ℚ<-subtraction-preserves-order : Fun-Ext → (p q : ℚ) → 0ℚ < q → p - q < p
+ℚ<-subtraction-preserves-order fe p q l = transport ((p - q) <_) III II
+ where
+  I : p < p + q
+  I = ℚ<-addition-preserves-order'' fe p q l
+  II : p - q < p + q - q
+  II = ℚ<-addition-preserves-order p (p + q) (- q) I
+  III : p + q - q ≡ p
+  III = ℚ+-assoc fe p q (- q) ∙ (ap (p +_) (ℚ-inverse-sum-to-zero fe q) ∙ ℚ-zero-right-neutral fe p)
+
+ 
 
 ℚ<-adding-zero : (p q : ℚ) → 0ℚ < p → 0ℚ < q → 0ℚ < p + q
 ℚ<-adding-zero p q l₁ l₂ = ℚ<-adding 0ℚ p 0ℚ q l₁ l₂
@@ -726,5 +621,40 @@ trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
   I (inl l) (inr r) = r ⁻¹
   I (inr e) (inl f) = e
   I (inr e) (inr f) = e
+
+0<1/2 : 0ℚ < 1/2
+0<1/2 = toℚ-< (pos 0 , 0) (pos 1 , 1) (0 , refl)
+
+0<1/5 : 0ℚ < 1/5
+0<1/5 = toℚ-< (pos 0 , 0) (pos 1 , 5) (0 , refl)
+
+halving-preserves-order : (p : ℚ) → 0ℚ < p → 0ℚ < p * 1/2
+halving-preserves-order p l = ℚ<-pos-multiplication-preserves-order p 1/2 l 0<1/2
+
+ℚ-dense : Fun-Ext → (p q : ℚ) → p < q → Σ x ꞉ ℚ , (p < x) × (x < q)
+ℚ-dense fe p q l = (p + (1/2 * (q - p))) , I , II
+ where
+  i : 0ℚ < (q - p) * 1/2
+  i = halving-preserves-order (q - p) (ℚ<-difference-positive fe p q l)
+  ii : 0ℚ < 1/2 * (q - p)
+  ii = transport (0ℚ <_) (ℚ*-comm (q - p) 1/2) i
+  I : p < p + (1/2 * (q - p))
+  I = ℚ<-addition-preserves-order'' fe p (1/2 * (q - p)) ii
+
+  iii : p + (1/2 * (q - p)) < p + (1/2 * (q - p)) + (1/2 * (q - p))
+  iii = ℚ<-addition-preserves-order'' fe (p + (1/2 * (q - p))) (1/2 * (q - p)) ii
+  iv : p + (1/2 * (q - p)) + (1/2 * (q - p)) ≡ q
+  iv = p + 1/2 * (q - p) + 1/2 * (q - p)    ≡⟨ ℚ+-assoc fe p (1/2 * (q - p)) (1/2 * (q - p)) ⟩
+       p + (1/2 * (q - p) + 1/2 * (q - p))  ≡⟨ ap (p +_) (ℚ-distributivity' fe (q - p) 1/2 1/2 ⁻¹) ⟩
+       p + (1/2 + 1/2) * (q - p)            ≡⟨ ap (λ α → p + α * (q - p)) (1/2+1/2 fe) ⟩
+       p + 1ℚ * (q - p)                     ≡⟨ ap (p +_) (ℚ-mult-left-id fe (q - p)) ⟩
+       p + (q - p)                          ≡⟨ ap (p +_) (ℚ+-comm q (- p)) ⟩
+       p + ((- p) + q)                      ≡⟨ ℚ+-assoc fe p (- p) q ⁻¹ ⟩
+       p - p + q                            ≡⟨ ap (_+ q) (ℚ-inverse-sum-to-zero fe p) ⟩
+       0ℚ + q                               ≡⟨ ℚ-zero-left-neutral fe q ⟩
+       q ∎
+   
+  II : p + (1/2 * (q - p)) < q
+  II = transport (p + (1/2 * (q - p)) <_) iv iii
 
 \end{code}

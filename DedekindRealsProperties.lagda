@@ -1,10 +1,12 @@
 Andrew Sneap
-
+ra
 \begin{code}
 
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
+
+open import OrderNotation --TypeTopology
 open import UF-Base -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
 open import UF-FunExt -- TypeTopology
@@ -12,8 +14,7 @@ open import UF-Powerset -- TypeTopology
 open import UF-Subsingletons -- TypeTopology
 open import NaturalNumbers-Properties --TypeTopology
 
-open import MetricSpaceRationals
-open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _≤_ to _ℕ≤_)
+open import NaturalsOrder
 open import Rationals
 open import RationalsAbs
 open import RationalsAddition
@@ -28,6 +29,7 @@ module DedekindRealsProperties
         (pe : Prop-Ext)
       where
 open import DedekindReals pe pt fe
+open import MetricSpaceRationals fe pt pe
 open PropositionalTruncation pt
 
 exists-2/3-n : (x y p : ℚ) → x < y → 0ℚ < p → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * (y - x)) < p)
@@ -58,26 +60,26 @@ exists-2/3-n x y (p , α) l₁ l₂ = V use-limit
   IV : 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)
   IV = ℚ<-pos-multiplication-preserves-order (toℚ p) (multiplicative-inverse fe (y - x) I) (transport (0ℚ <_) p-convert l₂) III
 
-  use-limit : Σ N ꞉ ℕ , ((n : ℕ) → N ℕ≤ n → ℚ-metric fe (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I))
-  use-limit = ⟨2/3⟩^n-converges fe (toℚ p * multiplicative-inverse fe (y - x) I) IV
+  use-limit : Σ N ꞉ ℕ , ((n : ℕ) → N ≤ n → ℚ-metric (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I))
+  use-limit = ⟨2/3⟩^n-converges fe pt pe (toℚ p * multiplicative-inverse fe (y - x) I) IV
 
-  V : (Σ N ꞉ ℕ , ((n : ℕ) → N ℕ≤ n → ℚ-metric fe (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)))
+  V : (Σ N ꞉ ℕ , ((n : ℕ) → N ≤ n → ℚ-metric (⟨2/3⟩^ n) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)))
      → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * (y - x)) < (p , α))
   V (N , f) = (succ N) , transport₂ _<_ VIII IX VII
    where
     abstract
-     VI : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ < (toℚ p * multiplicative-inverse fe (y - x) I)
+     VI : ℚ-metric (⟨2/3⟩^ succ N) 0ℚ <ℚ (toℚ p * multiplicative-inverse fe (y - x) I)
      VI = f (succ N) (≤-succ N)
-     VII : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ  * (y - x) < (toℚ p * multiplicative-inverse fe (y - x) I) * (y - x)
-     VII = ℚ<-pos-multiplication-preserves-order' fe (ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ) ((toℚ p * multiplicative-inverse fe (y - x) I)) (y - x) VI II
-     VIII : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ * (y - x) ≡ ((⟨2/3⟩^ (succ N)) * (y - x))
+     VII : ℚ-metric  (⟨2/3⟩^ succ N) 0ℚ  * (y - x) <ℚ (toℚ p * multiplicative-inverse fe (y - x) I) * (y - x)
+     VII = ℚ<-pos-multiplication-preserves-order' fe (ℚ-metric (⟨2/3⟩^ succ N) 0ℚ) ((toℚ p * multiplicative-inverse fe (y - x) I)) (y - x) VI II
+     VIII : ℚ-metric (⟨2/3⟩^ succ N) 0ℚ * (y - x) ≡ ((⟨2/3⟩^ (succ N)) * (y - x))
      VIII = ap (_* (y - x)) i
       where
-       i : ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ ≡ (⟨2/3⟩^ (succ N))
-       i = ℚ-metric fe (⟨2/3⟩^ succ N) 0ℚ ≡⟨ by-definition ⟩
+       i : ℚ-metric (⟨2/3⟩^ succ N) 0ℚ ≡ (⟨2/3⟩^ (succ N))
+       i = ℚ-metric (⟨2/3⟩^ succ N) 0ℚ ≡⟨ by-definition ⟩
            abs ((⟨2/3⟩^ succ N) - 0ℚ)     ≡⟨ ap (λ β → abs ((⟨2/3⟩^ succ N) + β) ) (ℚ-minus-zero-is-zero ⁻¹) ⟩
            abs ((⟨2/3⟩^ succ N) + 0ℚ)     ≡⟨ ap abs (ℚ-zero-right-neutral fe ((⟨2/3⟩^ succ N))) ⟩
-           abs (⟨2/3⟩^ succ N)            ≡⟨ abs-of-pos-is-pos fe (⟨2/3⟩^ succ N) (ℚ<-coarser-than-≤ 0ℚ (⟨2/3⟩^ succ N) (⟨2/3⟩^n-positive fe (succ N))) ⟩
+           abs (⟨2/3⟩^ succ N)            ≡⟨ abs-of-pos-is-pos fe (⟨2/3⟩^ succ N) (ℚ<-coarser-than-≤ 0ℚ (⟨2/3⟩^ succ N) (⟨2/3⟩^n-positive fe pt pe (succ N))) ⟩
            (⟨2/3⟩^ succ N) ∎
      IX : (toℚ p * multiplicative-inverse fe (y - x) I) * (y - x) ≡ (p , α)
      IX = toℚ p * multiplicative-inverse fe (y - x) I * (y - x)     ≡⟨ ap (λ γ → γ * (multiplicative-inverse fe (y - x) I) * (y - x)) (p-convert ⁻¹) ⟩
@@ -122,10 +124,10 @@ ral-lemma α β n e = ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡⟨ refl �
     II x y x-L y-R zero ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄            = ∣ (x , y) , x-L , y-R , α , β ∣
      where
       abstract
-       α : 0ℚ < (y - x)
+       α : 0ℚ <ℚ (y - x)
        α = ℚ<-difference-positive fe x y (disjoint x y (x-L , y-R))
-       β : y - x < p
-       β = transport (_< p) (ℚ-mult-left-id fe (y - x)) l₄
+       β : y - x <ℚ p
+       β = transport (_<ℚ p) (ℚ-mult-left-id fe (y - x)) l₄
       
     II x y x-L y-R (succ zero) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄     = ∥∥-rec ∃-is-prop III (located x' y' l₂)
      where
@@ -133,17 +135,17 @@ ral-lemma α β n e = ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡⟨ refl �
       III (inl x'-L) = ∣ (x' , y) , x'-L , y-R , α , β ∣
        where
         abstract
-         α : 0ℚ < y - x'
+         α : 0ℚ <ℚ y - x'
          α = ℚ<-difference-positive fe x' y (disjoint x' y (x'-L , y-R))
-         β : y - x' < p
-         β = transport (_< p) (e₁ ⁻¹) l₄
+         β : y - x' <ℚ p
+         β = transport (_<ℚ p) (e₁ ⁻¹) l₄
       III (inr y'-R) = ∣ (x , y') , x-L , y'-R , α , β ∣
        where
         abstract
-         α : 0ℚ < y' - x
+         α : 0ℚ <ℚ y' - x
          α = ℚ<-difference-positive fe x y' (disjoint x y' (x-L , y'-R))
-         β : y' - x < p
-         β = transport (_< p) (e₂ ⁻¹) l₄
+         β : y' - x <ℚ p
+         β = transport (_<ℚ p) (e₂ ⁻¹) l₄
     II x y x-L y-R (succ (succ n)) ((x' , y') , l₁ , l₂ , l₃ , e₁ , e₂) l₄ =
       ∥∥-induction (λ _ → ∃-is-prop)
         (cases (λ x'-L → II x' y  x'-L y-R  (succ n) (trisect fe x' y (ℚ<-trans x' y' y l₂ l₃)) III)

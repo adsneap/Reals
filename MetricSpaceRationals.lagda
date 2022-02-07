@@ -1,13 +1,16 @@
 \begin{code}
 
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
+open import OrderNotation --TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-Base -- TypeTopology
+open import UF-Subsingletons --TypeTopology
+open import UF-PropTrunc -- TypeTopology
 
-open import MetricSpaceAltDef
+
 open import Rationals
 open import RationalsAbs
 open import RationalsAddition
@@ -16,7 +19,11 @@ open import RationalsOrder
 
 module MetricSpaceRationals
          (fe : Fun-Ext)
+         (pt : propositional-truncations-exist)
+         (pe : Prop-Ext)
  where
+
+open import MetricSpaceAltDef pt fe pe
 
 ℚ-metric : ℚ → ℚ → ℚ
 ℚ-metric p q = abs (p - q)

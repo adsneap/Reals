@@ -1,16 +1,17 @@
 \begin{code}
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe --experimental-lossy-unification #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
-open import UF-Base
+open import OrderNotation --TypeTopology
+open import UF-Base -- TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-Powerset -- TypeTopology
 open import UF-PropTrunc -- TypeTopology
 open import UF-Subsingletons -- TypeTopology
 
 open import DedekindRealsProperties
-open import MetricSpaceAltDef
+open import NaturalsOrder hiding (max ;  max-comm ;  max-assoc)
 open import RationalsAddition
 open import Rationals
 open import RationalsAbs
@@ -25,8 +26,9 @@ module MetricSpaceDedekindReals
 
 open PropositionalTruncation pt
 
+open import MetricSpaceAltDef pt fe pe 
 open import DedekindReals pe pt fe
-open import MetricSpaceRationals fe
+open import MetricSpaceRationals fe pt pe
 open import RationalsMinMax fe
 
 B-ℝ : (x y : ℝ) → (ε : ℚ) → 0ℚ < ε → 𝓤₀ ̇
@@ -283,7 +285,242 @@ m1b-lemma q ε (l₁ , l₂) = IV
            v = transport₂ (λ α β → ℚ-metric α β < ε₂ + ε₁) (e₁ ⁻¹) (e₂ ⁻¹) from-inequalities
 
 ℝ-metric-space : metric-space ℝ
-ℝ-metric-space = B-ℝ , ℝ-m1a , ℝ-m1b , ℝ-m2 , ℝ-m3 , ℝ-m4 
+ℝ-metric-space = B-ℝ , ℝ-m1a , ℝ-m1b , ℝ-m2 , ℝ-m3 , ℝ-m4
+
+open import DedekindRealsOrder pe pt fe
+open import RationalsMultiplication
+
+cauchy-approximation : 𝓤₁ ̇
+cauchy-approximation = Σ f ꞉ (ℚ₊ → ℝ) , (((δ , l₁) (ε , l₂) : ℚ₊) → B-ℝ (f (δ , l₁)) (f (ε , l₂)) (δ + ε) (ℚ<-adding-zero δ ε l₁ l₂))
+
+cauchy-approximation-limit : cauchy-approximation → 𝓤₁ ̇
+cauchy-approximation-limit (ca , _) = Σ l ꞉ ℝ , (((ε , l₁) (θ , l₂) : ℚ₊) → B-ℝ (ca (ε , l₁)) l (ε + θ) (ℚ<-adding-zero ε θ l₁ l₂))
+
+cauchy-approximation-limit-exists : (ca : cauchy-approximation) → cauchy-approximation-limit ca
+cauchy-approximation-limit-exists (f , approximation-condition) = y , {!!}
+ where
+  type-of-approx : ((α , l₁) (β , l₂) : ℚ₊) → B-ℝ (f (α , l₁)) (f (β , l₂)) (α + β) (ℚ<-adding-zero α β l₁ l₂)
+  type-of-approx = approximation-condition
+  
+  Ly : ℚ-subset-of-propositions
+  Ly q = (∃ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (q + ε + θ) (f (ε , l₁))) , ∃-is-prop
+
+  Ry : ℚ-subset-of-propositions
+  Ry q = (∃ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (q - ε - θ) (f (ε , l₁))) , ∃-is-prop
+
+  inhabited-left-y : inhabited-left Ly
+  inhabited-left-y = ∣ {!!} , {!!} ∣
+
+  inhabited-right-y : inhabited-right Ry
+  inhabited-right-y = {!!}
+
+  rounded-left-y : rounded-left Ly
+  rounded-left-y k = I , II
+   where
+    I : k ∈ Ly → ∃ p ꞉ ℚ , k < p × p ∈ Ly
+    I kLy = ∥∥-functor i kLy
+     where
+      i : Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (k + ε + θ) (f (ε , l₁))
+        → Σ p ꞉ ℚ , k < p × p ∈ Ly
+      i (((ε , l₁) , (θ , l₂)) , lwc) = k + (θ * 1/2) , (ℚ<-addition-preserves-order'' fe k (θ * 1/2) iii , ∣ ((ε , l₁) , (θ * 1/2) , iii) , transport (λ α → in-lower-cut α (f (ε , l₁))) ii lwc ∣)
+       where
+        ii : k + ε + θ ≡ k + θ * 1/2 + ε + θ * 1/2
+        ii = k + ε + θ                   ≡⟨ ap ((k + ε) +_) (ℚ-into-half fe θ) ⟩
+             k + ε + (θ * 1/2 + θ * 1/2) ≡⟨ ℚ+-assoc fe (k + ε) (θ * 1/2) (θ * 1/2) ⁻¹ ⟩
+             k + ε + θ * 1/2 + θ * 1/2   ≡⟨ ap (_+ θ * 1/2) (ℚ+-assoc fe k ε (θ * 1/2)) ⟩
+             k + (ε + θ * 1/2) + θ * 1/2 ≡⟨ ap (λ α → k + α + θ * 1/2) (ℚ+-comm ε (θ * 1/2)) ⟩
+             k + (θ * 1/2 + ε) + θ * 1/2 ≡⟨ ap (_+ θ * 1/2) (ℚ+-assoc fe k (θ * 1/2) ε ⁻¹) ⟩
+             k + θ * 1/2 + ε + θ * 1/2 ∎
+        iii : 0ℚ < θ * 1/2
+        iii = halving-preserves-order θ l₂
+    
+    II : ∃ p ꞉ ℚ , k < p × p ∈ Ly → k ∈ Ly
+    II assumption = ∥∥-rec (∈-is-prop Ly k) i assumption
+     where
+      i : Σ p ꞉ ℚ , k < p × p ∈ Ly → ∃ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (k + ε + θ) (f (ε , l₁))
+      i (p , (k<p , pLy)) = ∥∥-functor ii pLy
+       where
+        ii : Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (p + ε + θ) (f (ε , l₁))
+           → Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (k + ε + θ) (f (ε , l₁))
+        ii (((ε , l₁) , (θ , l₂)) , lwc) = ((ε , l₁) , p - k + θ , ℚ<-addition-preserves-order' fe 0ℚ (p - k) θ (ℚ<-difference-positive fe k p k<p) l₂) , transport (λ α → in-lower-cut α (f (ε , l₁))) iii lwc
+         where
+          iii : p + ε + θ ≡ k + ε + (p - k + θ)
+          iii = p + ε + θ                 ≡⟨ ℚ-zero-left-neutral fe (p + ε + θ) ⁻¹ ⟩
+                0ℚ + (p + ε + θ)          ≡⟨ ap (_+ (p + ε + θ)) (ℚ-inverse-sum-to-zero fe k ⁻¹) ⟩
+                k + (- k) + (p + ε + θ)   ≡⟨ ℚ+-assoc fe k (- k) (p + ε + θ) ⟩
+                k + ((- k) + (p + ε + θ)) ≡⟨ ap (k +_) (ℚ+-assoc fe (- k) (p + ε) θ ⁻¹) ⟩
+                k + ((- k) + (p + ε) + θ) ≡⟨ ap (λ α → k + (α + θ)) (ℚ+-comm (- k) (p + ε)) ⟩
+                k + (p + ε + (- k) + θ)   ≡⟨ ap (λ α → k + (α - k + θ)) (ℚ+-comm p ε) ⟩
+                k + (ε + p - k + θ)       ≡⟨ ap (k +_) (ℚ+-assoc fe (ε + p) (- k) θ) ⟩
+                k + (ε + p + ((- k) + θ)) ≡⟨ ap (k +_) (ℚ+-assoc fe ε p ((- k) + θ)) ⟩
+                k + (ε + (p + ((- k) + θ))) ≡⟨ ap (λ α → k + (ε + α)) (ℚ+-assoc fe p (- k) θ ⁻¹) ⟩
+                k + (ε + (p - k + θ))     ≡⟨ ℚ+-assoc fe k ε (p - k + θ) ⁻¹ ⟩
+                k + ε + (p - k + θ) ∎
+
+  rounded-right-y : rounded-right Ry
+  rounded-right-y k = I , II
+   where
+    I : k ∈ Ry → ∃ q ꞉ ℚ , q < k × q ∈ Ry
+    I kRy = ∥∥-functor i kRy
+     where
+      i : Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (k - ε - θ) (f (ε , l₁))
+        → Σ q ꞉ ℚ , q < k × q ∈ Ry
+      i (((ε , l₁) , (θ , l₂)) , ruc) = (k - θ * 1/2) , (ii , ∣ ((ε , l₁) , θ * 1/2 , iii) , transport (λ α → in-upper-cut α (f (ε , l₁))) iv ruc ∣)
+       where
+        iii : 0ℚ < θ * 1/2
+        iii = halving-preserves-order θ l₂
+        ii : k - θ * 1/2 < k
+        ii = ℚ<-subtraction-preserves-order fe k (θ * 1/2) iii
+        iv : k - ε - θ ≡ k - θ * 1/2 - ε - θ * 1/2
+        iv = k - ε - θ                           ≡⟨ ap (λ α → (k - ε) - α) (ℚ-into-half fe θ) ⟩
+             k - ε - (θ * 1/2 + θ * 1/2)         ≡⟨ ap (λ α → (k - ε) + α) (ℚ-minus-dist fe (θ * 1/2) (θ * 1/2) ⁻¹) ⟩
+             k - ε + ((- θ * 1/2) + (- θ * 1/2)) ≡⟨ ℚ+-assoc fe (k - ε) (- (θ * 1/2)) (- (θ * 1/2)) ⁻¹ ⟩
+             k + (- ε) + (- θ * 1/2) - θ * 1/2   ≡⟨ ap (_- θ * 1/2) (ℚ+-assoc fe k (- ε) (- (θ * 1/2))) ⟩
+             k + ((- ε) + (- θ * 1/2)) - θ * 1/2 ≡⟨ ap (λ α → k + α - θ * 1/2) (ℚ+-comm (- ε) (- (θ * 1/2))) ⟩
+             k + ((- θ * 1/2) + (- ε)) - θ * 1/2 ≡⟨ ap (_- θ * 1/2) (ℚ+-assoc fe k (- (θ * 1/2)) (- ε) ⁻¹)  ⟩
+             k - θ * 1/2 - ε - θ * 1/2 ∎
+    II : ∃ q ꞉ ℚ , q < k × q ∈ Ry → k ∈ Ry
+    II = ∥∥-rec (∈-is-prop Ry k) III
+     where
+      III : Σ q ꞉ ℚ , q < k × q ∈ Ry → k ∈ Ry
+      III (q , q<k , qRy) = ∥∥-functor i qRy
+       where
+        i : Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (q - ε - θ) (f (ε , l₁))
+          → Σ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (k - ε - θ) (f (ε , l₁))
+        i (((ε , l₁) , (θ , l₂)) , iuc) = ((ε , l₁) , ((- q) + k + θ) , iii) , transport (λ α → in-upper-cut α (f (ε , l₁))) iv iuc
+         where
+          ii : 0ℚ < k - q + θ
+          ii = ℚ<-addition-preserves-order' fe 0ℚ (k - q) θ (ℚ<-difference-positive fe q k q<k) l₂
+          iii : 0ℚ < (- q) + k + θ
+          iii = transport (0ℚ <_) (ap (_+ θ) (ℚ+-comm k (- q))) ii
+          iv : q - ε - θ ≡ k - ε - ((- q) + k + θ)
+          iv = q - ε - θ                              ≡⟨ ap (_- θ) (ℚ+-comm q (- ε)) ⟩
+               (- ε) + q - θ                          ≡⟨ ℚ+-assoc fe (- ε) q (- θ) ⟩
+               (- ε) + (q - θ)                        ≡⟨ ap ((- ε) +_) (ℚ-zero-left-neutral fe (q - θ) ⁻¹) ⟩
+               (- ε) + (0ℚ + (q - θ))                 ≡⟨ ap (λ α → (- ε) + (α + (q - θ))) (ℚ-inverse-sum-to-zero fe k ⁻¹) ⟩
+               (- ε) + (k + (- k) + (q - θ))          ≡⟨ ap ((- ε) +_) (ℚ+-assoc fe (k + (- k)) q (- θ) ⁻¹) ⟩
+               (- ε) + (k + (- k) + q - θ)            ≡⟨ ap (λ α → (- ε) + (k + (- k) + α - θ)) (ℚ-minus-minus fe q)  ⟩
+               (- ε) + (k - k - (- q) - θ)            ≡⟨ ap (λ α → (- ε) + (α - θ)) (ℚ+-assoc fe k (- k) (- (- q))) ⟩
+               (- ε) + (k + ((- k) + (- (- q))) - θ)  ≡⟨ ap (λ α → (- ε) + (k + α - θ)) (ℚ-minus-dist fe k (- q)) ⟩
+               (- ε) + (k - (k - q) - θ)              ≡⟨ ap ((- ε) +_) (ℚ+-assoc fe k (- (k - q)) (- θ)) ⟩
+               (- ε) + (k + ((- (k - q)) - θ))        ≡⟨ ap ((- ε) +_) (ap (k +_) (ℚ-minus-dist fe (k - q) θ)) ⟩
+               (- ε) + (k + (- (k - q + θ)))          ≡⟨ ℚ+-assoc fe (- ε) k (- (k - q + θ)) ⁻¹ ⟩
+               (- ε) + k - (k - q + θ)                ≡⟨ ap₂ _-_ (ℚ+-comm (- ε) k) (ap (_+ θ) (ℚ+-comm k (- q))) ⟩
+               k - ε - ((- q) + k + θ)                ∎
+
+  disjoint-y : disjoint Ly Ry
+  disjoint-y p q (pLy , qRy) = ∥∥-rec (ℚ<-is-prop p q) I (binary-choice pLy qRy)
+   where
+    I : (Σ ((ε₁ , l₁) , (θ₁ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (p + ε₁ + θ₁) (f (ε₁ , l₁)))
+      × (Σ ((ε₂ , l₃) , (θ₂ , l₄)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (q - ε₂ - θ₂) (f (ε₂ , l₃)))
+      → p < q
+    I = {!!}
+    
+
+  located-y : located Ly Ry
+  located-y q r l = ∥∥-rec ∨-is-prop II I
+   where
+    5ε : ℚ
+    5ε = r - q
+
+    0<5ε : 0ℚ < (r - q)
+    0<5ε = ℚ<-difference-positive fe q r l
+       
+    ε : ℚ
+    ε = 1/5 * 5ε
+
+    0<ε : 0ℚ < ε
+    0<ε = ℚ<-pos-multiplication-preserves-order 1/5 5ε 0<1/5 0<5ε
+
+    ε₊ : ℚ₊
+    ε₊ = ε , 0<ε
+    
+    q+2ε : ℚ
+    q+2ε = q + ε + ε
+    
+    r-2ε : ℚ
+    r-2ε = r - ε - ε
+
+    q+3ε : ℚ
+    q+3ε = q + ε + ε + ε
+
+    setup : q + 5ε ≡ r
+    setup = q + (r - q)            ≡⟨ ap (q +_) (ℚ+-comm r (- q)) ⟩
+            q + ((- q) + r)        ≡⟨ ℚ+-assoc fe q (- q) r ⁻¹ ⟩
+            q + (- q) + r          ≡⟨ ap (_+ r) (ℚ-inverse-sum-to-zero fe q) ⟩
+            0ℚ + r                 ≡⟨ ℚ-zero-left-neutral fe r ⟩
+            r                      ∎
+    setup2 : q + 5ε - (ε + ε) ≡ r - (ε + ε)
+    setup2 = ap (_- (ε + ε)) setup
+
+    setup3 : ε + (ε + ε) ≡ 5ε - (ε + ε)
+    setup3 = ε + (ε + ε)                     ≡⟨ ap (ε +_) (ℚ-distributivity' fe 5ε 1/5 1/5 ⁻¹) ⟩
+            1/5 * 5ε + (1/5 + 1/5) * 5ε      ≡⟨ ap (λ α → 1/5 * 5ε + α * 5ε) (1/5+1/5 fe) ⟩
+            1/5 * 5ε + 2/5 * 5ε              ≡⟨ ℚ-distributivity' fe 5ε 1/5 2/5 ⁻¹ ⟩
+            (1/5 + 2/5) * 5ε                 ≡⟨ ap (_* 5ε) (1/5+2/5 fe) ⟩
+            3/5 * 5ε                         ≡⟨ ap (_* 5ε) (1-2/5≡3/5 fe ⁻¹) ⟩
+            (1ℚ - 2/5) * 5ε                  ≡⟨ ℚ-distributivity' fe 5ε 1ℚ (- 2/5) ⟩
+            1ℚ * 5ε + ((- 2/5) * 5ε)         ≡⟨ ap (_+ ((- 2/5) * 5ε)) (ℚ-mult-left-id fe 5ε) ⟩
+            5ε + ((- 2/5) * 5ε)              ≡⟨ ap (λ α → 5ε + α) (ℚ-subtraction-dist-over-mult fe 2/5 5ε) ⟩
+            5ε - (2/5 * 5ε)                  ≡⟨ ap (λ α → 5ε - (α * 5ε)) (1/5+1/5 fe ⁻¹)  ⟩
+            5ε - ((1/5 + 1/5) * 5ε)          ≡⟨ ap (λ α → 5ε - α) (ℚ-distributivity' fe 5ε 1/5 1/5)  ⟩
+            5ε - (ε + ε) ∎
+
+    last-two-equal : q + ε + ε + ε ≡ r - ε - ε
+    last-two-equal = q + ε + ε + ε          ≡⟨ ℚ+-assoc fe (q + ε) ε ε ⟩
+                     q + ε + (ε + ε)        ≡⟨ ℚ+-assoc fe q ε (ε + ε) ⟩
+                     q + (ε + (ε + ε))      ≡⟨ ap (q +_) setup3 ⟩
+                     q + (5ε - (ε + ε))     ≡⟨ ℚ+-assoc fe q 5ε (- (ε + ε)) ⁻¹ ⟩
+                     q + 5ε - (ε + ε)       ≡⟨ setup2 ⟩
+                     r - (ε + ε)            ≡⟨ ap (λ α → r + α) (ℚ-minus-dist fe ε ε ⁻¹) ⟩
+                     r + ((- ε) - ε)        ≡⟨ ℚ+-assoc fe r (- ε) (- ε) ⁻¹ ⟩
+                     r - ε - ε ∎ 
+
+    q+2ε<q+3ε : q+2ε < q+3ε
+    q+2ε<q+3ε = ℚ<-addition-preserves-order'' fe q+2ε ε 0<ε
+
+    q+2ε<r-2ε : q+2ε < r-2ε
+    q+2ε<r-2ε = transport (q+2ε <_) last-two-equal q+2ε<q+3ε
+    
+    Lε : ℚ-subset-of-propositions
+    Lε = lower-cut-of (f ε₊)
+    Rε : ℚ-subset-of-propositions
+    Rε = upper-cut-of (f ε₊)
+    
+    I : q+2ε ∈ Lε ∨ r-2ε ∈ Rε
+    I = located-from-real (f (ε , 0<ε)) q+2ε r-2ε q+2ε<r-2ε
+    
+    II : (q + ε + ε) ∈ Lε ∔ (r - ε - ε) ∈ Rε → q ∈ Ly ∨ r ∈ Ry
+    II = cases i ii
+     where
+      i : (q + ε + ε) ∈ Lε → q ∈ Ly ∨ r ∈ Ry
+      i s = ∣ inl ∣ ((ε , 0<ε) , (ε , 0<ε)) , s ∣ ∣      
+      ii : (r - ε - ε) ∈ Rε → q ∈ Ly ∨ r ∈ Ry
+      ii s = ∣ inr ∣ ((ε , 0<ε) , (ε , 0<ε)) , s ∣ ∣
+ 
+  y : ℝ
+  y = ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
+  
+
+{-
+
+ℝ-cauchy-sequences-are-convergent : (S : ℕ → ℝ) → cauchy→convergent ℝ ℝ-metric-space S
+ℝ-cauchy-sequences-are-convergent S ℝMS = {!!}
+ where
+  l : ℝ
+  l = (Ll , Rl) , {!!}
+   where
+    Ll : ℚ-subset-of-propositions
+    Ll p = (∃ n ꞉ ℕ , ((k : ℕ) → n ≤ k → p ∈ pr₁ (pr₁ (S k)))) , ∃-is-prop
+    Rl : {!!}
+    Rl = {!!}
+  I : {!!}
+  I = {!!}
+
+
+ℝ-complete-metric-space : complete-metric-space ℝ
+ℝ-complete-metric-space = ℝ-metric-space , {!!} -- ℝ-cauchy-sequences-are-convergent
+-}
 
 
 

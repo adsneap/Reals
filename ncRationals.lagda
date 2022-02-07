@@ -6,7 +6,7 @@ In this file I define the free rationals. They are rationals they may not be in 
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import DiscreteAndSeparated --TypeTopology
 open import NaturalNumbers-Properties --TypeToplogy

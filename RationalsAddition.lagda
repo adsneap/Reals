@@ -2,9 +2,9 @@ Andrew Sneap
 
 \begin{code}
 
-{-# OPTIONS --without-K --exact-split --safe #-}
+{-# OPTIONS --without-K --exact-split --safe  --experimental-lossy-unification #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import UF-Base hiding (_≈_) --TypeTopology
 open import UF-FunExt -- TypeTopology
@@ -97,11 +97,79 @@ toℚ-+ fe p q = equiv→equality fe (p ℚₙ+ q) (p' ℚₙ+ q') conclusion
 ℚ-zero-right-neutral : Fun-Ext → (q : ℚ) → q + 0ℚ ≡ q
 ℚ-zero-right-neutral fe q = ℚ+-comm q 0ℚ ∙ (ℚ-zero-left-neutral fe q)
 
+open import IntegersAddition renaming (_+_ to _ℤ+_)
+open import IntegersMultiplication
+
+add-same-denom : Fun-Ext → ((x , a) (y , a) : ℚₙ) → (toℚ (x , a)) + toℚ (y , a) ≡ toℚ (x ℤ+ y , a)
+add-same-denom fe (x , a) (y , b) = I ⁻¹ ∙ equiv→equality fe ((x , b) ℚₙ+ (y , b)) (x ℤ+ y , b) II
+ where
+  I : toℚ ((x , b) ℚₙ+ (y , b)) ≡ toℚ (x , b) + toℚ (y , b)
+  I = toℚ-+ fe (x , b) (y , b)
+  II : ((x , b) ℚₙ+ (y , b)) ≈ (x ℤ+ y , b)
+  II = ℚₙ-add-same-denom (x , b) (y , b)
+
+
 1/3+1/3 : Fun-Ext → 1/3 + 1/3 ≡ 2/3
-1/3+1/3 fe = equiv→equality fe ((pos 1 , 2) ℚₙ+ (pos 1 , 2)) (pos 2 , 2) 1/3+1/3≈2/3
+1/3+1/3 fe = add-same-denom fe (pos 1 , 2) (pos 1 , 2)
+
 
 1/3+2/3 : Fun-Ext → 1/3 + 2/3 ≡ 1ℚ
-1/3+2/3 fe = equiv→equality fe ((pos 1 , 2) ℚₙ+ (pos 2 , 2)) (pos 1 , 0) 1/3+2/3≈1
+1/3+2/3 fe = I ∙ equiv→equality fe (pos 3 , 2) (pos 1 , 0) refl 
+ where
+  abstract
+   I : toℚ (pos 1 , 2) + toℚ (pos 2 , 2) ≡ toℚ (pos 1 ℤ+ pos 2 , 2)
+   I = add-same-denom fe (pos 1 , 2) (pos 2 , 2)
+
+
+1/2+1/2 : Fun-Ext → 1/2 + 1/2 ≡ 1ℚ
+1/2+1/2 fe = 1/2 + 1/2                         ≡⟨ refl ⟩
+             toℚ ((pos 1 , 1) ℚₙ+ (pos 1 , 1)) ≡⟨ equiv→equality fe ((pos 1 , 1) ℚₙ+ (pos 1 , 1)) (pos 1 , 0) by-definition ⟩
+             toℚ (pos 1 , 0)                   ≡⟨ refl ⟩
+             1ℚ ∎
+
+1/5+1/5 : Fun-Ext → 1/5 + 1/5 ≡ 2/5
+1/5+1/5 fe = I
+ where
+  abstract
+   I : 1/5 + 1/5 ≡ 2/5
+   I = add-same-denom fe (pos 1 , 4) (pos 1 , 4) -- equiv→equality fe ((pos 1 , 4) ℚₙ+ (pos 1 , 4)) (pos 2 , 4) refl
+
+1/5+2/5 : Fun-Ext → 1/5 + 2/5 ≡ 3/5
+1/5+2/5 fe = I
+ where
+  abstract
+   I : 1/5 + 2/5 ≡ 3/5
+   I = add-same-denom fe (pos 1 , 4) (pos 2 , 4)
+
+2/5+1/5 : Fun-Ext → 2/5 + 1/5 ≡ 3/5
+2/5+1/5 fe = (ℚ+-comm 2/5 1/5) ∙ (1/5+2/5 fe)
+
+2/5+3/5-lemma : Fun-Ext → toℚ (pos 2 , 4) + toℚ (pos 3 , 4) ≡ toℚ (pos 2 ℤ+ pos 3 , 4)
+2/5+3/5-lemma fe = I
+ where
+  abstract
+   I : toℚ (pos 2 , 4) + toℚ (pos 3 , 4) ≡ toℚ (pos 2 ℤ+ pos 3 , 4)
+   I = add-same-denom fe (pos 2 , 4) (pos 3 , 4)
+
+\end{code}
+
+Abstracting the proofs above lets me compile 2/5+1/5, otherwise we get an infinite compile.
+
+It does not work for the proof below.
+
+\begin{code}
+
+
+2/5+3/5 : Fun-Ext → 2/5 + 3/5 ≡ 1ℚ
+2/5+3/5 fe = I 
+ where
+  abstract
+   I : 2/5 + 3/5 ≡ 1ℚ
+   I = 2/5+3/5-lemma fe ∙ equiv→equality fe (pos 5 , 4) (pos 1 , 0) refl
+
+\end{code}
+
+
   
 
 

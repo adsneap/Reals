@@ -4,7 +4,7 @@ Andrew Sneap - 26th November 2021
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalsAddition renaming (_+_ to _ℕ+_) -- TypeTopology
 open import NaturalNumbers-Properties -- TypeTopology
@@ -267,6 +267,12 @@ abs (x , a) = absℤ x , a
  where
   I : (ℤ- x) ℤ* y ≡ ℤ- (x ℤ* y)
   I = subtraction-dist-over-mult' x y
+
+ℚₙ-add-same-denom : ((x , a) (y , a) : ℚₙ) →  (((x , a) + (y , a)) ≈ (x ℤ+ y , a))
+ℚₙ-add-same-denom (x , a) (y , b) = (x ℤ* pos (succ b) ℤ+ y ℤ* pos (succ b)) ℤ* pos (succ b)   ≡⟨ ap (_ℤ* pos (succ b)) (distributivity-mult-over-ℤ x y (pos (succ b)) ⁻¹) ⟩
+                                    (x ℤ+ y) ℤ* pos (succ b) ℤ* pos (succ b)                   ≡⟨ ℤ*-assoc (x ℤ+ y ) (pos (succ b)) (pos (succ b)) ⟩
+                                    (x ℤ+ y) ℤ* (pos (succ b) ℤ* pos (succ b))                 ≡⟨ ap ((x ℤ+ y) ℤ*_) (denom-setup b b ⁻¹) ⟩
+                                    (x ℤ+ y) ℤ* pos (succ (pred (succ b ℕ* succ b)))           ∎
 
 
 

@@ -46,7 +46,7 @@ import FieldAxioms
 import Rationals
 import RationalsAbs
 import RationalsAddition
--- import RationalsExtension
+import RationalsExtension
 import RationalsField
 import RationalsLimits
 import RationalsMinMax
@@ -55,14 +55,17 @@ import RationalsNegation
 import RationalsOrder
 
 import DedekindReals
+-- import DedekindRealsAddition
 import DedekindRealsProperties
+import DedekindRealsOrder
 
---import MetricSpaces -- This will require addition of the reals to complete
 import MetricSpaceAltDef
 import MetricSpaceRationals
+-- import MetricSpaceDedekindReals
 
---import MetricSpaceDedekindReals
+-- import ContinuousExtensionTheorem
+
+import FieldRationals
 
 
 \end{code}
-

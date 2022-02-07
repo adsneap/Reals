@@ -6,7 +6,7 @@ In this file I define absolute values of integers and some properties of abs, al
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import DiscreteAndSeparated -- TypeTopology
 open import NaturalNumbers-Properties --TypeTopology

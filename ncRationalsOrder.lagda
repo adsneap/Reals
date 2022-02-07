@@ -4,9 +4,10 @@ Andrew Sneap
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalNumbers-Properties --Type Topology
+open import OrderNotation
 open import UF-Base --TypeTopology
 open import UF-Subsingletons --TypeTopology
 
@@ -14,7 +15,7 @@ open import IntegersAbs
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
-open import IntegersOrder renaming (_<_ to _ℤ<_ ; _≤_ to _ℤ≤_ ; _>_ to _ℤ>_ ; _≥_ to _ℤ≥_ )
+open import IntegersOrder 
 open import MoreNaturalProperties
 open import NaturalsAddition renaming (_+_ to _ℕ+_)
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
@@ -22,14 +23,14 @@ open import ncRationals
 open import ncRationalsOperations
 
 _ℚₙ≤_ _ℚₙ≥_ : ℚₙ → ℚₙ → 𝓤₀ ̇
-(x , a) ℚₙ≤ (y , b) = (x ℤ* pos (succ b)) ℤ≤ (y ℤ* pos (succ a))
+(x , a) ℚₙ≤ (y , b) = (x ℤ* pos (succ b)) ≤ (y ℤ* pos (succ a))
 p ℚₙ≥ q = q ℚₙ≤ p
 
 ℚₙ≤-is-prop : (p q : ℚₙ) → is-prop (p ℚₙ≤ q)
 ℚₙ≤-is-prop (x , a) (y , b) = ℤ≤-is-prop (x ℤ* pos (succ b)) (y ℤ* pos (succ a))
 
 _ℚₙ<_ _ℚₙ>_ : ℚₙ → ℚₙ → 𝓤₀ ̇
-(x , a) ℚₙ< (y , b) = (x ℤ* pos (succ b)) ℤ< (y ℤ* pos (succ a))
+(x , a) ℚₙ< (y , b) = (x ℤ* pos (succ b)) < (y ℤ* pos (succ a))
 p ℚₙ> q = q ℚₙ< p
 
 ℚₙ<-coarser-than-≤ : (p q : ℚₙ) → p ℚₙ< q → p ℚₙ≤ q
@@ -45,19 +46,19 @@ p ℚₙ> q = q ℚₙ< p
   b' = pos (succ b)
   c' = pos (succ c)
   
-  I : x ℤ* c' ℤ* b' ℤ< z ℤ* a' ℤ* b'
+  I : x ℤ* c' ℤ* b' < z ℤ* a' ℤ* b'
   I = ℤ<-trans ((x ℤ* c') ℤ* b') ((y ℤ* a') ℤ* c') ((z ℤ* a') ℤ* b') i ii
    where
-    i : x ℤ* c' ℤ* b' ℤ< y ℤ* a' ℤ* c'
-    i = transport (_ℤ< ((y ℤ* a') ℤ* c')) ϕ θ
+    i : x ℤ* c' ℤ* b' < y ℤ* a' ℤ* c'
+    i = transport (_< ((y ℤ* a') ℤ* c')) ϕ θ
      where
       ϕ : x ℤ* b' ℤ* c' ≡ x ℤ* c' ℤ* b'
       ϕ = ℤ-mult-rearrangement x b' c'
 
-      θ : x ℤ* b' ℤ* c' ℤ< y ℤ* a' ℤ* c'
+      θ : x ℤ* b' ℤ* c' < y ℤ* a' ℤ* c'
       θ = positive-multiplication-preserves-order (x ℤ* b') (y ℤ* a') c' ⋆ α
-    ii : y ℤ* a' ℤ* c' ℤ< z ℤ* a' ℤ* b'
-    ii = transport₂ _ℤ<_ γ₁ γ₂ γ₃
+    ii : y ℤ* a' ℤ* c' < z ℤ* a' ℤ* b'
+    ii = transport₂ _<_ γ₁ γ₂ γ₃
      where
       γ₁ : y ℤ* c' ℤ* a' ≡ y ℤ* a' ℤ* c'
       γ₁ = ℤ-mult-rearrangement y c' a'
@@ -65,7 +66,7 @@ p ℚₙ> q = q ℚₙ< p
       γ₂ : z ℤ* b' ℤ* a' ≡ z ℤ* a' ℤ* b'
       γ₂ = ℤ-mult-rearrangement z b' a'
 
-      γ₃ : y ℤ* c' ℤ* a' ℤ< z ℤ* b' ℤ* a'
+      γ₃ : y ℤ* c' ℤ* a' < z ℤ* b' ℤ* a'
       γ₃ = positive-multiplication-preserves-order (y ℤ* c') (z ℤ* b') a' ⋆ β
 
 ℚₙ<-addition-preserves-order : (p q r : ℚₙ) → p ℚₙ< q → (p + r) ℚₙ< (q + r)

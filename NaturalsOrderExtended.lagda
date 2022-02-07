@@ -12,6 +12,7 @@ open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 open import DecidableAndDetachable --TypeTopology
 open import NaturalsAddition --TypeTopology
 open import NaturalsOrder --TypeTopology
+open import OrderNotation
 open import UF-Base
 
 module NaturalsOrderExtended where
@@ -84,8 +85,8 @@ not-less-or-equal-is-bigger (succ x) 0        l = zero-minimal x
 not-less-or-equal-is-bigger (succ x) (succ y) l = not-less-or-equal-is-bigger x y l
 
 ≤-dichotomous : (x y : ℕ) → x ≤ y ∔ y ≤ x
-≤-dichotomous zero     y        = inl *
-≤-dichotomous (succ x) zero     = inr *
+≤-dichotomous zero     y        = inl ⋆
+≤-dichotomous (succ x) zero     = inr ⋆
 ≤-dichotomous (succ x) (succ y) = ≤-dichotomous x y
 
 ≥-dichotomy : (x y : ℕ) → x ≥ y ∔ x ≤ y

@@ -2,10 +2,11 @@ Andrew Sneap
 
 
 \begin{code}
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
+open import OrderNotation
 open import UF-Base --Typetopology
 open import UF-FunExt --TypeTopology
 open import Plus-Properties --TypeTopology

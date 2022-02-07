@@ -4,7 +4,7 @@ Andrew Sneap - 11th November 2021
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import UF-Base hiding (_≈_) --TypeTopology
 open import UF-FunExt --TypeTopology
@@ -205,6 +205,9 @@ division-by-self-is-one fe (pos (succ x) , a) e = I II
       toℚ ((negsucc x , a) ℚₙ* (negsucc a , x))   ≡⟨ division-by-self-is-one fe (negsucc x ℤ* negsucc a , pred (succ a ℕ* succ x)) ψ ⟩
       1ℚ ∎
 
+ℚ*-inverse : Fun-Ext → (q : ℚ) → ¬ (q ≡ 0ℚ) → Σ q' ꞉ ℚ , q * q' ≡ 1ℚ
+ℚ*-inverse fe q nz = (multiplicative-inverse fe q nz) , ℚ*-inverse-product-is-one fe q nz
+
 ⟨2/3⟩^_ : ℕ → ℚ
 ⟨2/3⟩^ 0         = toℚ (pos 1 , 0)
 ⟨2/3⟩^ (succ n)  = rec 2/3 (_* 2/3) n
@@ -227,9 +230,6 @@ division-by-self-is-one fe (pos (succ x) , a) e = I II
 ⟨1/n⟩-1 : Fun-Ext → ⟨1/n⟩ 0 ≡ 1ℚ
 ⟨1/n⟩-1 fe = equiv→equality fe (pos 1 , 0) (pos 1 , 0) refl
 
-1/2 : ℚ
-1/2 = toℚ (pos 1 , 1)
-
 ⟨1/n⟩-1/2 : Fun-Ext → ⟨1/n⟩ 1 ≡ 1/2
 ⟨1/n⟩-1/2 fe = equiv→equality fe (pos 1 , 1) (pos 1 , 1) by-definition
 
@@ -237,3 +237,8 @@ division-by-self-is-one fe (pos (succ x) , a) e = I II
 ⟨1/2⟩^ 0         = toℚ (pos 1 , 0)
 ⟨1/2⟩^ (succ n)  = rec (1/2) (_* 1/2) n
 
+ℚ-into-half : Fun-Ext → (q : ℚ) → q ≡ q * 1/2 + q * 1/2
+ℚ-into-half fe q = q                 ≡⟨ ℚ-mult-right-id fe q ⁻¹ ⟩
+                   q * 1ℚ            ≡⟨ ap (q *_) (1/2+1/2 fe ⁻¹) ⟩
+                   q * (1/2 + 1/2)   ≡⟨ ℚ-distributivity fe q 1/2 1/2 ⟩
+                   q * 1/2 + q * 1/2 ∎

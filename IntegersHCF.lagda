@@ -6,33 +6,29 @@ I link to this module within the Integers section of my report.
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT hiding (_+_) --TypeTopology
 
-import NaturalsAddition  --TypeTopology
-import NaturalsOrder --TypeTopology
-import UF-Base --TypeTopology
-import UF-Subsingletons --TypeTopology
+open import NaturalsAddition renaming (_+_ to _ℕ+_) --TypeTopology
+open import NaturalsOrder --TypeTopology
+open import OrderNotation --TypeTopology
+open import UF-Base --TypeTopology
+open import UF-Subsingletons --TypeTopology
 
 open import IntegersB
 open import IntegersAddition
 open import IntegersNegation
 
-import IntegersDivision
+open import IntegersDivision
 open import IntegersMultiplication
 open import IntegersAbs
-import NaturalsDivision
-import NaturalsMultiplication 
-import HCF
+open import NaturalsDivision renaming (_∣_ to _ℕ∣_)
+open import NaturalsMultiplication renaming (_*_ to _ℕ*_) 
+open import HCF
 
 module IntegersHCF where
 
-
-open IntegersDivision
-
 ℤ-is-common-divisor : (d x y : ℤ) → 𝓤₀ ̇
 ℤ-is-common-divisor d x y = (d ∣ x) × (d ∣ y)
-
-open UF-Subsingletons --TypeTopology
 
 ℤ-is-common-divisor-is-prop : (d x y : ℤ) → not-zero d → is-prop (ℤ-is-common-divisor d x y)
 ℤ-is-common-divisor-is-prop d x y nz p q = ×-is-prop ((d ℤ∣ x -is-prop) nz) ((d ℤ∣ y -is-prop) nz) p q
@@ -40,13 +36,7 @@ open UF-Subsingletons --TypeTopology
 ℤ-is-hcf : (d : ℕ) → (x y : ℤ) → 𝓤₀ ̇
 ℤ-is-hcf d x y = ℤ-is-common-divisor (pos d) x y × ((f : ℕ) → ℤ-is-common-divisor (pos f) x y → pos f ∣ pos d)
 
-open HCF
-open NaturalsAddition renaming (_+_ to _ℕ+_) --TypeTopology
-open NaturalsDivision renaming (_∣_ to _ℕ∣_)
-open NaturalsMultiplication renaming (_*_ to _ℕ*_)
-open NaturalsOrder --TypeTopology
-
-ℤ-HCF : (a b : ℕ) → Σ h ꞉ ℕ , (is-hcf h a b) × (Σ (x , y) ꞉ ℤ × ℤ , pos h ≡ ((pos a) * x) + ((pos b) * y))
+ℤ-HCF : (a b : ℕ) → Σ h ꞉ ℕ , (is-hcf h a b) × (Σ (x , y) ꞉ ℤ × ℤ , (pos h ≡ ((pos a) * x) + ((pos b) * y)))
 ℤ-HCF = course-of-values-induction (λ a → (b : ℕ) → Σ h ꞉ ℕ , is-hcf h a b × (Σ (x , y) ꞉ ℤ × ℤ , pos h ≡ pos a * x + pos b * y)) step 
  where
   step : (n : ℕ)
@@ -133,8 +123,6 @@ coprime-bezout a b = I (ℤ-HCF a b)
     
     III : pos h ≡ pos 1
     III = ap pos II
-
-open UF-Base --TypeTopology
 
 coprime-with-division : (a b c : ℕ) → coprime a b → a ℕ∣ b ℕ* c → a ℕ∣ c
 coprime-with-division a b c coprime (α , αₚ) = I (coprime-bezout a b coprime)

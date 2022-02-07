@@ -6,7 +6,7 @@ In this file I define Integers, along with an induction principle for integers
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalsAddition renaming (_+_ to _ℕ+_)  --TypeTopology
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)

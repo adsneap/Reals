@@ -6,9 +6,10 @@ In this file, I define order of integers, and prove some common properties of or
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
-open import NaturalsOrder renaming (_<_ to _ℕ<_ ; _>_ to _ℕ>_ ; _≤_ to _ℕ≤_ ; _≥_ to _ℕ≥_)
+open import NaturalsOrder 
+open import OrderNotation --TypeTopology
 open import UF-Base 
 open import UF-Subsingletons
 
@@ -31,13 +32,21 @@ First, the definition of < and ≤ for the integers. See the NaturalsOrder impor
 
 \begin{code}
 
-_≤_ _≥_ : (x y : ℤ) → 𝓤₀ ̇
-x ≤ y = Σ n ꞉ ℕ , x + pos n ≡ y
-x ≥ y = y ≤ x
+_≤ℤ_ _≥ℤ_ : (x y : ℤ) → 𝓤₀ ̇
+x ≤ℤ y = Σ n ꞉ ℕ , x + pos n ≡ y
+x ≥ℤ y = y ≤ℤ x
 
-_<_ _>_ : (x y : ℤ) → 𝓤₀ ̇
-x < y = succℤ x ≤ y
-x > y = y < x
+instance
+ Order-ℤ-ℤ : Order ℤ ℤ
+ _≤_ {{Order-ℤ-ℤ}} = _≤ℤ_
+ 
+_<ℤ_ _>ℤ_ : (x y : ℤ) → 𝓤₀ ̇
+x <ℤ y = succℤ x ≤ y
+x >ℤ y = y <ℤ x
+
+instance
+ Strict-Order-ℤ-ℤ : Strict-Order ℤ ℤ
+ _<_ {{Strict-Order-ℤ-ℤ}} = _<ℤ_
 
 ℤ≤-is-prop : (x y : ℤ) → is-prop (x ≤ y)
 ℤ≤-is-prop x y (n , p) (m , q) = to-subtype-≡ (λ _ → ℤ-is-set) (pos-lc (ℤ+-lc (pos n) (pos m) x (p ∙ (q ⁻¹))))
@@ -128,7 +137,7 @@ negative-less-than-positive x y = (x ℕ+ y) , I
       pos 0 + pos y                           ≡⟨ ℤ-zero-left-neutral (pos y) ⟩
       pos y                                   ∎  
 
-ℕ-order-respects-ℤ-order : (m n : ℕ) → m ℕ< n → pos m < pos n
+ℕ-order-respects-ℤ-order : (m n : ℕ) → m < n → pos m < pos n
 ℕ-order-respects-ℤ-order m n l = I (subtraction'' m n l)
  where
   I : (Σ k ꞉ ℕ , succ k ℕ+ m ≡ n) → pos m < pos n
@@ -141,7 +150,7 @@ negative-less-than-positive x y = (x ℕ+ y) , I
          pos (succ k ℕ+ m)     ≡⟨ ap pos e ⟩
          pos n                 ∎
 
-ℕ-order-respects-ℤ-order' : (m n : ℕ) → m ℕ< n → negsucc n < negsucc m
+ℕ-order-respects-ℤ-order' : (m n : ℕ) → m < n → negsucc n < negsucc m
 ℕ-order-respects-ℤ-order' m n l = I (subtraction'' m n l)
  where
   I : (Σ k ꞉ ℕ , succ k ℕ+ m ≡ n) → negsucc n < negsucc m
@@ -184,7 +193,7 @@ negative-less-than-positive x y = (x ℕ+ y) , I
       y + (x + (- x))                 ≡⟨ ℤ+-assoc y x (- x ) ⁻¹ ⟩
       y + x + (- x) ∎
 
-ℕ≤-to-ℤ≤ : (x y : ℕ) → x ℕ≤ y → pos x ≤ pos y
+ℕ≤-to-ℤ≤ : (x y : ℕ) → x ≤ y → pos x ≤ pos y
 ℕ≤-to-ℤ≤ x y l = I (subtraction x y l) 
  where
   I : (Σ k ꞉ ℕ , k ℕ+ x ≡ y) → pos x ≤ pos y
@@ -199,14 +208,14 @@ negative-less-than-positive x y = (x ℕ+ y) , I
 ℤ-dichotomous : (x y : ℤ) → x ≤ y ∔ y ≤ x
 ℤ-dichotomous (pos x) (pos y) = I (≤-dichotomous x y)
  where
-  I : (x ℕ≤ y) ∔ (y ℕ≤ x) → (pos x ≤ pos y) ∔ (pos y ≤ pos x)
+  I : (x ≤ y) ∔ (y ≤ x) → (pos x ≤ pos y) ∔ (pos y ≤ pos x)
   I (inl l) = inl (ℕ≤-to-ℤ≤ x y l)
   I (inr r) = inr (ℕ≤-to-ℤ≤ y x r)
 ℤ-dichotomous (pos x) (negsucc y) = inr (negative-less-than-positive (succ y) x)
 ℤ-dichotomous (negsucc x) (pos y) = inl (negative-less-than-positive (succ x) y)
 ℤ-dichotomous (negsucc x) (negsucc y) = I (≤-dichotomous x y)
  where
-  I : (x ℕ≤ y) ∔ (y ℕ≤ x) → (negsucc x ≤ negsucc y) ∔ (negsucc y ≤ negsucc x)
+  I : (x ≤ y) ∔ (y ≤ x) → (negsucc x ≤ negsucc y) ∔ (negsucc y ≤ negsucc x)
   I (inl l) = inr (ℤ≤-swap (pos (succ x)) (pos (succ y)) (ℕ≤-to-ℤ≤ (succ x) (succ y) l))
   I (inr r) = inl (ℤ≤-swap (pos (succ y)) (pos (succ x)) (ℕ≤-to-ℤ≤ (succ y) (succ x) r))
 
@@ -228,7 +237,7 @@ negative-less-than-positive x y = (x ℕ+ y) , I
 ℤ-trichotomous : (x y : ℤ) → (x < y) ∔ (x ≡ y) ∔ (y < x)
 ℤ-trichotomous (pos x) (pos y) = I (nat-order-trichotomous x y)
  where
-  I : (x ℕ< y) ∔ (x ≡ y) ∔ (y ℕ< x) → (pos x < pos y) ∔ (pos x ≡ pos y) ∔ (pos y < pos x)
+  I : (x < y) ∔ (x ≡ y) ∔ (y < x) → (pos x < pos y) ∔ (pos x ≡ pos y) ∔ (pos y < pos x)
   I (inl l) = inl (ℕ-order-respects-ℤ-order x y l)
   I (inr (inl e)) = inr (inl (ap pos e))
   I (inr (inr l)) = inr (inr (ℕ-order-respects-ℤ-order y x l))
@@ -236,7 +245,7 @@ negative-less-than-positive x y = (x ℕ+ y) , I
 ℤ-trichotomous (negsucc x) (pos y) = inl (negative-less-than-positive x y)
 ℤ-trichotomous (negsucc x) (negsucc y) = I (nat-order-trichotomous x y)
  where
-  I : (x ℕ< y) ∔ (x ≡ y) ∔ (y ℕ< x)
+  I : (x < y) ∔ (x ≡ y) ∔ (y < x)
     → (negsucc x < negsucc y) ∔ (negsucc x ≡ negsucc y) ∔ (negsucc y < negsucc x)
   I (inl l) = inr (inr (ℕ-order-respects-ℤ-order' x y l))
   I (inr (inl e)) = inr (inl (ap negsucc e))

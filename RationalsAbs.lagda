@@ -1,10 +1,11 @@
 Andrew Sneap
 
 \begin{code}
-{-# OPTIONS --without-K --exact-split #-}
+{-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆)  -- TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
+open import OrderNotation --TypeTopology
 open import UF-FunExt -- TypeTopology
 open import UF-Base hiding (_≈_) -- TypeTopology
 open import UF-Subsingletons -- TypeTopology
@@ -13,7 +14,7 @@ open import IntegersAbs hiding (abs)
 open import IntegersAddition renaming (_+_ to _ℤ+_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
-open import IntegersOrder renaming (_≤_ to _ℤ≤_) hiding (_<_)
+open import IntegersOrder 
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import ncRationals
 open import ncRationalsOperations renaming (abs to ℚₙ-abs) renaming (-_ to ℚₙ-_) hiding (_+_)
@@ -84,11 +85,11 @@ abs-of-pos-is-pos fe ((pos x , a) , α) l = I
       ((pos x , a) , α) ∎
 abs-of-pos-is-pos fe ((negsucc x , a) , α) l = 𝟘-elim (III II)
  where
-  I : (pos 0 ℤ* pos (succ a)) ℤ≤ (negsucc x ℤ* pos 1)
+  I : (pos 0 ℤ* pos (succ a)) ≤ (negsucc x ℤ* pos 1)
   I = l
-  II : pos 0 ℤ≤ negsucc x
-  II = transport₂ _ℤ≤_ (ℤ-zero-left-is-zero (pos (succ a))) (ℤ-zero-right-neutral (negsucc x)) I
-  III : ¬ (pos 0 ℤ≤ negsucc x) 
+  II : pos 0 ≤ negsucc x
+  II = transport₂ _≤_ (ℤ-zero-left-is-zero (pos (succ a))) (ℤ-zero-right-neutral (negsucc x)) I
+  III : ¬ (pos 0 ≤ negsucc x) 
   III (k , e) = pos-not-negative (ℤ-zero-left-neutral (pos k) ⁻¹ ∙ e)
   
 

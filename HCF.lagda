@@ -5,11 +5,12 @@ In this file I define common divisors, and HCF's, along with a proof that the Eu
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalsAddition --TypeTopology
 open import NaturalNumbers-Properties --TypeTopology
 open import NaturalsOrder --TypeTopoology
+open import OrderNotation --TypeTopology
 open import UF-Base --TypeTopology
 open import UF-FunExt --TypeTopology
 open import UF-Subsingletons --TypeTopology

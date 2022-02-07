@@ -6,7 +6,7 @@ In this file, I define negation of integers, and prove some common properties of
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import IntegersB
 
@@ -17,7 +17,7 @@ module IntegersNegation where
 -_ (pos (succ x)) = negsucc x
 -_ (negsucc x)    = pos (succ x)
 
-infix 30 -_
+infix 31 -_
 
 predminus : (x : ℤ) → predℤ (- x) ≡ (- succℤ x)
 predminus (pos 0)            = refl

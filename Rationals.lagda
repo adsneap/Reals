@@ -4,7 +4,7 @@ Andrew Sneap - 26th November 2021
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import DiscreteAndSeparated --TypeTopology
 open import NaturalNumbers-Properties --TypeTopology
@@ -42,7 +42,10 @@ toℚₙ (q , _) = q
 I would like to rewrite this function to move h out of a sigma type (h = hcf' x (succ a))
 
 \begin{code}
-
+{-
+toℚ' : ℚₙ → ℚ
+toℚ' (x , a) = {!!}
+-}
 toℚlemma : ((x , a) : ℚₙ) → Σ ((x' , a') , p) ꞉ ℚ , (Σ h ꞉ ℕ , (x ≡ (pos (succ h)) ℤ* x') × (succ a ≡ (succ h) ℕ* succ a'))
 toℚlemma (pos a , b) = f (divbyhcf a (succ b))
  where
@@ -88,6 +91,18 @@ toℚ q = pr₁ (toℚlemma q)
 1/3 2/3 : ℚ
 1/3 = toℚ (pos 1 , 2)
 2/3 = toℚ (pos 2 , 2)
+
+1/2 : ℚ
+1/2 = toℚ (pos 1 , 1)
+
+1/5 : ℚ
+1/5 = toℚ (pos 1 , 4)
+
+2/5 : ℚ
+2/5 = toℚ (pos 2 , 4)
+
+3/5 : ℚ
+3/5 = toℚ (pos 3 , 4)
 
 \end{code}
 I would like to rewrite the following proof as it is difficult to follow, and having ⇔ introduces many projections later in the code.
@@ -270,6 +285,7 @@ toℚ-toℚₙ fe (r , p) = II
   I = equiv-with-lowest-terms-is-equal r r' (≈-toℚ r) p r'lt
   II : r , p ≡ pr₁ (pr₁ (toℚlemma r)) , pr₂ (pr₁ (toℚlemma r))
   II = to-subtype-≡ (is-in-lowest-terms-is-prop fe) I
+
 
 
 

@@ -4,9 +4,9 @@ In this file I define the free rationals. They are rationals they may not be in 
 
 \begin{code}
 
-{-# OPTIONS --without-K --exact-split --safe #-}
+{-# OPTIONS --without-K --exact-split --safe --experimental-lossy-unification #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import UF-Base hiding (_≈_) --TypeTopology
 open import UF-FunExt --TypeTopology
@@ -110,7 +110,7 @@ toℚ-neg fe (x , a) = IV
        toℚ ((ℤ- x , a) ℚₙ+ (ℤ- y , b))                                                              ≡⟨ I refl ⟩
        toℚ (((ℤ- x') , a') ℚₙ+ ((ℤ- y') , b'))                                                      ≡⟨ ap₂ (λ α β → toℚ (α ℤ+ β ,  pred (succ a' ℕ* succ b'))) (subtraction-dist-over-mult' x' (pos (succ b'))) (subtraction-dist-over-mult' y' (pos (succ a'))) ⟩
        toℚ (((ℤ- x' ℤ* pos (succ b')) ℤ+ (ℤ- y' ℤ* pos (succ a'))) , ( pred (succ a' ℕ* succ b'))) ≡⟨ ap (λ - → toℚ (- , pred (succ a' ℕ* succ b'))) (negation-dist (x' ℤ* pos (succ b')) (y' ℤ* pos (succ a'))) ⟩
-       toℚ ((ℤ- x' ℤ* pos (succ b') ℤ+ y' ℤ* pos (succ a')) , ( pred (succ a' ℕ* succ b')))        ≡⟨ toℚ-neg fe ((x' ℤ* pos (succ b') ℤ+ y' ℤ* pos (succ a') , pred (succ a' ℕ* succ b'))) ⁻¹ ⟩
+       toℚ ((ℤ- (x' ℤ* pos (succ b') ℤ+ y' ℤ* pos (succ a'))) , ( pred (succ a' ℕ* succ b')))        ≡⟨ toℚ-neg fe ((x' ℤ* pos (succ b') ℤ+ y' ℤ* pos (succ a') , pred (succ a' ℕ* succ b'))) ⁻¹ ⟩
        (- toℚ (x' ℤ* pos (succ b') ℤ+ y' ℤ* pos (succ a') , pred (succ a' ℕ* succ b')))            ≡⟨ refl ⟩
        (- toℚ (p' ℚₙ+ q'))                                                                          ≡⟨ refl ⟩
        (- (((x , a) , p) + ((y , b) , q))) ∎
@@ -248,4 +248,13 @@ toℚ-subtraction fe p q = II
   II = toℚ p - toℚ q       ≡⟨ ap (toℚ p +_) (toℚ-neg fe q) ⟩
        toℚ p + toℚ (ℚₙ- q) ≡⟨ I ⁻¹ ⟩
        toℚ (p ℚₙ+ (ℚₙ- q)) ∎
+
+1-2/5≡3/5 : Fun-Ext → 1ℚ - 2/5 ≡ 3/5
+1-2/5≡3/5 fe = 1ℚ - 2/5              ≡⟨ ap (λ α → α - 2/5) (2/5+3/5 fe ⁻¹) ⟩
+               2/5 + 3/5 - 2/5       ≡⟨ ℚ+-assoc fe 2/5 3/5 (- 2/5) ⟩
+               2/5 + (3/5 - 2/5)     ≡⟨ ap (2/5 +_) (ℚ+-comm 3/5 (- 2/5)) ⟩
+               2/5 + ((- 2/5) + 3/5) ≡⟨ ℚ+-assoc fe 2/5 (- 2/5) 3/5 ⁻¹ ⟩
+               2/5 - 2/5 + 3/5       ≡⟨ ap (_+ 3/5) (ℚ-inverse-sum-to-zero fe 2/5) ⟩
+               0ℚ + 3/5              ≡⟨ ℚ-zero-left-neutral fe 3/5 ⟩ 
+               3/5                   ∎
 

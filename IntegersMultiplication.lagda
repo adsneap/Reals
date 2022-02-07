@@ -6,7 +6,7 @@ In this file, I define addition of integers, and prove some common properties of
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
-open import SpartanMLTT renaming (_+_ to _∔_ ; * to ⋆) --TypeTopology
+open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 
@@ -161,8 +161,8 @@ distributivity-mult-over-ℤ₁ x y = induction base step
   step : (k : ℕ)
        → (x + y) * negsucc k               ≡ x * negsucc k + y * negsucc k
        → (- (x + y)) + (x + y) * negsucc k ≡ (- x) + x * negsucc k + ((- y) + y * negsucc k)
-  step k IH = (- x + y) + (x + y) * negsucc k                   ≡⟨ ap ((- (x + y)) +_) IH                                                   ⟩
-              (- x + y) + (x * negsucc k + y * negsucc k)       ≡⟨ ap (_+ (((x * negsucc k) + (y * negsucc k)))) (negation-dist x y ⁻¹) ⟩
+  step k IH = (- (x + y)) + (x + y) * negsucc k                   ≡⟨ ap ((- (x + y)) +_) IH                                                   ⟩
+              (- (x + y)) + (x * negsucc k + y * negsucc k)       ≡⟨ ap (_+ (((x * negsucc k) + (y * negsucc k)))) (negation-dist x y ⁻¹) ⟩
               (- x) + (- y) + (x * negsucc k + y * negsucc k)   ≡⟨ ℤ+-assoc (- x) (- y) (u + v)                                            ⟩
               (- x) + ((- y) + (x * negsucc k + y * negsucc k)) ≡⟨ ap ((- x) +_) (ℤ+-assoc (- y) u v ⁻¹)                                   ⟩
               (- x) + ((- y) + x * negsucc k + y * negsucc k)   ≡⟨ ap (λ z → (- x) + (z + v)) (ℤ+-comm (- y) u)                            ⟩
@@ -272,7 +272,7 @@ subtraction-dist-over-mult₀ x = induction base step
     step 0        IH = refl
     step (succ k) IH = x * (- pos (succ (succ k)))  ≡⟨ ap ((- x) +_) IH                     ⟩
                        (- x) + (- x * pos (succ k)) ≡⟨ negation-dist x (x + (x * pos k)) ⟩
-                       - x + (x + x * pos k)        ∎
+                       - (x + (x + x * pos k))        ∎
 
 subtraction-dist-over-mult₁ : (x : ℤ) → (y : ℕ) → x * (- negsucc y) ≡ - x * negsucc y
 subtraction-dist-over-mult₁ x = induction base step
@@ -282,11 +282,11 @@ subtraction-dist-over-mult₁ x = induction base step
 
   step : (k : ℕ)
        → x * (- negsucc k) ≡ - x * negsucc k
-       → x + x * (- negsucc k) ≡ - (- x) + x * negsucc k
+       → x + x * (- negsucc k) ≡ - ((- x) + x * negsucc k)
   step k IH = x + x * (- negsucc k)         ≡⟨ ap (x +_) IH                                            ⟩
               x + (- x * negsucc k)         ≡⟨ ap (_+ (- (x * negsucc k)) ) (minus-minus-is-plus x ⁻¹) ⟩
               (- (- x)) + (- x * negsucc k) ≡⟨ negation-dist (- x) (x * negsucc k)                  ⟩
-              - (- x) + x * negsucc k       ∎
+              - ((- x) + x * negsucc k)       ∎
 
 subtraction-dist-over-mult : (x y : ℤ) → x * (- y) ≡ - (x * y)
 subtraction-dist-over-mult x (pos y)     = subtraction-dist-over-mult₀ x y 
