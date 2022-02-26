@@ -310,7 +310,7 @@ generalised-dependent-type-universal-property A P f = (λ x → pr₁ (f x)) , �
 
 RationalsCauchySequence : (S : ℕ → ℚ) → 𝓤₀ ̇
 RationalsCauchySequence = cauchy-sequence ℚ ℚ-metric-space
-
+{-
 modulus-of-convergence-from-cauchy : (S : ℕ → ℚ) → (RCS : RationalsCauchySequence S)
                        → Σ M ꞉ ((ε : ℚ₊) → ℕ) , (((ε , l) : ℚ₊) → (m n : ℕ) → M (ε , l) < m → M (ε , l) < n → B-ℚ (S m) (S n) ε l)
 modulus-of-convergence-from-cauchy S RCS  = generalised-dependent-type-universal-property { 𝓤₀ } M condition RCS
@@ -322,5 +322,7 @@ modulus-of-convergence-from-cauchy S RCS  = generalised-dependent-type-universal
 
 modulus-of-convergence : (S : ℕ → ℚ) → (RCS : RationalsCauchySequence S) → ℚ₊ → ℕ
 modulus-of-convergence S RCS = pr₁ (modulus-of-convergence-from-cauchy S RCS)
+-}
+
 
 \end{code}
