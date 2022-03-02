@@ -289,5 +289,3 @@ max₄ a b c d = max (max (max a b) c) d
 
 
 
-
-
