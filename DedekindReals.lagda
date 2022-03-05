@@ -61,6 +61,9 @@ rounded-left-a L r x y l y-L = II (ℚ≤-split fe x y l)
 rounded-left-b : (L : ℚ-subset-of-propositions) → rounded-left L → (x : ℚ) → x ∈ L → (∃ p ꞉ ℚ , (x < p) × p ∈ L)
 rounded-left-b L r x x-L = (pr₁ (r x)) x-L
 
+rounded-left-c : (L : ℚ-subset-of-propositions) → rounded-left L → (x y : ℚ) → x < y → y ∈ L → x ∈ L
+rounded-left-c L r x y l yL = pr₂ (r x) ∣ y , (l , yL) ∣
+
 rounded-right : (R : ℚ-subset-of-propositions) → 𝓤₀ ̇
 rounded-right R = (x : ℚ) → x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R)
 
@@ -75,6 +78,9 @@ rounded-right-a R r x y l x-R = II (ℚ≤-split fe x y l)
 
 rounded-right-b : (R : ℚ-subset-of-propositions) → rounded-right R → (x : ℚ) → x ∈ R → (∃ q ꞉ ℚ , (q < x) × q ∈ R)
 rounded-right-b R r x x-R = (pr₁ (r x)) x-R
+
+rounded-right-c : (R : ℚ-subset-of-propositions) → rounded-right R → (x y : ℚ) → x < y → x ∈ R → y ∈ R
+rounded-right-c R r x y l xR = pr₂ (r y) ∣ x , (l , xR) ∣
 
 rounded-left-is-prop : (L : ℚ-subset-of-propositions) → is-prop (rounded-left L)
 rounded-left-is-prop L = Π-is-prop fe δ

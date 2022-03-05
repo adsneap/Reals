@@ -306,7 +306,32 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
   III : p + q - q ≡ p
   III = ℚ+-assoc fe p q (- q) ∙ (ap (p +_) (ℚ-inverse-sum-to-zero fe q) ∙ ℚ-zero-right-neutral fe p)
 
- 
+ℚ<-subtraction-preserves-order' : Fun-Ext → (p q : ℚ) → q < 0ℚ → p + q < p
+ℚ<-subtraction-preserves-order' fe p q l = transport₂ _<_ (ℚ+-comm q p) (ℚ-zero-left-neutral fe p) I 
+ where
+  I : q + p < 0ℚ + p
+  I = ℚ<-addition-preserves-order q 0ℚ p l
+
+ℚ<-difference-positive' : Fun-Ext → (p q : ℚ) → p < q → p - q < 0ℚ
+ℚ<-difference-positive' fe p q l = transport (p - q <_) (ℚ-inverse-sum-to-zero fe q) (ℚ<-addition-preserves-order p q (- q) l)
+
+ℚ<-swap' : Fun-Ext → (p q r : ℚ) → p - q < r → p - r < q
+ℚ<-swap' fe p q r l = transport₂ _<_ I II (ℚ<-addition-preserves-order (p - q) r (q - r) l  )
+ where
+  I : p - q + (q - r) ≡ p - r
+  I = p - q + (q - r)         ≡⟨ ℚ+-assoc fe p (- q) (q - r) ⟩
+      p + ((- q) + (q - r))   ≡⟨ ap (p +_) (ℚ+-assoc fe (- q) q (- r) ⁻¹) ⟩
+      p + ((- q) + q - r)     ≡⟨ ap (λ z → p + (z - r)) (ℚ-inverse-sum-to-zero' fe q) ⟩
+      p + (0ℚ - r)            ≡⟨ ap (p +_) (ℚ-zero-left-neutral fe (- r)) ⟩
+      p - r ∎
+  II : r + (q - r) ≡ q
+  II = r + (q - r)     ≡⟨ ap (r +_) (ℚ+-comm q (- r)) ⟩
+       r + ((- r) + q) ≡⟨ ℚ+-assoc fe r (- r) q ⁻¹ ⟩
+       r - r + q       ≡⟨ ap (_+ q) (ℚ-inverse-sum-to-zero fe r) ⟩
+       0ℚ + q          ≡⟨ ℚ-zero-left-neutral fe q ⟩
+       q ∎
+
+  
 
 ℚ<-adding-zero : (p q : ℚ) → 0ℚ < p → 0ℚ < q → 0ℚ < p + q
 ℚ<-adding-zero p q l₁ l₂ = ℚ<-adding 0ℚ p 0ℚ q l₁ l₂

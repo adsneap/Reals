@@ -31,6 +31,7 @@ succℤ (negsucc (succ x)) = negsucc x
                              → ((k : ℤ) → A k → A (succℤ k))
                              → ((k : ℤ) → A (succℤ k) → A k)
                              → (x : ℤ)
+                             
                              → A x 
 ℤ-induction base step₀ step₁ (pos 0)            = base
 ℤ-induction base step₀ step₁ (pos (succ x))     = step₀ (pos x) (ℤ-induction base step₀ step₁ (pos x))

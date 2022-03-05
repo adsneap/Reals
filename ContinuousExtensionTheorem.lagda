@@ -9,6 +9,7 @@ open import UF-FunExt
 open import UF-PropTrunc
 open import OrderNotation
 
+
 open import Rationals
 open import RationalsOrder
 
@@ -26,6 +27,7 @@ open import MetricSpaceAltDef pt fe pe
 open import MetricSpaceDedekindReals pt fe pe
 open import MetricSpaceRationals fe pt pe
 open import RationalsLimits fe pt pe
+open import DedekindRealsProperties fe pt pe
 
 \end{code}
 
@@ -52,7 +54,10 @@ continuous {𝓤} {𝓥} {M₁} {M₂} (B₁ , conditions) (B₂ , conditions') 
 every-point-in-ℝ-limit-point : (x : ℝ) → {!Σ !}
 every-point-in-ℝ-limit-point = {!!}
 
-{-
+open import RationalsMultiplication
+open import RationalsNegation
+open import UF-Powerset
+
 continuous-extension-theorem : (f : ℚ → ℝ)
                              → continuous ℚ-metric-space ℝ-metric-space f
                              → ∃! g ꞉ (ℝ → ℝ) , (continuous ℝ-metric-space ℝ-metric-space g)
@@ -60,11 +65,30 @@ continuous-extension-theorem f f-continuous = (g , g-continuous) , g-unique
  where
   g : ℝ → ℝ
   g x = {!!}
+   where
+    Sl : ℕ → ℝ
+    Sl n = embedding-ℚ-to-ℝ {!!}
+     where
+      I : {!Exists (ℚ × ℚ)
+            (λ .patternInTele1 →
+               pr₁ .patternInTele1 ∈ pr₁ (pr₁ x) ×
+               pr₂ .patternInTele1 ∈ pr₂ (pr₁ x) ×
+               (Strict-Order-ℚ-ℚ Strict-Order.< 0ℚ)
+               (pr₂ .patternInTele1 - pr₁ .patternInTele1)
+               ×
+               (Strict-Order-ℚ-ℚ Strict-Order.<
+                pr₂ .patternInTele1 - pr₁ .patternInTele1)
+               (⟨1/sn⟩ n))!} 
+      I = ℝ-arithmetically-located x (⟨1/sn⟩ n) {!!}
+    res1 : (S : ℕ → ℝ) → cauchy→convergent ℝ ℝ-metric-space S
+    res1 = ℝ-cauchy-sequences-are-convergent
+  
   g-continuous : continuous ℝ-metric-space ℝ-metric-space g
   g-continuous = {!!}
+  
   g-unique : is-central (Σ (continuous ℝ-metric-space ℝ-metric-space)) (g , g-continuous)
   g-unique (g' , g'-continuous) = {!!}
--}
+
 open import RationalsAddition
 
 ℚ-addition-to-ℝ : ℚ → ℚ → ℝ

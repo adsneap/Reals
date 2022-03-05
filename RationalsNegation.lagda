@@ -258,3 +258,11 @@ toℚ-subtraction fe p q = II
                0ℚ + 3/5              ≡⟨ ℚ-zero-left-neutral fe 3/5 ⟩ 
                3/5                   ∎
 
+
+ℚ-inverse-intro : Fun-Ext → (p q : ℚ) → p ≡ p + (q - q)
+ℚ-inverse-intro fe p q = p           ≡⟨ ℚ-zero-right-neutral fe p ⁻¹ ⟩
+                         p + 0ℚ      ≡⟨ ap (p +_) (ℚ-inverse-sum-to-zero fe q ⁻¹) ⟩
+                         p + (q - q) ∎
+
+ℚ-inverse-intro' : Fun-Ext → (p q : ℚ) → p ≡ (q - q) + p
+ℚ-inverse-intro' fe p q = ℚ-inverse-intro fe p q ∙ ℚ+-comm p (q - q)
