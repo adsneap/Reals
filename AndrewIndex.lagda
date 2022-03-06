@@ -55,7 +55,7 @@ import RationalsNegation
 import RationalsOrder
 
 import DedekindReals
--- import DedekindRealsAddition
+import DedekindRealsAddition
 import DedekindRealsProperties
 import DedekindRealsOrder
 
