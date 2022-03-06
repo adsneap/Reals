@@ -325,11 +325,11 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
     δ = 1ℚ
     0<1 : 0ℚ < 1ℚ
     0<1 = 0 , refl
-    obtain-p' : ∃ p' ꞉ ℚ , p' ∈ lower-cut-of (f (ε , 0<1))
+    obtain-p' : ∃ p' ꞉ ℚ , p' < (f (ε , 0<1))
     obtain-p' = inhabited-from-real-L (f (ε , 0<1))
 
-    γ : Σ p' ꞉ ℚ , p' ∈ lower-cut-of (f (ε , 0<1)) → ∃ p ꞉ ℚ , p ∈ Ly
-    γ (p' , p'Ly) = ∣ p , ∣ ((ε , 0<1) , (δ , 0<1)) , transport (_∈ lower-cut-of (f (ε , 0<1))) I p'Ly ∣ ∣
+    γ : Σ p' ꞉ ℚ , p' < (f (ε , 0<1)) → ∃ p ꞉ ℚ , p ∈ Ly
+    γ (p' , p'Ly) = ∣ p , ∣ ((ε , 0<1) , (δ , 0<1)) , transport (_< (f (ε , 0<1))) I p'Ly ∣ ∣
      where
       p : ℚ
       p = p' - ε - δ
@@ -355,10 +355,10 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
     δ = 1ℚ
     0<1 : 0ℚ < 1ℚ
     0<1 = 0 , refl
-    obtain-q' : ∃ q' ꞉ ℚ , q' ∈ upper-cut-of (f (ε , 0<1))
+    obtain-q' : ∃ q' ꞉ ℚ , q' > (f (ε , 0<1))
     obtain-q' = inhabited-from-real-R (f (ε , 0<1))
-    γ : Σ q' ꞉ ℚ , q' ∈ upper-cut-of (f (ε , 0<1)) → ∃ q ꞉ ℚ , q ∈ Ry
-    γ (q' , q'Ly) = ∣ q , ∣ ((ε , 0<1) , (δ , 0<1)) , (transport (_∈ upper-cut-of (f (ε , 0<1))) I q'Ly) ∣ ∣
+    γ : Σ q' ꞉ ℚ , q' > (f (ε , 0<1)) → ∃ q ꞉ ℚ , q ∈ Ry
+    γ (q' , q'Ly) = ∣ q , ∣ ((ε , 0<1) , (δ , 0<1)) , (transport (_> (f (ε , 0<1))) I q'Ly) ∣ ∣
      where
       q : ℚ
       q = q' + ε + δ
@@ -561,7 +561,7 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
          → 𝟘 
       II ((((ε₁ , l₁) , (θ₁ , l₂)) , klc) , ((ε₂ , l₃) , (θ₂ , l₄)) , kuc)  = ∥∥-rec 𝟘-is-prop III (approximation-condition (ε₁ , l₁) (ε₂ , l₃))
        where
-        III : Σ (a , b , c , d) ꞉ ℚ × ℚ × ℚ × ℚ , a ∈ lower-cut-of (f (ε₁ , l₁)) × c ∈ lower-cut-of (f (ε₂ , l₃)) × b ∈ upper-cut-of (f (ε₁ , l₁)) × d ∈ upper-cut-of (f (ε₂ , l₃)) × B-ℚ (min a c) (max b d) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₃) → 𝟘
+        III : Σ (a , b , c , d) ꞉ ℚ × ℚ × ℚ × ℚ , a < (f (ε₁ , l₁)) × c < (f (ε₂ , l₃)) × b > (f (ε₁ , l₁)) × d > (f (ε₂ , l₃)) × B-ℚ (min a c) (max b d) (ε₁ + ε₂) (ℚ<-adding-zero ε₁ ε₂ l₁ l₃) → 𝟘
         III ((a , b , c , d) , aL1 , cL2 , bR1 , dR2 , B)  = ℚ<-not-itself 0ℚ xii
          where
           i : c < k - ε₂ - θ₂
@@ -689,9 +689,9 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
     0<θ/2 : 0ℚ < 1/2 * θ
     0<θ/2 = ℚ<-pos-multiplication-preserves-order 1/2 θ (0 , refl) l₂
     
-    obtain-bounds :  ∃ (u , v) ꞉ ℚ × ℚ , u ∈ lower-cut-of (f (ε , l₁)) × v ∈ upper-cut-of (f (ε , l₁)) × 0ℚ < (v - u) × (v - u) < 1/2 * θ
+    obtain-bounds :  ∃ (u , v) ꞉ ℚ × ℚ , u < (f (ε , l₁)) × v > (f (ε , l₁)) × 0ℚ < (v - u) × (v - u) < 1/2 * θ
     obtain-bounds = ℝ-arithmetically-located (f (ε , l₁)) (1/2 * θ) 0<θ/2
-    I :  Σ (u , v) ꞉ ℚ × ℚ , u ∈ lower-cut-of (f (ε , l₁)) × v ∈ upper-cut-of (f (ε , l₁)) × 0ℚ < (v - u) × (v - u) < 1/2 * θ
+    I :  Σ (u , v) ꞉ ℚ × ℚ , u < (f (ε , l₁)) × v > (f (ε , l₁)) × 0ℚ < (v - u) × (v - u) < 1/2 * θ
       → ∃ (a , b , c , d) ꞉ ℚ × ℚ × ℚ × ℚ , a ∈ Lε × c ∈ Ly × b ∈ Rε × d ∈ Ry × B-ℚ (min a c) (max b d) (ε + θ) l₃
     I ((u , v) , uLε , vRε , 0<v-u , v-u<θ/2) = ∥∥-functor using-located (located-from-real y u v u<v)
      where

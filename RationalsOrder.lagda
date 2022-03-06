@@ -331,8 +331,6 @@ rounded-lemma₀ (succ a) = succ (2 ℕ* pred (succ (succ a))) ≡⟨ ap (λ - �
        0ℚ + q          ≡⟨ ℚ-zero-left-neutral fe q ⟩
        q ∎
 
-  
-
 ℚ<-adding-zero : (p q : ℚ) → 0ℚ < p → 0ℚ < q → 0ℚ < p + q
 ℚ<-adding-zero p q l₁ l₂ = ℚ<-adding 0ℚ p 0ℚ q l₁ l₂
 
@@ -734,6 +732,8 @@ inequality-chain-outer-bounds-inner fe a b c d l₁ l₂ l₃ = ℚ<-trans (c - 
  where
   I : p ≤ s
   I = ℚ≤-trans₂ fe p q r s l₁ l₂ l₃
+
+
 
 
 

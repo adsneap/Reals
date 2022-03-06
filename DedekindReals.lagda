@@ -287,9 +287,27 @@ rounded-from-real-R ((L , R) , _ , _ , _ , rounded-R , _) = rounded-R
 disjoint-from-real : (((L , R) , i) : ℝ) → disjoint L R
 disjoint-from-real ((L , R) , _ , _ , _ , _ , disjoint , _) = disjoint
 
+\end{code}
 
+Now we have notation for p < x < q where p , q ∈ ℚ and x ∈ ℝ.
 
+\begin{code}
 
+open import OrderNotation
+
+_ℚ<ℝ_  : ℚ → ℝ → 𝓤₀ ̇
+p ℚ<ℝ x = p ∈ lower-cut-of x
+
+instance
+ Strict-Order-ℚ-ℝ : Strict-Order ℚ ℝ
+ _<_ {{Strict-Order-ℚ-ℝ}} = _ℚ<ℝ_
+
+_ℝ<ℚ_  : ℝ → ℚ → 𝓤₀ ̇
+x ℝ<ℚ q = q ∈ upper-cut-of x
+
+instance
+ Strict-Order-ℝ-ℚ : Strict-Order ℝ ℚ
+ _<_ {{Strict-Order-ℝ-ℚ}} = _ℝ<ℚ_
 
 
 \end{code}
