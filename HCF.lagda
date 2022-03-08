@@ -44,7 +44,7 @@ is-hcf-is-prop fe d x y p q = ×-is-prop (is-common-divisor-is-prop d x y) g p q
   
     g : is-prop ((f : ℕ) → is-common-divisor f x y → f ∣ succ d)
     g p' q' = Π₂-is-prop fe h p' q'
-
+ 
 has-hcf : (x y : ℕ) → 𝓤₀ ̇
 has-hcf x y = Σ d ꞉ ℕ , is-hcf (succ d) x y
 
@@ -193,7 +193,7 @@ hcf-unique a b (h , h-icd , f) (h' , h'-icd , f') = ∣-anti h h' I II
 Sketch code to formalise rationals stuff 
 
 \begin{code}
-
+{-
 HCF' : (a b : ℕ) → Σ h ꞉ ℕ , is-hcf (succ h) a (succ b)
 HCF' a b = I (HCF a (succ b))
  where
@@ -228,8 +228,5 @@ new-denominator fe x a = I (HCF' x a)
 
     h-is-hcf : h ≡ pr₁ (HCF' x a)
     h-is-hcf = pr₁ (from-Σ-≡ h-is-hcf')
-{-
-divbyhcf-gives-coprime : (x a : ℕ) → {!!}
-divbyhcf-gives-coprime = {!!}
 -}
 \end{code}

@@ -126,5 +126,20 @@ equiv-with-lowest-terms-is-equal (x , a) (y , b) e ((m₁ , m₂) , n) ((m₁' ,
   xyequal : x ≡ y
   xyequal = ℤ-mult-right-cancellable x y (pos (succ a)) (λ z → z) e''
 
+open import CanonicalMapNotation
 
+ℤ-to-ℚₙ : ℤ → ℚₙ
+ℤ-to-ℚₙ z = z , 0
+
+instance
+ canonical-map-ℤ-to-ℚₙ : Canonical-Map ℤ ℚₙ
+ ι {{canonical-map-ℤ-to-ℚₙ}} = ℤ-to-ℚₙ
+
+ℕ-to-ℚₙ : ℕ → ℚₙ
+ℕ-to-ℚₙ n = ι (ι n)
+
+instance
+ canonical-map-ℕ-to-ℚₙ : Canonical-Map ℕ ℚₙ
+ ι {{canonical-map-ℕ-to-ℚₙ}} = ℕ-to-ℚₙ
+ 
 \end{code}

@@ -48,7 +48,11 @@ predsuccℤ (pos x)            = refl
 predsuccℤ (negsucc 0)        = refl
 predsuccℤ (negsucc (succ x)) = refl
 
+open import CanonicalMapNotation
 
+instance
+ canonical-map-ℕ-to-ℤ : Canonical-Map ℕ ℤ
+ ι {{canonical-map-ℕ-to-ℤ}} = λ x → pos x
 
 {-
 

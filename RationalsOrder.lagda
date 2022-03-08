@@ -648,6 +648,9 @@ trisect fe x y l = (x + d * 1/3 , x + d * 2/3) , I , II , III , IV , V
 0<1/2 : 0ℚ < 1/2
 0<1/2 = toℚ-< (pos 0 , 0) (pos 1 , 1) (0 , refl)
 
+0<1/4 : 0ℚ < 1/4
+0<1/4 = toℚ-< (pos 0 , 0) (pos 1 , 3) (0 , refl)
+
 0<1/5 : 0ℚ < 1/5
 0<1/5 = toℚ-< (pos 0 , 0) (pos 1 , 5) (0 , refl)
 
@@ -659,6 +662,12 @@ halving-preserves-order p l = ℚ<-pos-multiplication-preserves-order p 1/2 l 0<
 
 halving-preserves-order' : (p : ℚ) → 0ℚ < p → 0ℚ < 1/2 * p
 halving-preserves-order' p l = ℚ<-pos-multiplication-preserves-order 1/2 p 0<1/2 l
+
+quarter-preserves-order : (p : ℚ) → 0ℚ < p → 0ℚ < p * 1/4
+quarter-preserves-order p l = ℚ<-pos-multiplication-preserves-order p 1/4 l 0<1/4
+
+quarter-preserves-order' : (p : ℚ) → 0ℚ < p → 0ℚ < 1/4 * p
+quarter-preserves-order' p l = ℚ<-pos-multiplication-preserves-order 1/4 p 0<1/4 l
 
 half-of-pos-is-less : Fun-Ext → (p : ℚ) → 0ℚ < p → 1/2 * p < p
 half-of-pos-is-less fe p l = transport (1/2 * p <_) III II

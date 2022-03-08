@@ -6,6 +6,7 @@ Andrew Sneap - 8th January 2022
 
 open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
+open import CanonicalMapNotation --TypeTopology
 open import OrderNotation --TypeTopology
 open import UF-Base -- TypeTopology
 open import UF-FunExt -- TypeTopology
@@ -208,8 +209,8 @@ diagram-commutes : (f g : ℚ → ℚ)
                  → (f-order-preserving : ((p q : ℚ) → p < q ⇔ f p < f q))
                  → (f-g-bijective : ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r)))
                  → (q : ℚ)
-                 → (f-bar f g f-order-preserving f-g-bijective ∘ embedding-ℚ-to-ℝ) q ≡ (embedding-ℚ-to-ℝ ∘ f) q
-diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar f g f-order-preserving f-g-bijective ∘ embedding-ℚ-to-ℝ) q) ((embedding-ℚ-to-ℝ ∘ f) q) I II III IV
+                 → (f-bar f g f-order-preserving f-g-bijective ∘ ι) q ≡ (ι ∘ f) q
+diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar f g f-order-preserving f-g-bijective ∘ ι) q) ((ι ∘ f) q) I II III IV
  where
   I : (a : ℚ) → g a < q → a < f q 
   I a b = transport (_< f q) ii i

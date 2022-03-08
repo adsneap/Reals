@@ -84,7 +84,7 @@ instance
   II = ℤ+-lc (succℤ (pos (α ℕ+ β))) (pos 0) x I
 
 ℤ≤-split : (x y : ℤ) → x ≤ y → (x < y) ∔ (x ≡ y)
-ℤ≤-split x y (zero , p) = inr p
+ℤ≤-split x y (zero , p)   = inr p
 ℤ≤-split x y (succ a , p) = inl (a , (ℤ-left-succ x (pos a)  ∙ p))
 
 ℤ≤-trans : (x y z : ℤ) → x ≤ y → y ≤ z → x ≤ z
@@ -440,6 +440,15 @@ ordering-right-cancellable a b (pos (succ x)) p l = orcl' a b x l
 ℤ≤-ordering-right-cancellable a b (pos zero) p l = 𝟘-elim p
 ℤ≤-ordering-right-cancellable a b (pos (succ x)) p l = orcl a b x l
 ℤ≤-ordering-right-cancellable a b (negsucc x) p l = 𝟘-elim p
-      
- 
+
+ℤ≤-anti : (x y : ℤ) → x ≤ y → y ≤ x → x ≡ y 
+ℤ≤-anti x y l₁ l₂ = I (ℤ≤-split x y l₁) (ℤ≤-split y x l₂)
+ where
+  I : x < y ∔ (x ≡ y) → y < x ∔ (y ≡ x)
+    → x ≡ y
+  I (inl x<y) (inl y<x) = 𝟘-elim (ℤ-equal-not-less-than x (ℤ<-trans x y x x<y y<x))
+  I (inl x<y) (inr e)   = e ⁻¹
+  I (inr e)   (inl y<x) = e
+  I (inr e)   (inr e')  = e
+       
 \end{code}

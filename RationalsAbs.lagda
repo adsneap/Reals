@@ -91,6 +91,9 @@ abs-of-pos-is-pos fe ((negsucc x , a) , α) l = 𝟘-elim (III II)
   II = transport₂ _≤_ (ℤ-zero-left-is-zero (pos (succ a))) (ℤ-zero-right-neutral (negsucc x)) I
   III : ¬ (pos 0 ≤ negsucc x) 
   III (k , e) = pos-not-negative (ℤ-zero-left-neutral (pos k) ⁻¹ ∙ e)
+
+abs-of-pos-is-pos' : Fun-Ext → (p : ℚ) → 0ℚ < p → abs p ≡ p
+abs-of-pos-is-pos' fe p l = abs-of-pos-is-pos fe p (ℚ<-coarser-than-≤ 0ℚ p l)
   
 
 ℚ-abs-neg-equals-pos : Fun-Ext → (q : ℚ) → abs q ≡ abs (- q)

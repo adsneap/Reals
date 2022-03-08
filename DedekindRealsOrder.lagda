@@ -26,7 +26,7 @@ open import DedekindReals pe pt fe
 open PropositionalTruncation pt -- TypeTopology
 
 _<ℝ_ : ℝ → ℝ → 𝓤₀ ̇
-((Lx , Rx) , isCutx) <ℝ ((Ly , Ry) , isCuty) = ∃ q ꞉ ℚ , q ∈ Rx × q ∈ Ly
+x <ℝ y = ∃ q ꞉ ℚ , x < q × q < y
 
 instance
  Strict-Order-ℝ-ℝ : Strict-Order ℝ ℝ
@@ -36,14 +36,20 @@ instance
 <-is-prop x y = ∃-is-prop
 
 ℝ<-trans : (x y z : ℝ) → x < y → y < z → x < z
-ℝ<-trans ((Lx , Rx) , _) ((Ly , Ry) , _ , _ , _ , _ , disjoint-y , _) ((Lz , Rz) , _ , _ , rounded-left-z , _ , _ , _) l r = ∥∥-functor I (binary-choice l r)
+ℝ<-trans x y z x<y y<z = ∥∥-functor I (binary-choice x<y y<z)
  where
-  I : (Σ q ꞉ ℚ , q ∈ Rx × q ∈ Ly) × (Σ p ꞉ ℚ , p ∈ Ry × p ∈ Lz ) → Σ s ꞉ ℚ , s ∈ Rx × s ∈ Lz
-  I ((q , (qRx , qLy)) , (p , (pRy , pLz)))
-   = q , (qRx , rounded-left-a Lz rounded-left-z q p (ℚ<-coarser-than-≤ q p (disjoint-y q p (qLy , pRy))) pLz)
+  I : (Σ k ꞉ ℚ , x < k × k < y)
+    × (Σ l ꞉ ℚ , y < l × l < z)
+    →  Σ m ꞉ ℚ , x < m × m < z
+  I ((k , (x<k , k<y)) , l , (y<l , l<z)) = k , (x<k , k<z)
+   where
+    k<l : k < l
+    k<l = disjoint-from-real y k l (k<y , y<l)
+    k<z : k < z
+    k<z = rounded-left-c (lower-cut-of z) (rounded-from-real-L z) k l k<l l<z
 
 _≤ℝ_ : ℝ → ℝ → 𝓤₀ ̇
-((Lx , Rx) , isCutx) ≤ℝ ((Ly , Ry) , isCuty) = (q : ℚ) → q ∈ Lx → q ∈ Ly
+x ≤ℝ y = (q : ℚ) → q < x → q < y
 
 instance
  Order-ℝ-ℝ : Order ℝ ℝ
@@ -57,8 +63,7 @@ instance
 
 ℝ-archimedean : (x y : ℝ)
               → x < y
-              → ∃ q ꞉ ℚ , q > x
-                        × q < y
+              → ∃ q ꞉ ℚ , q > x × q < y
 ℝ-archimedean x y l = l
 
 weak-linearity : (x y z : ℝ) → x < y → x < z ∨ z < y
@@ -80,6 +85,18 @@ weak-linearity x y z l = ∥∥-rec ∨-is-prop I l
       IV (inl rLz) = ∣ inl ∣ r , rRx , rLz ∣ ∣
       IV (inr sRz) = ∣ inr ∣ s , sRz , sLy ∣ ∣
 
+
+
+weak-linearity' : (x y z : ℝ) → x < y → x < z ∨ z < y
+weak-linearity' x y z l = do
+ (q , x<q , q<y) ← l
+ (r , r<q , x<r) ← rounded-right-b (upper-cut-of x) (rounded-from-real-R x) q x<q
+ (s , q<s , s<y) ← rounded-left-b (lower-cut-of y) (rounded-from-real-L y) q q<y
+ t               ← located-from-real z r s (ℚ<-trans r q s r<q q<s)
+ Cases t (λ r<z → ∣ inl ∣ r , x<r , r<z ∣ ∣)
+         (λ z<s → ∣ inr ∣ s , z<s , s<y ∣ ∣)
+
+  
 _♯_ : (x y : ℝ) → 𝓤₀ ̇
 x ♯ y = x < y ∨ y < x
 
@@ -91,14 +108,14 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
    where
     II : x < x
     II = transport (x <_) (e ⁻¹) l
-    III : Σ q ꞉ ℚ , q > x × q < x → 𝟘
-    III (q , qRx , qLx) = ℚ<-not-itself q (disjoint-from-real x q q (qLx , qRx))
+    III : Σ q ꞉ ℚ , x < q × q < x → 𝟘
+    III (q , x<q , q<x) = ℚ<-not-itself-from-ℝ q x (q<x , x<q)
   I (inr r) = ∥∥-rec 𝟘-is-prop III II
    where
     II : y < y
     II = transport (y <_) e r
     III : Σ p ꞉ ℚ , p > y × p < y → 𝟘
-    III (p , pRy , pLy) = ℚ<-not-itself p (disjoint-from-real y p p (pLy , pRy))
+    III (p , y<p , p<y) = ℚ<-not-itself-from-ℝ p y (p<y , y<p)
 
 ℝ<-≤-trans : (x y z : ℝ) → x < y → y ≤ z → x < z
 ℝ<-≤-trans x y z x<y y≤z = ∥∥-functor I x<y
@@ -109,8 +126,8 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 ℝ-less-than-or-equal-not-greater : (x y : ℝ) → x ≤ y → ¬ (y < x)
 ℝ-less-than-or-equal-not-greater x y x≤y y<x = ∥∥-rec 𝟘-is-prop I y<x
  where
-  I : Σ q ꞉ ℚ , q > y × q < x → 𝟘
-  I (q , qRy , qLx) = ℚ<-not-itself q (disjoint-from-real y q q ((x≤y q qLx) , qRy))
+  I : ¬ (Σ q ꞉ ℚ , y < q × q < x)
+  I (q , y<q , q<x) = ℚ<-not-itself-from-ℝ q y (x≤y q q<x , y<q)
 
 ℝ-less-than-not-greater-or-equal : (x y : ℝ) → x < y → ¬ (y ≤ x)
 ℝ-less-than-not-greater-or-equal x y l₁ l₂ = ℝ-less-than-or-equal-not-greater y x l₂ l₁
@@ -145,8 +162,8 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 ℝ-less-than-not-itself : (x : ℝ) → x ≮ x
 ℝ-less-than-not-itself x l = ∥∥-rec 𝟘-is-prop I l
  where
-  I : (Σ k ꞉ ℚ , k > x × k < x) → 𝟘
-  I (k , x<k , k<x) = ℚ<-not-itself k (disjoint-from-real x k k (k<x , x<k))
+  I : ¬ (Σ k ꞉ ℚ , x < k × k < x)
+  I (k , x<k , k<x) = ℚ<-not-itself-from-ℝ k x (k<x , x<k)
 
 ℝ-zero-less-than-one : 0ℝ < 1ℝ
 ℝ-zero-less-than-one = ∣ 1/2 , 0<1/2 , 1/2<1 ∣

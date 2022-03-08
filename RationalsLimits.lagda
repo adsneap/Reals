@@ -114,6 +114,8 @@ open import IntegersB
 open import ncRationalsOrder
 open import ncRationalsOperations renaming (_*_ to _ℚₙ*_ ; _+_ to _ℚₙ+_ ; -_ to ℚₙ-_ ; abs to ℚₙ-abs) 
 
+open import CanonicalMapNotation
+
 embedding-ℕ-to-ℚ : ℕ → ℚ
 embedding-ℕ-to-ℚ n = toℚ (pos n , 0)
 

@@ -6,6 +6,7 @@ Andrew Sneap - 26th November 2021
 
 open import SpartanMLTT renaming (_+_ to _∔_) --TypeTopology
 
+open import CanonicalMapNotation --TypeTopology
 open import DiscreteAndSeparated --TypeTopology
 open import NaturalNumbers-Properties --TypeTopology
 open import UF-Base hiding (_≈_)
@@ -294,6 +295,22 @@ toℚ-toℚₙ fe (r , p) = II
   II : r , p ≡ pr₁ (pr₁ (toℚlemma r)) , pr₂ (pr₁ (toℚlemma r))
   II = to-subtype-≡ (is-in-lowest-terms-is-prop fe) I
 
+instance
+ canonical-map-ℚₙ-to-ℚ : Canonical-Map ℚₙ ℚ
+ ι {{canonical-map-ℚₙ-to-ℚ}} = toℚ
 
+ℤ-to-ℚ : ℤ → ℚ
+ℤ-to-ℚ z = ι (ι z)
+
+instance
+ canonical-map-ℤ-to-ℚ : Canonical-Map ℤ ℚ
+ ι {{canonical-map-ℤ-to-ℚ}} = ℤ-to-ℚ
+
+ℕ-to-ℚ : ℕ → ℚ
+ℕ-to-ℚ n = ι {{ canonical-map-ℤ-to-ℚ }} (ι n)
+
+instance
+ canonical-map-ℕ-to-ℚ : Canonical-Map ℕ ℚ 
+ ι {{canonical-map-ℕ-to-ℚ}} = ℕ-to-ℚ
 
 

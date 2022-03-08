@@ -123,6 +123,9 @@ add-same-denom fe (x , a) (y , b) = I ⁻¹ ∙ equiv→equality fe ((x , b) ℚ
 1/3+1/3 : Fun-Ext → 1/3 + 1/3 ≡ 2/3
 1/3+1/3 fe = add-same-denom fe (pos 1 , 2) (pos 1 , 2)
 
+1/4+1/4 : Fun-Ext → 1/4 + 1/4 ≡ 1/2
+1/4+1/4 fe = add-same-denom fe (pos 1 , 3) (pos 1 , 3) ∙ equiv→equality fe (pos 2 , 3) (pos 1 , 1) refl
+
 1/2+1/4 : Fun-Ext → 1/2 + 1/4 ≡ 3/4
 1/2+1/4 fe = equiv→equality fe ((pos 1 , 1) ℚₙ+ (pos 1 , 3)) (pos 3 , 3) refl
 

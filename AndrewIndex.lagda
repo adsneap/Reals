@@ -16,6 +16,9 @@ You can split buffers by typing "C-x 2" or "C-x 3" to see horizontal
 splits or vertical splits respectively. You can return to a single
 buffer view by typing "C-x 1" in the buffer you want to see.
 
+For more emacs info, see:
+https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf
+
 \begin{code}
 
 {-# OPTIONS --without-K --exact-split --safe #-}
