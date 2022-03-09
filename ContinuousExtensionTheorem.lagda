@@ -40,12 +40,13 @@ If f is a uniformly continuous mapping of A into Y, then f can be extended uniqu
 
 In order to prove this, it is first necessary to introduce the definitions in the proof.
 
-First, we would like to know that every point in ℝ is a limit point for some cauchy sequence.
+First, we would like to know that every point in ℝ is a limit point for some cauchy sequence. <- This is impossible constructively, so search for another solution.
 
 \begin{code}
 
 open import OrderNotation
 open import NaturalsOrder
+
 {-
 ℚ-converges-to-point-in-ℝ : (x : ℝ) → Σ S ꞉ (ℕ → ℚ) , (c : ?) → (embedding-ℚ-to-ℝ {!!} ≡ x)
 ℚ-converges-to-point-in-ℝ S = {!!}
@@ -65,7 +66,7 @@ open import NaturalsOrder
     sequence-converges' = ℝ-cauchy-sequences-are-convergent S' ι-sequence-cauchy'
  -}
  
-continuous : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} → (m₁ : metric-space M₁) → (m₂ : metric-space M₂) → (f : M₁ → M₂) → 𝓤 ̇ 
+continuous : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} → (m₁ : metric-space M₁) → (m₂ : metric-space M₂) → (f : M₁ → M₂) → 𝓤 ̇
 continuous {𝓤} {𝓥} {M₁} {M₂} (B₁ , _) (B₂ , _) f = (c : M₁) → ((ε , l) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , ((x : M₁) → B₁ c x δ l₂ → B₂ (f c) (f x) ε l)
 
 open import RationalsNegation
@@ -73,6 +74,8 @@ open import RationalsMinMax fe renaming (max to ℚ-max ; min to ℚ-min)
 open import RationalsAbs
 open import RationalsAddition
 
+
+ -- This needs to be cleaned up, abstract two proofs to chop proof in half
 ι-continuous : continuous ℚ-metric-space ℝ-metric-space ι
 ι-continuous c (ε , 0<ε) = (ε' , 0<ε') , I 
  where
@@ -182,31 +185,25 @@ open import RationalsAddition
       l₄ : x <ℚ x + 1/4 * ε
       l₄ = ℚ<-addition-preserves-order'' fe x (1/4 * ε) 0<ε''
 
-{-
-I
- where
-  S : ℕ → ℝ
-  S _ = ι c
 
-  ι-sequence-cauchy : cauchy-sequence ℝ ℝ-metric-space S
-  ι-sequence-cauchy (ε , l) = 0 , sequence-is-cauchy
+chain-continuity : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} {M₃ : 𝓦 ̇}
+                → (m₁ : metric-space M₁)
+                → (m₂ : metric-space M₂)
+                → (m₃ : metric-space M₃)
+                → (f : M₁ → M₂)
+                → (g : M₂ → M₃)
+                → continuous m₁ m₂ f
+                → continuous m₂ m₃ g
+                → continuous m₁ m₃ (g ∘ f) 
+chain-continuity  {𝓤} {𝓥} {𝓦} {M₁} {M₂} {M₃} (B₁ , m₁) (B₂ , m₂) (B₃ , m₃) f g c₁ c₂ c (ε , l) = I (c₂ (f c) (ε , l))
+ where
+  I : Σ (δ , 0<δ) ꞉ ℚ₊ , ((y : M₂) → B₂ (f c) y δ 0<δ → B₃ (g (f c)) (g y) ε l)
+    → Σ (κ , 0<κ) ꞉ ℚ₊ , ((x : M₁) → B₁ c x κ 0<κ → B₃ (g (f c)) (g (f x)) ε l)
+  I ((δ , 0<δ) , τ) = II (c₁ c (δ , 0<δ))
    where
-    sequence-is-cauchy : (m n : ℕ) → 0 ≤ m → 0 ≤ n → B-ℝ (S m) (S n) ε l
-    sequence-is-cauchy m n l₁ l₂ = ℝ-m1b (ι c) ε l
-    
-  sequence-converges : convergent-sequence ℝ ℝ-metric-space S
-  sequence-converges = ℝ-cauchy-sequences-are-convergent S ι-sequence-cauchy
-  
-  I : (x : ℚ) → B-ℚ c x ε 0<ε → B-ℝ (ι c) (ι x) ε 0<ε
-  I x B = ∥∥-rec ∃-is-prop II sequence-converges
-   where
-    II : Σ y ꞉ ℝ , ((((ε , l) : ℚ₊) → Σ _ ꞉ ℕ , ((n : ℕ) → _ → B-ℝ y (ι c) ε l)))
-       → B-ℝ (ι c) (ι x) ε 0<ε
-    II (y , f) = {!!}
-     where
-      c-ε/2-close : Σ N ꞉ ℕ , ((n : ℕ) → N < n → B-ℝ y (ι c) (1/2 * ε) {!!})
-      c-ε/2-close = f (1/2 * ε , {!!})  
--}
+    II : (Σ (δ₁ , 0<δ₁) ꞉ ℚ₊ , ((z : M₁) → B₁ c z δ₁ 0<δ₁ → B₂ (f c) (f z) δ 0<δ))
+        → Σ (κ , 0<κ) ꞉ ℚ₊ , ((x : M₁) → B₁ c x κ 0<κ → B₃ (g (f c)) (g (f x)) ε l)
+    II ((δ₁ , 0<δ₁) , τ₁) = (δ₁ , 0<δ₁) , λ x B → τ (f x) (τ₁ x B)
 
 \end{code}
 
@@ -224,20 +221,189 @@ I am first going to try and show that certain functions are continuous, and atte
   I x B = B
 
 ℚ-ℝ-id : ℚ → ℝ
-ℚ-ℝ-id = ι ∘ id
-{-
-ℚ-ℝ-id-continuous : continuous ℚ-metric-space ℝ-metric-space ℚ-ℝ-id
-ℚ-ℝ-id-continuous c (ε , 0<ε) = (ε , 0<ε) , I
- where
-  I : (x : ℚ) → B-ℚ c x ε 0<ε → B-ℝ (ℚ-ℝ-id c) (ℚ-ℝ-id x) ε 0<ε
-  I x B = {!!}
+ℚ-ℝ-id = ι ∘ ℚ-id
 
-every-point-in-ℝ-limit-point : (x : ℝ) → {!Σ !}
-every-point-in-ℝ-limit-point = {!!}
+ℚ-ℝ-id-continuous : continuous ℚ-metric-space ℝ-metric-space ℚ-ℝ-id
+ℚ-ℝ-id-continuous = chain-continuity ℚ-metric-space ℚ-metric-space ℝ-metric-space ℚ-id ι ℚ-id-continuous ι-continuous
+
+\end{code}
+
+Now we have that the function from ℚ-ℝ-id is continuous. We want to extend this function from the rationals to the reals.
+
+\begin{code}
+
+open import DedekindRealsOrder pe pt fe
+open import DedekindRealsAddition pe pt fe renaming (_+_ to _ℝ+_)
+{-
+ℝ-no-maximum : (x : ℝ) → Σ y ꞉ ℝ , y < x ∔ x < y
+ℝ-no-maximum x = {!weak-linearity ? ? ? ?!}
+
+ℝ-id : ℝ → ℝ
+ℝ-id r = ℚ-ℝ-id (I by-ℚ-ℝ-id-continuity)
+ where
+  S : ℕ → ℚ
+  S = ⟨1/sn⟩
+  
+  by-ℚ-ℝ-id-continuity : (c : ℚ) → ((ε , l) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , ((x : ℚ) → B-ℚ c x δ l₂ → B-ℝ (ℚ-ℝ-id c) (ℚ-ℝ-id x) ε l)
+  by-ℚ-ℝ-id-continuity = ℚ-ℝ-id-continuous
+  
+  I : ((c : ℚ) → ((ε , l) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , ((x : ℚ) → B-ℚ c x δ l₂ → B-ℝ (ℚ-ℝ-id c) (ℚ-ℝ-id x) ε l)) → ℚ
+  I f = {!!}
+   where
+    II : {!!}
+    II = {!f 0 1!}
+
+
+ℝ-id' : ℝ → ℝ
+ℝ-id' r = I (by-ℚ-ℝ-id-continuity)
+ where
+  
+  by-ℚ-ℝ-id-continuity : (c : ℚ) → ((ε , l) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , ((x : ℚ) → B-ℚ c x δ l₂ → B-ℝ (ℚ-ℝ-id c) (ℚ-ℝ-id x) ε l)
+  by-ℚ-ℝ-id-continuity = ℚ-ℝ-id-continuous
+  
+  I : ((c : ℚ) → ((ε , l) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , ((x : ℚ) → B-ℚ c x δ l₂ → B-ℝ (ℚ-ℝ-id c) (ℚ-ℝ-id x) ε l)) → ℝ
+  I f = (left , right) , {!!}
+   where
+    left : ℚ-subset-of-propositions
+    left p = B-ℝ {!!} {!!} {!!} {!!} , {!!}
+    right : ℚ-subset-of-propositions
+    right = {!!}
 -}
+\end{code}
+
+The problem goes even further. There is no way to find a q in relation to r without q being truncated, and we cannot escape truncations since neither Q or R are subsingletons.
+That is, not only can I not find a q close to r (without truncation), I cannot find a q any distance from r without truncation.
+
+So how do we find to find a q close to r? We cannot.
+
+The only way I see to get access to values is by defining the "fbar" function. 
+
+\begin{code}
+
 open import RationalsMultiplication
 open import RationalsNegation
 open import UF-Powerset
+
+{-
+ℚ-continuous-has-inverse :  (f : ℚ → ℚ) → continuous ℚ-metric-space ℚ-metric-space f
+                         → Σ g ꞉ (ℚ → ℚ) , continuous ℚ-metric-space ℚ-metric-space g × (g ∘ f ≡ id)
+ℚ-continuous-has-inverse f cont = I , II
+ where
+  I : ℚ → ℚ
+  I q = i {!by-f-continuity q!}
+   where
+    i : {!!}
+    i = {!!}
+  II : continuous ℚ-metric-space ℚ-metric-space I × (I ∘ f ≡ id)
+  II = {!!}
+  by-f-continuity : (c : ℚ) → ((ε , 0<ε) : ℚ₊) → Σ (δ , 0<δ) ꞉ ℚ₊ , ((x : ℚ) → B-ℚ c x δ 0<δ → B-ℚ (f c) (f x) ε 0<ε)
+  by-f-continuity = cont 
+-}
+
+f^ : (f g : ℚ → ℚ)
+   → continuous ℚ-metric-space ℚ-metric-space f
+   → continuous ℚ-metric-space ℚ-metric-space g
+   → ((k : ℚ) → (f ∘ g) k ≡ k)
+   → ((k : ℚ) → (g ∘ f) k ≡ k)
+   → ℝ → ℝ
+f^ f g f-cont g-cont e₁ e₂ r = z
+ where
+  z : ℝ
+  z =  (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
+   where
+
+\end{code}
+
+So we adopt the same strategy as we used to show that monotonic functions can be extended. Now we have access to some p and q.
+
+My initial thought is to use the same condition as we used before. The idea is the since we have continuity, this property allows us to extract the reals conditions.
+Working in reverse, we impose conditions base on (g p) < r, (since we can obtain p' < r → g p' ≡ g (f p') ≡ p').
+
+However, I actually think this is not a strong enough condition. We don't know how f p behaves, so some of the conditions are now not automatic.
+The monotinicity result is extremely strong, since it gives us order on g.
+
+I believe we need to design a condition L and R, which is related to continuity.
+
+We have that ∀ ε , δ > 0 , ∀ x c →  | x - c | < δ  → | f x - f c | < ε
+                                    | x - c | < δ →  | g x - g c | < ε
+
+We have some r , mapping to r' , but we are defining r'.
+
+                         p < r' → condition    with     condition ⇔ ?
+                         
+                         We require that if a < r then f a < r' . But I see here that a = g b for some b. b = f a.
+                         So we want b < r' ⇔ g b < r. This is fine by bijectivity of f , g.
+
+So then, the question is, is continuity strong enough to be able to construct this real?
+
+\begin{code}
+
+    L : ℚ-subset-of-propositions
+    L p = (g p < r) , ∈-is-prop (lower-cut-of r) (g p)
+    R : ℚ-subset-of-propositions
+    R q = (r < g q) , ∈-is-prop (upper-cut-of r) (g q)
+    inhabited-left-z : inhabited-left L
+    inhabited-left-z = ∥∥-functor I (inhabited-from-real-L r)
+     where
+      I : Σ p ꞉ ℚ , p < r → Σ p' ꞉ ℚ , g p' < r
+      I (p , p<r) = (f p) ,  transport (_< r) (e₂ p ⁻¹) p<r
+      
+    inhabited-right-z : inhabited-right R
+    inhabited-right-z = ∥∥-functor I (inhabited-from-real-R r)
+     where
+      I : Σ q ꞉ ℚ , r < q → Σ q' ꞉ ℚ , r < g q'
+      I (q , r<q) = f q ,  transport (r <_) (e₂ q ⁻¹) r<q 
+
+\end{code}
+
+Inhabitedness is trivial and is lifted from the monotonicity proof. It doesn't make use of monotonicity/continuity properties.
+
+Roundedness is where the problem begins. Following the same proof pattern, this reduces to proving:
+
+ Given that
+
+ g p < p' < r
+
+ is p < f p'?
+
+ The only thing we have is continuity of f and g. I don't think this is possible.
+
+ But we have not considered the standard theorem, which perhaps we could introduce at this point now that we have access to p and p'.
+
+ Cauchy sequences on rationals?
+ Different condition for z (I believe the current condition would have to be extended rather than replaced)?
+ Or perhaps the above is easilu provable and I'm not seeing it.
+
+\begin{code}
+
+    rounded-left-z : rounded-left L
+    rounded-left-z p = ltr , rtl
+     where
+      ltr : g p < r → ∃ p' ꞉ ℚ , p < p' × g p' < r
+      ltr gp<r = ∥∥-functor I (rounded-left-b (lower-cut-of r) (rounded-from-real-L r) (g p) gp<r)
+       where
+        I : Σ p' ꞉ ℚ , (g p) < p' × p' < r → Σ p' ꞉ ℚ , p < p' × (g p' < r)
+        I (p' , gp<p' , p'<r) = (f p') , {!not-true!} , (transport (_< r) (e₂ p' ⁻¹) p'<r)
+         where
+          by-continuity : {!!}
+          by-continuity = {!!}
+      
+      rtl : {!!}
+      rtl = {!!}
+     
+    
+    rounded-right-z : rounded-right R
+    rounded-right-z = {!!}
+    
+    disjoint-z : disjoint L R
+    disjoint-z = {!!}
+    
+    located-z : located L R
+    located-z = {!!}
+
+  
+
+
 {-
 continuous-extension-theorem : (f : ℚ → ℝ)
                              → continuous ℚ-metric-space ℝ-metric-space f
@@ -261,8 +427,8 @@ continuous-extension-theorem f f-continuous = (g , g-continuous) , g-unique
   g-unique : is-central (Σ (continuous ℝ-metric-space ℝ-metric-space)) (g , g-continuous)
   g-unique (g' , g'-continuous) = {!!}
 -}
-open import RationalsAddition
 
+{-
 ℚ-addition-to-ℝ : ℚ → ℚ → ℝ
 ℚ-addition-to-ℝ p q = embedding-ℚ-to-ℝ (p + q)
 
@@ -271,6 +437,7 @@ open import RationalsAddition
 
 ℚ-succ-to-ℝ : ℚ → ℝ
 ℚ-succ-to-ℝ q = embedding-ℚ-to-ℝ (ℚ-succ q)
+-}
 {-
 ℚ-succ-to-ℝ-continuous : continuous ℚ-metric-space ℝ-metric-space ℚ-succ-to-ℝ
 ℚ-succ-to-ℝ-continuous c ε = {!!}
@@ -285,11 +452,6 @@ rationals-extension f = {!!}
   this = {!!}
 -}
 
+
+
 \end{code}
-
-
-{-
-continuous-extension-theorem : {M₁ : 𝓤 ̇} → {M₂ : 𝓥 ̇}
-                             → (m₁ : metric-space M₁) → (m₂ : complete-metric-space M₂) → {!!}
-continuous-extension-theorem = {!!}
--}

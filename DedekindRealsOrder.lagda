@@ -96,7 +96,6 @@ weak-linearity' x y z l = do
  Cases t (λ r<z → ∣ inl ∣ r , x<r , r<z ∣ ∣)
          (λ z<s → ∣ inr ∣ s , z<s , s<y ∣ ∣)
 
-  
 _♯_ : (x y : ℝ) → 𝓤₀ ̇
 x ♯ y = x < y ∨ y < x
 
@@ -170,6 +169,7 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 
 ℝ-zero-apart-from-one : 0ℝ ♯ 1ℝ
 ℝ-zero-apart-from-one = ∣ inl ℝ-zero-less-than-one ∣
+
 
 
 

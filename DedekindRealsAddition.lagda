@@ -540,3 +540,5 @@ open import Groups
 
 ℝ-additive-group : Group-structure ℝ
 ℝ-additive-group = _+_ , (ℝ-is-set , ℝ+-assoc , 0ℝ , ℝ-zero-left-neutral , ℝ-zero-right-neutral , ℝ+-inverse-exists')
+
+

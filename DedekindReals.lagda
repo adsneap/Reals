@@ -254,6 +254,9 @@ instance
 1ℝ : ℝ
 1ℝ = ι 1ℚ
 
+1/2ℝ : ℝ
+1/2ℝ = ι 1/2
+
 ℝ-equality : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ)
            → (Lx ≡ Ly)
            → (Rx ≡ Ry)
