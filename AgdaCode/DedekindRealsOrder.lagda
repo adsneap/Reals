@@ -1,5 +1,7 @@
 Andrew Sneap
 
+\AgdaNoSpaceAroundCode
+
 \begin{code}
 {-# OPTIONS --without-K --exact-split --safe #-}
 
@@ -25,8 +27,16 @@ module DedekindRealsOrder
 open import DedekindReals pe pt fe
 open PropositionalTruncation pt -- TypeTopology
 
+
+\end{code}
+
+\newcommand{\RealsOrder}{
+\begin{code}
 _<ℝ_ : ℝ → ℝ → 𝓤₀ ̇
 x <ℝ y = ∃ q ꞉ ℚ , x < q × q < y
+\end{code}
+}
+\begin{code}
 
 instance
  Strict-Order-ℝ-ℝ : Strict-Order ℝ ℝ
