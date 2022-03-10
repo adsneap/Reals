@@ -1,4 +1,4 @@
-Andrew Sneap
+%Andrew Sneap
 
 \AgdaNoSpaceAroundCode
 

@@ -1,0 +1,10 @@
+\end{code}
+
+\newcommand{\CommandName}{
+\begin{code}
+
+Agda code here
+
+\end{code}
+}
+\begin{code}
