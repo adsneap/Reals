@@ -1,6 +1,4 @@
-%Andrew Sneap
 
-\AgdaNoSpaceAroundCode
 
 \begin{code}
 {-# OPTIONS --without-K --exact-split --safe #-}
@@ -178,6 +176,8 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 
 ℝ-zero-apart-from-one : 0ℝ ♯ 1ℝ
 ℝ-zero-apart-from-one = ∣ inl ℝ-zero-less-than-one ∣
+
+\end{code}
 
 
 
