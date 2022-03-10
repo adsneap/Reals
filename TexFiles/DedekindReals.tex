@@ -1,0 +1,76 @@
+\documentclass[ProjectReport]{subfiles}
+
+\begin{document}
+
+\section{Dedekind Reals}
+\subsection{Strategy}
+
+To summarise, the goal of the project is to formalise the Complete Archimedean field in Agda, building on top of the TypeTopology library. In my third year project, I defined the Dedekind Reals, and showed that there is an embedding from \AgdaFunction{ℚ} to \AgdaFunction{ℝ}. 
+
+The goal is to show that this definition of the Reals, equipped with the usual addition and multiplication satisfies the constructive field axioms, and further show that the field is complete and Archimedean. As such, we break down the goal into sub-goals. 
+
+\begin{itemize}
+    \item Define Addition, Multiplication and Inverse Operations
+    \item Define Order, Apartness Relations
+    \item Show that the Dedekind Reals equipped with the above satisfy constructive field axioms
+    \item Show that the Dedekind Reals are Archimedean
+    \item Show that the Dedekind Reals are complete
+\end{itemize}
+
+The following sections describes my approach and progress towards each sub-goal.
+
+\subsection{Order and Apartness Relations}
+
+Although I did not develop these until towards the end of the project, I will first define these relations as they are trivial in comparison to the other goals.
+
+%TODO \ORDER
+
+The definitions for order and non-strict order are intuitive. I define them as in the HoTT Book \cite[Section 11.2.1]{hottbook}. The notion behind strict order is that if we can find some rational between two reals $x$ and $y$, then $x < y$. Note the use of the overloaded operators; for strict order we have two distinct relations which compare rationals and reals. The first says that $q$ is in the upper cut of $x$, and the second that says $q$ is in the lower cut of $y$. This is very useful syntactic sugar, since it much clearer for a reader than the more formal $q \in$ upper-cut-of $x$.
+
+%TODO: AGDA-FY IT!
+
+The following proof is an example of what a proof may look like when we have terms whose types are Dedekind Reals.
+
+%TODO: R<-trans PROOF
+
+Unsurprisingly, it is not much different to a standard proof. Recalling the definition of $x < y$ and $y < z$, we obtain rationals $k$ and $l$, except they are propositionally truncated. Since we want to return some value that is also truncated, we can simply provide a function which ignores the truncation to \AgdaFunction{∥∥-functor}. We can also escape a truncation if the return type of a function is a proposition. A reader with a background in functional programming may recognise that propositional truncation is a monad, and proofs in Agda with truncated types proceed similarly to how one would write monadic functions. Do notation is available in Agda, however in this development I avoid this as I find it to be less readable, and if I struggle to read my own code I cannot expect a reader to be able to decipher it.
+
+The Archimedean property is has many equivalent definition, but I choose to define it in the same way as the HoTT book \cite[Theorem 11.2.6]{hottbook}. 
+
+%TODO : Add Archimedean Proof.
+
+My reasoning for choosing this over any other definition (you can view a few variations here \cite{noauthor_archimedean_2022}), is that the proof is automatic, simply by the definition of strict order. An extension of this project could define more variations of the property and verify they are equivalent in the presence of the same field axioms.
+
+We now move onto the apartness relation.
+
+%TODO : Add APARTNESS Relation
+
+When defining complete Archimedean ordered field in classical mathematics, one doesn't need an apartness relation. The reason we need this relation is due to one of the classical field axioms not holding constructively. Specifically, in a field we have that for every real $x$ not equal to $0$, $x$ has a multiplicative inverse $x'$ such that $x * x' = 1$. This is not sufficient constructively, Troelstra and Dalen say \cite[Page 256]{troelstra1988constructivism} that ``apartness is a positive version of inequality...". This is analogous to how a classically one might say that a set is ``non-empty", whereas a constructively one would say that a set is ``inhabited".
+
+By defining apartness as above, we retain enough information so that we can prove the field conditions, whilst preserving the ``x not equal to zero" property.
+
+I also proved some properties of order of the Reals:
+
+%TODO : Add properties of Reals Order here.
+
+
+\subsection{Operations}
+
+At this stage, we have to decide how to implement operations of reals. Specifically, at the very least we need addition and multiplication. We would also like negation, for the additive inverse of a Real. We hope to avoid division, since I avoided this when formalising my rationals, although in the long term I would like to add division as an operator for both Reals and Rationals.
+
+%TODO : ADD REFERENCE
+
+As I discussed in my last project, I would like to avoid directly defining the operations; for each one we have to produce a Dedekind cut which satisfies the four conditions of a Dedekind Real, which is shown to be cumbersome by the simple proof that the rationals are embedded in the reals. 
+
+Avoiding direct implementation of the operators is further justified by my first attempt at defining addition directly. Addition on the Dedekind Reals is defined as a cut with the following conditions (as in the HoTT Book \cite{hottbook}:
+
+%TODO add dedekind reals conditions
+
+With some thought, one can prove the firs
+
+
+
+
+
+\end{document}
+

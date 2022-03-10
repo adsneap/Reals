@@ -1,0 +1,27 @@
+\documentclass[ProjectReport]{subfiles}
+
+\begin{document}
+
+\section{Setup}
+
+In this project I am working in Agda. I am building on top of Martin's Type Topology library, which is a library of ``Various new theorems in univalent mathematics written in Agda" \cite{TypeTopology}. The library is deliberately minimal and assumes as little as possible for each proof, using ``principles of HoTT/UF, \ldots and classical mathematics as explicit assumptions for the theorems \ldots that require them." In some sense, this library provides me with the mathematical language in which I write my proofs. I write proofs in Agda, in MLTT, and by the Curry-Howard correspondence we have the mathematical interpretation of the proofs.  The next section serves as an brief introduction to the types I use in my work, and their analogous object in mathematics.
+
+\section{Type Theory and Mathematics - CHC?}
+
+In type theory, every object has a type. We declare types in the following way:
+
+\TypeExample
+
+The type \AgdaDatatype{ℤ} defines the integers. The integers live in the lowest universe, which in TypeTopology is denoted by U0 {TODO : ADD COMMAND FOR U0}. A universe is a type whose elements are also types. There are two constructors, \AgdaInductiveConstructor{pos} and \AgdaInductiveConstructor{negsucc} which are functions that allow us to construct Integers. For example, by applying the natural number \AgdaInductiveConstructor{zero} to the function \AgdaInductiveConstructor{pos}, we obtain the integer \AgdaInductiveConstructor{pos}\AgdaSpace\AgdaInductiveConstructor{zero} which has type \AgdaDatatype{ℤ}. Explicity,
+\AgdaInductiveConstructor{pos zero}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaPrimitive{ℤ}.
+
+I will now introduce the types that correspond to the language of mathematics, described by the Curry-Howard correspondence. 
+
+In type theory, a mathematical statement can be written as a type, or more explicitly propositions are types. Not all types are propositions, however, so it must be proven that a given type is a proposition. This amounts to proving that a proof of the type is unique.
+
+
+
+
+\end{document}

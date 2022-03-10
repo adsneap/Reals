@@ -186,16 +186,16 @@ open import RationalsAddition
       l₄ = ℚ<-addition-preserves-order'' fe x (1/4 * ε) 0<ε''
 
 
-chain-continuity : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} {M₃ : 𝓦 ̇}
-                → (m₁ : metric-space M₁)
-                → (m₂ : metric-space M₂)
-                → (m₃ : metric-space M₃)
-                → (f : M₁ → M₂)
-                → (g : M₂ → M₃)
-                → continuous m₁ m₂ f
-                → continuous m₂ m₃ g
-                → continuous m₁ m₃ (g ∘ f) 
-chain-continuity  {𝓤} {𝓥} {𝓦} {M₁} {M₂} {M₃} (B₁ , m₁) (B₂ , m₂) (B₃ , m₃) f g c₁ c₂ c (ε , l) = I (c₂ (f c) (ε , l))
+composition-preserves-continuity : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} {M₃ : 𝓦 ̇}
+                                 → (m₁ : metric-space M₁)
+                                 → (m₂ : metric-space M₂)
+                                 → (m₃ : metric-space M₃)
+                                 → (f : M₁ → M₂)
+                                 → (g : M₂ → M₃)
+                                 → continuous m₁ m₂ f
+                                 → continuous m₂ m₃ g
+                                 → continuous m₁ m₃ (g ∘ f) 
+composition-preserves-continuity  {𝓤} {𝓥} {𝓦} {M₁} {M₂} {M₃} (B₁ , m₁) (B₂ , m₂) (B₃ , m₃) f g c₁ c₂ c (ε , l) = I (c₂ (f c) (ε , l))
  where
   I : Σ (δ , 0<δ) ꞉ ℚ₊ , ((y : M₂) → B₂ (f c) y δ 0<δ → B₃ (g (f c)) (g y) ε l)
     → Σ (κ , 0<κ) ꞉ ℚ₊ , ((x : M₁) → B₁ c x κ 0<κ → B₃ (g (f c)) (g (f x)) ε l)
@@ -224,7 +224,7 @@ I am first going to try and show that certain functions are continuous, and atte
 ℚ-ℝ-id = ι ∘ ℚ-id
 
 ℚ-ℝ-id-continuous : continuous ℚ-metric-space ℝ-metric-space ℚ-ℝ-id
-ℚ-ℝ-id-continuous = chain-continuity ℚ-metric-space ℚ-metric-space ℝ-metric-space ℚ-id ι ℚ-id-continuous ι-continuous
+ℚ-ℝ-id-continuous = composition-preserves-continuity ℚ-metric-space ℚ-metric-space ℝ-metric-space ℚ-id ι ℚ-id-continuous ι-continuous
 
 \end{code}
 
@@ -451,6 +451,46 @@ rationals-extension f = {!!}
   this : {!!}
   this = {!!}
 -}
+
+f^' : (f g : ℚ → ℚ)
+    → continuous ℚ-metric-space ℚ-metric-space g
+    → ℝ → ℝ
+f^' f f-cont e r = z
+ where
+  z : ℝ
+  z =  (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
+   where
+
+    L : ℚ-subset-of-propositions
+    L p = (∃ u ꞉ ℚ , u < f u) , {!!}
+    
+    R : ℚ-subset-of-propositions
+    R q = {!f q !} , {!!} 
+    
+    inhabited-left-z : inhabited-left L
+    inhabited-left-z = {!!}
+      
+    inhabited-right-z : inhabited-right R
+    inhabited-right-z = {!!}
+
+
+    rounded-left-z : rounded-left L
+    rounded-left-z p = ltr , rtl
+     where
+      ltr : {!!}
+      ltr = {!!}
+      rtl : {!!}
+      rtl = {!!}
+     
+    
+    rounded-right-z : rounded-right R
+    rounded-right-z = {!!}
+    
+    disjoint-z : disjoint L R
+    disjoint-z = {!!}
+    
+    located-z : located L R
+    located-z = {!!}
 
 
 

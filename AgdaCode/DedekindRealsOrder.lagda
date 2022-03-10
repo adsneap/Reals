@@ -86,7 +86,6 @@ weak-linearity x y z l = ∥∥-rec ∨-is-prop I l
       IV (inr sRz) = ∣ inr ∣ s , sRz , sLy ∣ ∣
 
 
-
 weak-linearity' : (x y z : ℝ) → x < y → x < z ∨ z < y
 weak-linearity' x y z l = do
  (q , x<q , q<y) ← l
