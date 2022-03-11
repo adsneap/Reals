@@ -1,4 +1,4 @@
-\begin{comment}
+\comment{
 
 \begin{code}
 {-# OPTIONS --without-K --exact-split --safe #-}
@@ -27,14 +27,14 @@ open PropositionalTruncation pt -- TypeTopology
 
 
 \end{code}
-\end{comment}
+}
 \newcommand{\RealsOrder}{
 \begin{code}
 _<ℝ_ : ℝ → ℝ → 𝓤₀ ̇
 x <ℝ y = ∃ q ꞉ ℚ , x < q × q < y
 \end{code}
 }
-\begin{comment}
+\comment{
 \begin{code}
 
 instance
@@ -179,8 +179,7 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 ℝ-zero-apart-from-one = ∣ inl ℝ-zero-less-than-one ∣
 
 \end{code}
-
-\end{comment}
+}
 
 
 
