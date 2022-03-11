@@ -1,6 +1,4 @@
-\comment{
-
-\begin{code}
+\begin{code}[hide]
 {-# OPTIONS --without-K --exact-split --safe #-}
 
 open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
@@ -25,17 +23,14 @@ module DedekindRealsOrder
 open import DedekindReals pe pt fe
 open PropositionalTruncation pt -- TypeTopology
 
-
 \end{code}
-}
 \newcommand{\RealsOrder}{
 \begin{code}
 _<ℝ_ : ℝ → ℝ → 𝓤₀ ̇
 x <ℝ y = ∃ q ꞉ ℚ , x < q × q < y
 \end{code}
 }
-\comment{
-\begin{code}
+\begin{code}[hide]
 
 instance
  Strict-Order-ℝ-ℝ : Strict-Order ℝ ℝ
@@ -179,7 +174,7 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 ℝ-zero-apart-from-one = ∣ inl ℝ-zero-less-than-one ∣
 
 \end{code}
-}
+
 
 
 
