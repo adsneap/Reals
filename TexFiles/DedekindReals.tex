@@ -23,7 +23,7 @@ The following sections describes my approach and progress towards each sub-goal.
 
 Although I did not develop these until towards the end of the project, I will first define these relations as they are trivial in comparison to the other goals.
 
-%TODO \ORDER
+\RealsOrder
 
 The definitions for order and non-strict order are intuitive. I define them as in the HoTT Book \cite[Section 11.2.1]{hottbook}. The notion behind strict order is that if we can find some rational between two reals $x$ and $y$, then $x < y$. Note the use of the overloaded operators; for strict order we have two distinct relations which compare rationals and reals. The first says that $q$ is in the upper cut of $x$, and the second that says $q$ is in the lower cut of $y$. This is very useful syntactic sugar, since it much clearer for a reader than the more formal $q \in$ upper-cut-of $x$.
 
@@ -51,7 +51,7 @@ By defining apartness as above, we retain enough information so that we can prov
 
 I also proved some properties of order of the Reals:
 
-%TODO : Add properties of Reals Order here.
+%TODO 
 
 
 \subsection{Operations}
@@ -66,10 +66,119 @@ Avoiding direct implementation of the operators is further justified by my first
 
 %TODO add dedekind reals conditions
 
-With some thought, one can prove the first three conditions. 
+Inhabitedness, roundedness and disjointedness are shown to be satisfied fairly easily; each follows from the respective property on $x$ and $y$, for example inhabitedness of $z$ follows from inhabitedness of $x$ and $y$.
+
+%TODO ADD CODE HERE
+
+Locatedness is not so easily provable. We want to show that for any $a < b$, either there exists $p < x, u < y$ such that $a = p + u$, or there exists $x < q, y < v$ such that $b = q + v$. As a naive first approach, since the other conditions follow from their respective conditions on $x$ and $y$, we look at what locatedness of $x$ and $y$ gives us. We are given $a < b$, so we obtain that $a < x$ or $x < b$, and $a < y$ or $y < b$. One might stare at these facts for a long time before realising that this is not enough information to prove the locatedness of $z$. 
+
+Bauer and Taylor remark in ``The Dedekind reals in abstract Stone duality" \cite[Remark 11.14]{bauer_taylor_2009} that ``Locatedness always seems to be the most difficult, because we need to calculate the result arbitrarily closely". 
+
+The problem is that we don't have enough information about how \textit{close} $a$ and $b$ are to either $x$ or $y$. We can move arbitrarily small distances to the left $a$, since $x$ is rounded and for all $\epsilon > 0$, $a - \epsilon < a$, but we cannot guarantee that $\epsilon < y$. By locatedness of $y$, we can find that $a - \epsilon < y$ or $y < a$. In the first case we need that either $\epsilon < x$, and in the second we have no extra useful information. 
+
+To tackle this problem, I used an idea from the same paper \cite[Proposition 11.15]{bauer_taylor_2009}. This proposition introduces the idea of Arithmetic Locatedness of the reals.
+
+%TODO ADD CODE FOR ARITHMETIC LOCATEDNESS%.
+
+The intuition behind Arithmetic Locatedness of the reals is that we can locate a real number $x$ to any degree of precision we wish. For any $epsilon > 0$, we can an interval $(p , q)$ with $x$ located somewhere in this interval. If we had Arithmetic Locatedness of the reals, then we could apply \cite[Lemma 11.16]{bauer_taylor_2009} to complete the addition operator. By writing Arithmetic Locatedness in Agda, leaving the proof as a hole, I managed to finish the implementation of addition directly.
+
+%TODO: Add code for addition, cleaned up
+
+The next step is clearly to prove that the reals are arithmetically located. A full discussion can be found later in this report, but for now it suffices to say that the first attempt was not successful. With the experience of implementing the embedding from \AgdaFunction{ℚ} to \AgdaFunction{ℝ}, and addition of reals sans the proof of arithmetic locatedness, I decided it was worth trying a different approach to implement the operations.
+
+\section{Extensions}
+
+Extensions of functions are an intuitive concept. Suppose we have sets $X, Y$ and $Z$, with $X \subset Y$, and a function $f : X \to Z$. A function $g : Y \to Z$ is considered an extension of $f$ if $g$ agrees with $f$ for every $x \in X$. We would like to implement addition, multiplication and inverses on the reals, and we notice that we already have these operations for reals, and that the rationals may be embedded in the reals. The question is, then, can we extend these functions from the rationals to the reals?
+
+%This paragraph is likely not needed
+
+One study of extensions is ``McShane-Whitney extensions in constructive analysis" \cite{petrakis2020mcshane} which discusses more complicated extensions than I am interested in, and is a dense read for my current knowledge of constructive mathematics, but there is an topical note in the introduction that says ''general extension theorems are rare and usually have interesting topological consequences". 
+
+Usually by imposing some conditions on the function we want to extend, we can find a unique extension to the new space. In this section I will discuss two extensions. Martin provided me with a reference to Simmons, "Introduction to Topology and Modern Analysis", with the goal of working towards Theorem D, \cite[Page 78]{simmons1983introduction}. The theorem is as follows:
+
+Let $X$ be a metric space, let $Y$ be a complete metric space, and let $A$ be a dense subspace of $X$. If f is a uniformly continuous mapping of $A$ into $Y$, then $f$ can be extended uniquely to a uniformly continuous mapping $g$ of $X$ into $Y$.
+
+In our specific case, $X$ and $Y$ are both the Reals, and $A$ is the rationals. This is known as the continuous extension theorem. The idea is that we can take continuous extensions from the rationals to the reals, and uniquely extend them to functions from the reals to the reals. This is exactly what we need to show that the Dedekind Reals form a complete ordered field; by take our addition, multiplication and inverse functions defined for the rationals and extending them, I avoid having to directly implement the operations. With some luck, since I have already proven that the rationals are field, by extending the functions in this way the field axioms also follow more easily than proving them for the operations implemented directly.
+
+On the other hand, the proof above mentions concepts which I haven't yet formalised. In order to prove the continuous extension theorem, I need to consider metric spaces, continuity, cauchy and convergent sequences, completeness of a metric space. These are all familiar concepts, but a daunting prospect to formalise in Agda. 
+
+As a proof of the concept of the extension of functions, I will now discuss a different extension, which I will call the monotonic extension theorem. 
+
+\subsection{Monotonic Extension Theorem}
+
+This theorem was suggested to me by Martin, who sketched out the proof for me in a Google Jamboard. If $f$ is rational valued function on the rationals, and $f$ is a monotonic function, and there exists a function $g$ where $f$ and $g$ are bijective, then there exists an unique extension $\hat{f}$ where $\hat{f}$ is a real valued function on the reals.
+
+We begin by proving a lemma. If $f$ and $g$ are bijective, and $f$ is strictly monotone, then $g$ is strictly monotone.
+
+%TODO: Insert agda proof here.
+
+With this, we can write a function which produces an extension $\hat{f}$ given monotonic function $f$ with a bijection. 
+
+%TODO : Add this proof
+
+And finally, we can prove that this function preserves the behaviour of $f$. That is, $\hat{f} \circ \iota \equiv \iota \circ f$, where $\iota : \AgdaFunction{Q} \to \AgdaFunction{R}$ is the canonical embedding of \AgdaFunction{Q} in \AgdaFunction{Q}.
+
+%TODO : ADD THIS PROOF
+
+This proof of concept was successful, I proved that given a monotonic function with a bijection on the rationals, I can extend it to the reals. Of course, there is a reason that this is a proof of concept and not the end of the story; montonicity is a very strong condition. There are many functions which are not monotone, with multiplication being a particular example. This theorem is not strong enough for me to obtain the operations I need to prove that the Dedekind Reals are a field, and so we look back to the continuous extension theorem. Multiplication is continuous, so with that we should be able to extend multiplication of rationals to the reals.
+
+\subsection{Continuous Extension Theorem}
+
+As discussed before, in order to prove this theorem, it's first necessary to formalise every concept mentioned in the proof. We first turn out attention to metric spaces.
+
+\section{Metric Spaces}
+
+We immediately run into a problem when trying to define a metric space. A metric space is simply a set (which may be empty), with a distance function, known as a metric. There are many metrics one could choose from, however, usually a metric $d$ would be defined on a set $X$ with $d : X \times X \to \mathbb{R}$. One of the axioms of a metric space is the triangle inequality, which has that $d(x , z) \leq d(x,y) + d(y,z)$ for $x , y , z \in X$. But $d(x,y) + d(y,z)$ is addition of the reals. The point of implementing the continuous extension theorem was to \textit{avoid} directly implementing addition of the reals, so we need to consider a different approach.
+
+Instead we replace the distance function onto reals with an equivalent definition which instead bounds %TODO DISCUSS METRIC SPACE
+
+We also have to replace the axioms with equivalent axioms for the metric function. With this new definition, we can use metric space which are defined in terms of only rational numbers. 
+
+%TODO AGDA CODE
+
+%TODO FILL OUT THIS SECTION
+
+Recalling the continuous extension theorem in Simmons, we require that both the rationals and the reals are metric spaces. Naturally, we begin with the rationals. 
+
+\subsection{Rationals Metric Space}
+
+I don't need to think too hard about a distance function for the rationals. Given $\epsilon > 0$, and $x , y \in \AgdaFunction{Q}$ we simply want to have the usual distance between $x$ and $y$ smaller than $\epsilon$. 
+
+To define this, it was necessary to extend my implementation of the rationals to include absolute values, and formalise many properties of the absolute value function. 
+
+%TODO, add code for absolute value functions.
+
+With this, I can define the metric for the set of rationals, and prove that the rationals are a metric space with respect to the alternative axioms. As a side note, it would be nice in the future that the alternative definition of the metric space is equivalent to the standard definition. I had imagined that absolute values would be difficult to work with, but I found that the proofs were intuitive and this section of the project progressed nicely.
+
+\subsection{Dedekind Reals Metric Space}
+
+The first thing we need is a distance function for the Dedekind Reals. Martin knew of a suitable distance function. We say that two reals are $\epsilon$-close if we can find a pair of rationals, one either side of each real such that the the distance between the furthest value on each side is less than $\epsilon$. 
+
+%TODO: ADD CODE AND PICTURE HERE
+
+This definition is equivalent to the standard definition of the metric. The intuition behind the definition is that we locate the two reals to some level of precision, then the reals are at most as far as way as the bounds of the precision. For example, if $a < x < b$, and $c < y < d$, then $x$ and $y$ are within the interval $[min a c , max b d]$, so the difference between them is at most $| min a c - max b d |$.
+
+To define this metric, I first need the min and max operations on rational numbers. It was surprisingly difficult to formalise these operations. This was a case where working constructively complicated the implementation of the operations. 
+
+%https://github.com/adsneap/Reals/commit/96c706a0f3c60a81f2fb8e957aca9cf46abee08b#diff-ebfc21b3aa729aeacbde135384ac5e98f1878d8c588a1b74996f9940a01694e8R23
+
+%Not sure whether to talk about this more.
+
+It is left to prove that the reals are a metric space with respect to the above metric. The second and third conditions are easy to prove using order transitivity and commutativity of min and max. The other properties provided particular challenge. It turns out that to prove m1b for the reals, I needed to prove that the reals are arithmetically located, which I abandoned earlier in my work due to it's difficulty.
+
+\subsubsection{Arithmetic Locatedness of Reals}
+
+Recall the definition of Arithmetic locatedness. Given an arbitrary real number $x$, we need to find a rational either side of it, with the rationals bounded by some arbitrarily small value.
+
+Since $x$ is inhabited, we begin with two rationals either side of $x$ which can be arbitrarily far apart. The question is then, how do we get arbitrarily close to $x$, given rationals $p$ and $q$ with $p < x < q$? If $p$ or $q$ were guaranteed to be close to $x$, this wouldn't be an issue since we could simply choose $p$ and $p + \epsilon$.
+
+A naive approach might take one side, and move closer repeatedly using roundedness of $x$, but if $q$ is greater than a distance $\epsilon$ away from $x$ this is not fruitful. As such, we need to use an iterative process to get close to $x$ on each side. One such process is described by Bauer and Taylor \cite[Proposition 11.15]{bauer_taylor_2009} uses approximate halves, along with a different (but equivalent) statement of the Archimedean principle. To avoid proving that the variations are equivalent, I instead chose to attempt my the proof using trisections of the interval $(p,q)$. This proof was suggested to me by Tom de Jong, a PHD student at the University of Birmingham, and the idea of the proof follows.
+
+By trisecting the interval $(p,q)$, we obtain rationals $a,b$ with $p<a<b<q$, with each sub interval a third of the difference of the whole interval. By using locatedness of the interval, we see that $a < x$ or $b < x$. We now have a new interval, either $(p,b)$ or $(a,q)$, which is $2/3$ the size of the original interval. By repeatedly applying trisections, we will find an interval smaller than any arbitrary $\epsilon$. 
 
 
-
+%INCORRECT. NEED 2/3^n < \epsilon
+The crux of the proof relies on the following: given $a,\epsilon : \AgdaFunction{Q}$, with $a , \epsilon > 0$ there exists $n : N$ such that $\frac{2}{3}^n * a < \epsilon$. This statement is clearly true, but fiendishly difficult to prove. Martin suggested formalising logarithms, but after some initial work I decided that it would be too difficult for me to implement this way, and temporarily abandoned the proof while I worked on Metric Spaces. After realising that I need this proof for the work on metric spaces too, I turned to it my full attention. I asked one of my Maths Lecturers if it was possible to solve this without using logrithms, and he came up with a nice solution using the binomial expansion of $2/3$. This was a nice proof (as an exercise, try and prove the fact using binomial expansions!), but I still believed this proof would be too difficult to implement in Agda. After a lot of thought, I came up with a proof of my own, by using limits of sequences of Rational Numbers.
 
 
 \end{document}

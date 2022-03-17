@@ -14,6 +14,7 @@
  }
 
 \usepackage{hyperref}
+\usepackage{comment}
 
 \usepackage[links]{TexFiles/Latex/agda}
 \usepackage{amsthm}
@@ -27,19 +28,20 @@
 \setmathfont{XITS Math}
 \setsansfont{XITS Math}
 
+\newfontfamily{\fallbackfont}{XITS Math}
+\DeclareTextFontCommand{\textfallback}{\fallbackfont}
+
 \usepackage{newunicodechar}
 \newunicodechar{₀}{\ensuremath{_{0}}}
 \newunicodechar{₁}{\ensuremath{_{1}}}
 \newunicodechar{₂}{\ensuremath{_{2}}}
-
+%Should try and finder a nicer version of this character
+\newunicodechar{꞉}{\textfallback{:}}
 %\AgdaTarget{ℤ} Perhaps test later
 
-\input{Latex/ReportCode} % This needs to be after the Unicode stuff
+\input{TexFiles/Latex/ReportCode} % This needs to be after the Unicode stuff
 %\input{Latex/DedekindRealsOrder}
-\input{Latex/DedekindRealsOrder}
-
-
-
+\input{TexFiles/Latex/DedekindRealsOrder}
 
 \title{Formalising Complete Fields in Agda}
 \author{Andrew Sneap - 1980030}
@@ -49,6 +51,7 @@
 
 \begin{document}
 
+%TC:ignore
 \maketitle
 
 \AgdaNoSpaceAroundCode
@@ -58,15 +61,18 @@
 \end{abstract}
 
 \tableofcontents
+%TC:endignore
 
-\subfile{Background.tex}
-\subfile{TypeTheory.tex}
-\subfile{MathsIntro.tex}
-\subfile{DedekindReals.tex}
+
+\subfile{TexFiles/Background.tex}
+\subfile{TexFiles/LiteratureReview.tex}
+\subfile{TexFiles/MathsIntro.tex}
+\subfile{TexFiles/DedekindReals.tex}
 
 \newpage
+%TC:ignore
 \printbibliography
-
+%TC:endignore
 \end{document}
 
 
