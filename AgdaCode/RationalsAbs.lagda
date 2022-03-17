@@ -95,7 +95,6 @@ abs-of-pos-is-pos fe ((negsucc x , a) , α) l = 𝟘-elim (III II)
 abs-of-pos-is-pos' : Fun-Ext → (p : ℚ) → 0ℚ < p → abs p ≡ p
 abs-of-pos-is-pos' fe p l = abs-of-pos-is-pos fe p (ℚ<-coarser-than-≤ 0ℚ p l)
   
-
 ℚ-abs-neg-equals-pos : Fun-Ext → (q : ℚ) → abs q ≡ abs (- q)
 ℚ-abs-neg-equals-pos fe (q , p) = conclusion
  where
@@ -287,7 +286,7 @@ abs-of-pos-is-pos' fe p l = abs-of-pos-is-pos fe p (ℚ<-coarser-than-≤ 0ℚ p
 ℚ-triangle-inequality : Fun-Ext → (x y : ℚ) → abs (x + y) ≤ (abs x + abs y)
 ℚ-triangle-inequality fe x y = ℚ≤-to-abs fe (x + y) (abs x + abs y) (I (ℚ-abs-≤ fe x) (ℚ-abs-≤ fe y))
  where
-  I : (- (abs x)) ≤ x × x ≤ abs x → (- abs y) ≤ y × y ≤ abs y → (- (abs x + abs y)) ≤ (x + y) × (x + y) ≤ (abs x + abs y) -- (input ℚ-abs-order' x and ℚ-abs-order' y)
+  I : (- (abs x)) ≤ x × x ≤ abs x → (- abs y) ≤ y × y ≤ abs y → (- (abs x + abs y)) ≤ (x + y) × (x + y) ≤ (abs x + abs y)
   I (l₁ , l₂) (l₃ , l₄) = transport (_≤ (x + y)) γ α , β
    where
     α : ((- abs x) + (- abs y)) ≤ (x + y)
@@ -297,6 +296,19 @@ abs-of-pos-is-pos' fe p l = abs-of-pos-is-pos fe p (ℚ<-coarser-than-≤ 0ℚ p
     β : (x + y) ≤ (abs x + abs y)
     β = ℚ≤-adding fe x (abs x) y (abs y) l₂ l₄
 
-
+pos-abs-no-increase : Fun-Ext → (q ε : ℚ) → 0ℚ < q × q < ε → abs q < ε
+pos-abs-no-increase fe q ε (l₁ , l₂) = IV
+ where
+  I : 0ℚ < ε 
+  I = ℚ<-trans 0ℚ q ε l₁ l₂
+  II : ((- ε) < 0ℚ)
+  II = transport (- ε <_) ℚ-minus-zero-is-zero i
+   where
+    i : (- ε) < (- 0ℚ)
+    i = ℚ<-swap fe 0ℚ ε I
+  III : (- ε) < q
+  III = ℚ<-trans (- ε) 0ℚ q II l₁
+  IV : abs q < ε
+  IV = ℚ<-to-abs fe q ε (III , l₂) 
 
 \end{code}

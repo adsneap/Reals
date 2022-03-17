@@ -519,7 +519,6 @@ multiplicative-inverse-preserves-pos fe ((negsucc x , a) , α) l nz = 𝟘-elim 
             pos 0                               ≡⟨ ℤ-zero-left-is-zero (pos (succ a)) ⁻¹ ⟩
             pos 0 ℤ* pos (succ a)               ∎
 
-
 ℚ-equal-or-less-than-is-prop : Fun-Ext → (x y : ℚ) → is-prop ((x ≡ y) ∔ (y < x))
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inl r) = ap inl (ℚ-is-set fe l r)
 ℚ-equal-or-less-than-is-prop fe x y (inl l) (inr r) = 𝟘-elim (ℚ<-not-itself y ((transport (y <_) l r)))

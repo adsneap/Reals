@@ -1,3 +1,5 @@
+
+
 \begin{code}
 
 {-# OPTIONS --without-K --exact-split --safe --experimental-lossy-unification #-}
@@ -33,14 +35,9 @@ open import DedekindRealsProperties fe pt pe
 
 \end{code}
 
-The goal is to solve the following proof from Simmons Introduction to Topology and Modern Analysis:
+The goal of this file is to prove the continous extension theorem constructively.
 
-Let X be a metric space, let Y be a complete metric space, and A be a dense subspace of X.
-If f is a uniformly continuous mapping of A into Y, then f can be extended uniquely to a uniformly continuous mapping g of X into Y.
-
-In order to prove this, it is first necessary to introduce the definitions in the proof.
-
-First, we would like to know that every point in ℝ is a limit point for some cauchy sequence. <- This is impossible constructively, so search for another solution.
+This is challenging. Classical proofs of continuous extension use the idea that every Real is the limit of some Cauchy sequence of rationals. This is not valid constructively.
 
 \begin{code}
 
@@ -211,20 +208,11 @@ I am first going to try and show that certain functions are continuous, and atte
 
 \begin{code}
 
-ℚ-id : ℚ → ℚ
-ℚ-id = id
+id-continuous : continuous ℚ-metric-space ℚ-metric-space id
+id-continuous c (ε , 0<ε) = (ε , 0<ε) , λ _ B → B
 
-ℚ-id-continuous : continuous ℚ-metric-space ℚ-metric-space ℚ-id
-ℚ-id-continuous c (ε , 0<ε) = (ε , 0<ε) , I
- where
-  I : (x : ℚ) → B-ℚ c x ε 0<ε → B-ℚ (id c) (id x) ε 0<ε
-  I x B = B
-
-ℚ-ℝ-id : ℚ → ℝ
-ℚ-ℝ-id = ι ∘ ℚ-id
-
-ℚ-ℝ-id-continuous : continuous ℚ-metric-space ℝ-metric-space ℚ-ℝ-id
-ℚ-ℝ-id-continuous = composition-preserves-continuity ℚ-metric-space ℚ-metric-space ℝ-metric-space ℚ-id ι ℚ-id-continuous ι-continuous
+ℚ-ℝ-id-continuous : continuous ℚ-metric-space ℝ-metric-space (ι ∘ id)
+ℚ-ℝ-id-continuous = composition-preserves-continuity ℚ-metric-space ℚ-metric-space ℝ-metric-space id ι id-continuous ι-continuous
 
 \end{code}
 
@@ -267,7 +255,7 @@ open import DedekindRealsAddition pe pt fe renaming (_+_ to _ℝ+_)
     left : ℚ-subset-of-propositions
     left p = B-ℝ {!!} {!!} {!!} {!!} , {!!}
     right : ℚ-subset-of-propositions
-    right = {!!}
+v    right = {!!}
 -}
 \end{code}
 
@@ -461,8 +449,11 @@ f^' f f-cont e r = z
   z =  (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
    where
 
+ -- CONDITION,
+ --   ∀ ε > 0, ∃ δ > 0 , x < r < y × | x - y | < δ → | f r - ? | < ε 
+
     L : ℚ-subset-of-propositions
-    L p = (∃ u ꞉ ℚ , u < f u) , {!!}
+    L p = {!!} , {!!}
     
     R : ℚ-subset-of-propositions
     R q = {!f q !} , {!!} 

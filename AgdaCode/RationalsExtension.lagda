@@ -1,5 +1,10 @@
 Andrew Sneap - 8th January 2022
 
+This file proves that a rational valued function on the rationals may
+be extended to rational real valued functions on the reals, provided
+that the function is strictly monotonic and has a bijection with
+another rational valued function on the rationals.
+
 \begin{code}
 
 {-# OPTIONS --without-K --exact-split --safe #-}
@@ -26,88 +31,78 @@ module RationalsExtension
 
 open PropositionalTruncation pt
 
-open import DedekindReals pe pt fe 
+open import DedekindReals pe pt fe
 
 \end{code}
 
-The proof is simple, and doesn't require condition (1) from the jamboard.
+We begin by proving a lemma. If f and g are bijective, and f is
+strictly monotone, then g is strictly monotone.
+
+TODO: Is it true that strictly monotone functions automatically have a
+bijection?
 
 \begin{code}
 
-order-preserving-and-bijection-statement : (f g : ℚ → ℚ) → 𝓤₀ ̇
-order-preserving-and-bijection-statement f g = ((p q : ℚ) → p < q ⇔ f p < f q)
-                                             → ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r))
-                                             → ((p q : ℚ) → p < q ⇔ g p < g q)
+bijection-preserves-monotone : (f g : ℚ → ℚ) → 𝓤₀ ̇
+bijection-preserves-monotone f g = ((p q : ℚ) → p < q ⇔ f p < f q)
+                                 → ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r))
+                                 → ((p q : ℚ) → p < q ⇔ g p < g q)
 
-order-preserving-and-bijection : (f : ℚ → ℚ)
-                               → (g : ℚ → ℚ) 
-                               → ((p q : ℚ) → p < q ⇔ f p < f q)
-                               → ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r))
-                               → ((p q : ℚ) → p < q ⇔ g p < g q)
-order-preserving-and-bijection f g f-preserves-order f-g-bijection = γ
+bijective-and-monotonic : (f : ℚ → ℚ)
+                        → (g : ℚ → ℚ)
+                        → bijection-preserves-monotone f g
+bijective-and-monotonic f g f-preserves-order f-g-bijection = γ
  where
   γ : (p q : ℚ) → (p < q) ⇔ (g p < g q)
-  γ p q = I , II
+  γ p q = ltr , rtl
    where
-    α : (g p < g q) ⇔ (f (g p) < f (g q))
-    α = f-preserves-order (g p) (g q)
-    
-    I : p < q → g p < g q
-    I l = (rl-implication α) i
+    apply-order-preversation : (g p < g q) ⇔ (f (g p) < f (g q))
+    apply-order-preversation = f-preserves-order (g p) (g q)
+
+    ltr : p < q → g p < g q
+    ltr l = (rl-implication apply-order-preversation) i
      where
       i : f (g p) < f (g q)
       i = transport₂ _<_ (pr₂ (f-g-bijection p) ⁻¹) (pr₂ (f-g-bijection q) ⁻¹) l
 
-
-    II : g p < g q → p < q
-    II l = transport₂ _<_ (pr₂ (f-g-bijection p)) (pr₂ (f-g-bijection q)) i
+    rtl : g p < g q → p < q
+    rtl l = transport₂ _<_ (pr₂ (f-g-bijection p)) (pr₂ (f-g-bijection q)) i
      where
       i : f (g p) < f (g q)
-      i = (lr-implication α) l
+      i = (lr-implication apply-order-preversation) l
 
 \end{code}
-The code without the unneeded assumption. 
+
+Now, given a monotonic function f, and a bijective function g, we construct an extension of f, which we call f̂.
+
+Pictorially, we have the following:
+
+                      f
+   ℚ ────────────────────────────────▶ ℚ
+   │                                   │           We want our extension to satisfy f̂ ∘ ι ≡ ι ∘ f
+   │                                   │           This means f̂ does not change the behavour of f 
+   │                                   │           for any point in the rationals.
+ ι │                                   │ ι
+   │                                   │
+   │                                   │  
+   ▼                                   ▼  
+   ℝ ────────────────────────────────▶ ℝ
+                      f̂
+
+
+The following f→f̂ extends functions, and the is followed by diagram commutes which proves that the above diagram is satisfied.
+
 \begin{code}
 
-order-preserving-and-bijection' : (f g : ℚ → ℚ) 
-                                → ((p q : ℚ) → p < q ⇔ f p < f q)
-                                → ((r : ℚ) → (f (g r) ≡ r))
-                                → ((p q : ℚ) → p < q ⇔ g p < g q)
-order-preserving-and-bijection' f g f-preserves-order f-g-bijection = γ
- where
-  γ : (p q : ℚ) → (p < q) ⇔ (g p < g q)
-  γ p q = I , II
-   where
-    α : (g p < g q) ⇔ (f (g p) < f (g q))
-    α = f-preserves-order (g p) (g q)
-
-    f-preserves-order-forward : f (g p) < f (g q) → g p < g q
-    f-preserves-order-forward = rl-implication α
-
-    f-preserves-order-backward : g p < g q → f (g p) < f (g q)
-    f-preserves-order-backward = lr-implication α
-    
-    I : p < q → g p < g q
-    I l = f-preserves-order-forward i
-     where
-      i : f (g p) < f (g q)
-      i = transport₂ _<_ ((f-g-bijection p) ⁻¹) ((f-g-bijection q) ⁻¹) l
-
-    II : g p < g q → p < q
-    II l = transport₂ _<_ (f-g-bijection p) (f-g-bijection q) i
-     where
-      i : f (g p) < f (g q)
-      i = f-preserves-order-backward l
-
-f-bar : (f g : ℚ → ℚ)
-      → ((p q : ℚ) → p < q ⇔ f p < f q)
-      → ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r))
-      → ℝ → ℝ
-f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) = (left , right) , inhabited-left' , inhabited-right' , rounded-left' , rounded-right' , disjoint' , located'
+f→f̂ : (f g : ℚ → ℚ)
+  → ((p q : ℚ) → p < q ⇔ f p < f q)
+  → ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r))
+  → ℝ → ℝ
+f→f̂ f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) = (left , right) , inhabited-left' , inhabited-right' , rounded-left' , rounded-right' , disjoint' , located'
  where
   x : ℝ
   x = ((L , R) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
-  
+
   left : ℚ-subset-of-propositions
   left p = (g p ∈ L) , ∈-is-prop L (g p)
   right : ℚ-subset-of-propositions
@@ -116,7 +111,7 @@ f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabit
   inhabited-left' : inhabited-left left
   inhabited-left' = ∥∥-functor I inhabited-left-x
    where
-    I : Σ p ꞉ ℚ , p ∈ L → Σ p' ꞉ ℚ , p' ∈ left 
+    I : Σ p ꞉ ℚ , p ∈ L → Σ p' ꞉ ℚ , p' ∈ left
     I (p , p-L) = (f p) , transport (_∈ L) (pr₁ (f-g-bijective p) ⁻¹) p-L
 
   inhabited-right' : inhabited-right right
@@ -153,7 +148,7 @@ f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabit
       i (p , (l , p-L)) = iv ∣ (g p) , iii , p-L ∣
        where
         ii : (k < p) ⇔ (g k < g p)
-        ii = order-preserving-and-bijection f g f-order-preserving f-g-bijective k p
+        ii = bijective-and-monotonic f g f-order-preserving f-g-bijective k p
         iii : g k < g p
         iii = (pr₁ ii) l
         iv : ∃ p' ꞉ ℚ , (g k < p') × p' ∈ L → g k ∈ L
@@ -181,7 +176,7 @@ f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabit
       i (q , (l , q-R)) = iv ∣ (g q) , (iii , q-R) ∣
        where
         ii : (q < k) ⇔ (g q < g k)
-        ii = order-preserving-and-bijection f g f-order-preserving f-g-bijective q k
+        ii = bijective-and-monotonic f g f-order-preserving f-g-bijective q k
         iii : g q < g k
         iii = (pr₁ ii) l
         iv : ∃ q ꞉ ℚ , (q < g k) × q ∈ R → g k ∈ R
@@ -191,28 +186,31 @@ f-bar f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhabit
   disjoint' p q l = (pr₂ I) II
    where
     I : (p < q) ⇔ (g p < g q)
-    I = order-preserving-and-bijection f g f-order-preserving f-g-bijective p q
+    I = bijective-and-monotonic f g f-order-preserving f-g-bijective p q
     II : g p < g q
     II = disjoint-x (g p) (g q) l
-    
+
   located' : located left right
   located' p q l = III
    where
     I : (p < q) ⇔ (g p < g q)
-    I = order-preserving-and-bijection f g f-order-preserving f-g-bijective p q
+    I = bijective-and-monotonic f g f-order-preserving f-g-bijective p q
     II : p < q → g p < g q
     II = pr₁ I
     III : g p ∈ L ∨ g q ∈ R
     III = located-x (g p) (g q) (II l)
 
-diagram-commutes : (f g : ℚ → ℚ) 
+diagram-commutes : (f g : ℚ → ℚ)
                  → (f-order-preserving : ((p q : ℚ) → p < q ⇔ f p < f q))
                  → (f-g-bijective : ((r : ℚ) → (g (f r) ≡ r) × (f (g r) ≡ r)))
                  → (q : ℚ)
-                 → (f-bar f g f-order-preserving f-g-bijective ∘ ι) q ≡ (ι ∘ f) q
-diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar f g f-order-preserving f-g-bijective ∘ ι) q) ((ι ∘ f) q) I II III IV
+                 → (f→f̂ f g f-order-preserving f-g-bijective ∘ ι) q ≡ (ι ∘ f) q
+diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f̂ ∘ ι) q) ((ι ∘ f) q) I II III IV
  where
-  I : (a : ℚ) → g a < q → a < f q 
+  f̂ : ℝ → ℝ
+  f̂ = f→f̂ f g f-order-preserving f-g-bijective
+  
+  I : (a : ℚ) → g a < q → a < f q
   I a b = transport (_< f q) ii i
    where
     i : f (g a) < f q
@@ -223,7 +221,7 @@ diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar 
   II a b = transport (g a <_) ii i
    where
     i : g a < g (f q)
-    i = (pr₁ (order-preserving-and-bijection f g f-order-preserving f-g-bijective a (f q))) b
+    i = (pr₁ (bijective-and-monotonic f g f-order-preserving f-g-bijective a (f q))) b
     ii : g (f q) ≡ q
     ii = pr₁ (f-g-bijective q)
   III : (a : ℚ) → q < g a → f q < a
@@ -237,13 +235,20 @@ diagram-commutes f g f-order-preserving f-g-bijective q = ℝ-equality' ((f-bar 
   IV a b = transport (_< g a) ii i
    where
     i : g (f q) < g a
-    i = (pr₁ (order-preserving-and-bijection f g f-order-preserving f-g-bijective (f q) a)) b
+    i = (pr₁ (bijective-and-monotonic f g f-order-preserving f-g-bijective (f q) a)) b
     ii : g (f q) ≡ q
     ii = pr₁ (f-g-bijective q)
 
+\end{code}
+
+With the monotonic extension theorem, here is an example of extending
+the function which adds 1 to a rational.
+
+\begin{code}
+
 open import RationalsAddition
 
-ℚ-succ : ℚ → ℚ 
+ℚ-succ : ℚ → ℚ
 ℚ-succ q = q + 1ℚ
 
 open import RationalsNegation
@@ -251,48 +256,69 @@ open import RationalsNegation
 ℚ-pred : ℚ → ℚ
 ℚ-pred q = q - 1ℚ
 
-this : (p : ℚ) → p + 1ℚ + -1ℚ ≡ p
-this p =   p + 1ℚ + -1ℚ   ≡⟨ ℚ+-assoc fe p 1ℚ (- 1ℚ) ⟩
-           p + (1ℚ - 1ℚ)  ≡⟨ ap (p +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
-           p + 0ℚ         ≡⟨ ℚ-zero-right-neutral fe p ⟩ p ∎
-
-ℚ-succ-ext : ℝ → ℝ
-ℚ-succ-ext = f-bar ℚ-succ ℚ-pred I II
+<-ℚ-succ : (p q : ℚ) → (p < q) ⇔ (ℚ-succ p < ℚ-succ q)
+<-ℚ-succ p q = i , ii
  where
-  I : (p q : ℚ) → (p < q) ⇔ (ℚ-succ p < ℚ-succ q)
-  I p q = i , ii
+  i : p < q → ℚ-succ p < ℚ-succ q
+  i l = ℚ<-addition-preserves-order p q 1ℚ l
+  ii : ℚ-succ p < ℚ-succ q → p < q
+  ii l = transport₂ _<_ iv v iii
    where
-    i : p < q → ℚ-succ p < ℚ-succ q
-    i l = ℚ<-addition-preserves-order p q 1ℚ l
-    ii : ℚ-succ p < ℚ-succ q → p < q
-    ii l = transport₂ _<_ iv v iii
-     where
-      iii : p + 1ℚ - 1ℚ < q + 1ℚ - 1ℚ
-      iii = ℚ<-addition-preserves-order (p + 1ℚ) (q + 1ℚ) (- 1ℚ) l
-      iv : p + 1ℚ - 1ℚ ≡ p
-      iv = this p
-      v : q + 1ℚ - 1ℚ ≡ q
-      v =  this q
-  II : (r : ℚ) → (ℚ-pred (ℚ-succ r) ≡ r) × (ℚ-succ (ℚ-pred r) ≡ r)
-  II r = i , ii
-   where
-    i : ℚ-pred (ℚ-succ r) ≡ r
-    i = this r
-    ii : ℚ-succ (ℚ-pred r) ≡ r
-    ii = ℚ-succ (ℚ-pred r) ≡⟨ by-definition ⟩
-         r - 1ℚ + 1ℚ       ≡⟨ ℚ+-assoc fe r (- 1ℚ) 1ℚ ⟩
-         r + ((- 1ℚ) + 1ℚ) ≡⟨ ap (r +_) (ℚ+-comm (- 1ℚ) 1ℚ) ⟩
-         r + (1ℚ + (- 1ℚ)) ≡⟨ ap (r +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
-         r + 0ℚ            ≡⟨ ℚ-zero-right-neutral fe r ⟩
-         r ∎
+    iii : p + 1ℚ - 1ℚ < q + 1ℚ - 1ℚ
+    iii = ℚ<-addition-preserves-order (p + 1ℚ) (q + 1ℚ) (- 1ℚ) l
+    iv : p + 1ℚ - 1ℚ ≡ p
+    iv = ℚ+-assoc fe p 1ℚ (- 1ℚ) ∙ ℚ-inverse-intro fe p 1ℚ ⁻¹
+    v : q + 1ℚ - 1ℚ ≡ q
+    v =  ℚ+-assoc fe q 1ℚ (- 1ℚ) ∙ ℚ-inverse-intro fe q 1ℚ ⁻¹
 
+ℚ-succ-pred : (r : ℚ) → (ℚ-pred (ℚ-succ r) ≡ r) × (ℚ-succ (ℚ-pred r) ≡ r)
+ℚ-succ-pred r = i , ii
+ where
+  i : ℚ-pred (ℚ-succ r) ≡ r
+  i = ℚ+-assoc fe r 1ℚ (- 1ℚ) ∙ ℚ-inverse-intro fe r 1ℚ ⁻¹ 
+  ii : ℚ-succ (ℚ-pred r) ≡ r
+  ii = ℚ-succ (ℚ-pred r) ≡⟨ by-definition ⟩
+       r - 1ℚ + 1ℚ       ≡⟨ ℚ+-assoc fe r (- 1ℚ) 1ℚ ⟩
+       r + ((- 1ℚ) + 1ℚ) ≡⟨ ap (r +_) (ℚ+-comm (- 1ℚ) 1ℚ) ⟩
+       r + (1ℚ - 1ℚ)     ≡⟨ ap (r +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
+       r + 0ℚ            ≡⟨ ℚ-zero-right-neutral fe r ⟩
+       r ∎
 
+ℝ-succ : ℝ → ℝ
+ℝ-succ = f→f̂ ℚ-succ ℚ-pred <-ℚ-succ ℚ-succ-pred
+
+ℚ-succ-behaviour-preserved : (q : ℚ) → ℝ-succ (ι q) ≡ ι (ℚ-succ q)
+ℚ-succ-behaviour-preserved q = diagram-commutes ℚ-succ ℚ-pred <-ℚ-succ ℚ-succ-pred q 
+
+\end{code}
+
+With this, we have a function which adds one to a real number, which
+agrees with the function that adds one to a rational. Moreover, we
+didn't have to write the proof that this function produces a real (by
+proving that the output satisifies the properties of a real, because
+this is taken care of by the f→f̂ function.
+
+TODO: I would like to be able to show that the extended function
+satisfies certain properties. For example, proving that x < x + 1 for
+any real.
+
+\begin{code}
+
+open import DedekindRealsOrder pe pt fe
+
+ℚ-succ-preserves-order : (p : ℚ) → p < ℚ-succ p
+ℚ-succ-preserves-order p = ℚ<-addition-preserves-order'' fe p 1ℚ (0 , refl)
+
+test : (x : ℚ) -> (ι x) < ℝ-succ (ι x)
+test x = transport (ι x <_) (ℚ-succ-behaviour-preserved x ⁻¹)
+           (embedding-preserves-order x (ℚ-succ x)
+             (ℚ-succ-preserves-order x)) -- (embedding-preserves-order x (ℚ-succ x))
 
 {-
-single-extension : (f : ℚ → ℝ) → (ℝ → ℝ)
-single-extension f = {!!}
-
-embed : (ℚ → ℚ) → (ℝ → ℝ) 
-embed = single-extension ∘ (embedding-ℚ-to-ℝ ∘_)
+ℝ-succ-preserves-order : (x : ℝ) → x < ℝ-succ x
+ℝ-succ-preserves-order x = ∣ {!!} ∣
+ where
+  I : {!!}
+  I = {!embedding-preserves-order ? ? ?!}
 -}
-
+\end{code}

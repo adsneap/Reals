@@ -3,6 +3,7 @@
 
 open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
+open import CanonicalMapNotation
 open import OrderNotation
 open import RationalsOrder
 
@@ -173,6 +174,15 @@ apartness-gives-inequality x y apart e = ∥∥-rec 𝟘-is-prop I apart
 ℝ-zero-apart-from-one : 0ℝ ♯ 1ℝ
 ℝ-zero-apart-from-one = ∣ inl ℝ-zero-less-than-one ∣
 
+embedding-preserves-order : (p q : ℚ) → p < q → ι p < ι q
+embedding-preserves-order p q l = I (use-rationals-density)
+ where
+  use-rationals-density : Σ k ꞉ ℚ , p < k × k < q
+  use-rationals-density = ℚ-dense fe p q l
+
+  I : (Σ k ꞉ ℚ , p < k × k < q) → ∃ k ꞉ ℚ , p < k × k < q
+  I (k , p<k , k<q) = ∣ k , p<k , k<q ∣
+  
 \end{code}
 
 

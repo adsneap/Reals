@@ -1,6 +1,8 @@
 \begin{code}
 {-# OPTIONS --without-K --exact-split --safe --experimental-lossy-unification #-}
 
+--Note to self: This file needs some major clean up.
+
 open import SpartanMLTT renaming (_+_ to _∔_) -- TypeTopology
 
 open import OrderNotation --TypeTopology
@@ -32,15 +34,23 @@ open import MetricSpaceRationals fe pt pe
 open import RationalsMinMax fe
 open import DedekindRealsProperties fe pt pe
 
+\end{code}
+
+We say that two reals are ε-close if we can find a pair of rationals,
+one either side of each real such that the the distance between the
+furthest value on each side is less than ε.
+
+\begin{code}
+
 B-ℝ : (x y : ℝ) → (ε : ℚ) → 0ℚ < ε → 𝓤₀ ̇
-B-ℝ ((Lx , Rx) , _) ((Ly , Ry) , _) ε l =
- ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε l
+B-ℝ x y ε l =
+ ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε l
 
 B-ℝ-ε-transport : (x y : ℝ) → (ε ε' : ℚ) → (ε ≡ ε') → (l₁ : 0ℚ < ε) → (l₂ : 0ℚ < ε') → B-ℝ x y ε l₁ → B-ℝ x y ε' l₂
-B-ℝ-ε-transport ((Lx , Rx) , _) ((Ly , Ry) , _) ε ε' e l₁ l₂ = ∥∥-functor I
+B-ℝ-ε-transport x y ε ε' e l₁ l₂ = ∥∥-functor I
  where
-  I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε l₁
-    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε' l₂
+  I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε l₁
+    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε' l₂
   I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = ((p , q , u , v) , pLx , uLy , qRx , vRy , transport (ℚ-metric (min p u) (max q v) <_) e B)
 
 ℝ-m1a-lemma : (((Lx , Rx) , _) ((Ly , Ry) , _) : ℝ) → ((ε : ℚ) → (ε>0 : 0ℚ < ε) → ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε ε>0) → Lx ⊆ Ly
@@ -123,64 +133,52 @@ B-ℝ-ε-transport ((Lx , Rx) , _) ((Ly , Ry) , _) ε ε' e l₁ l₂ = ∥∥-f
       if-smaller-than-u = pr₂ (rounded-left-y k)
 
 \end{code}
-It's useful to have the second condition before the first in order to abstract a proof in the first condition.
+
+It's useful to have the second condition before the first in order to
+abstract a proof in the first condition.
+
 \begin{code}
 
 ℝ-m2 : m2 ℝ B-ℝ
-ℝ-m2 ((Lx , Rx) , _) ((Ly , Ry) , _) ε l B = ∥∥-functor α B
+ℝ-m2 x y ε l = ∥∥-functor α 
  where
-  α : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε l
-    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Ly × u ∈ Lx × q ∈ Ry × v ∈ Rx × B-ℚ (min p u) (max q v) ε l
-  α ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = (u , v , p , q) , uLy , pLx , vRy , qRx , transport₂ (λ α β → B-ℚ α β ε l) (min-comm p u) (max-comm q v) B
+  α : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε l
+    → Σ (u , v , p , q) ꞉ ℚ × ℚ × ℚ × ℚ , u < y × p < x × y < v × x < q × B-ℚ (min u p) (max v q) ε l
+  α ((p , q , u , v) , p<x , u<y , x<q , y<v , B)
+   = (u , v , p , q) , u<y , p<x , y<v , x<q , transport₂ (λ α β → B-ℚ α β ε l) (min-comm p u) (max-comm q v) B
   
 ℝ-m1a : m1a ℝ B-ℝ
-ℝ-m1a ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) f = ℝ-equality-from-left-cut' x y I II
+ℝ-m1a x y f = ℝ-equality-from-left-cut' x y I II
  where
-  x = ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
-  y = ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
-
-  I : Lx ⊆ Ly
+  I : lower-cut-of x ⊆ lower-cut-of y
   I = ℝ-m1a-lemma x y f
 
-  II : Ly ⊆ Lx
+  II : lower-cut-of y ⊆ lower-cut-of x
   II = ℝ-m1a-lemma y x (λ ε ε>0 → ℝ-m2 x y ε ε>0 (f ε ε>0))
 
-m1b-lemma : (q ε : ℚ) → 0ℚ < q × q < ε → abs q < ε
-m1b-lemma q ε (l₁ , l₂) = IV
- where
-  I : 0ℚ < ε 
-  I = ℚ<-trans 0ℚ q ε l₁ l₂
-  II : ((- ε) < 0ℚ)
-  II = transport (- ε <_) ℚ-minus-zero-is-zero i
-   where
-    i : (- ε) < (- 0ℚ)
-    i = ℚ<-swap fe 0ℚ ε I
-  III : (- ε) < q
-  III = ℚ<-trans (- ε) 0ℚ q II l₁
-  IV : abs q < ε
-  IV = ℚ<-to-abs fe q ε (III , l₂) 
-
 ℝ-m1b : m1b ℝ B-ℝ
-ℝ-m1b ((L , R) , iscut) ε l = ∥∥-functor I (ℝ-arithmetically-located ((L , R) , iscut) ε l)
+ℝ-m1b x ε l = ∥∥-functor I (ℝ-arithmetically-located x ε l)
  where
-  I : (Σ (x , y) ꞉ ℚ × ℚ , x ∈ L × y ∈ R × (0ℚ < (y - x)) × ((y - x) < ε)) → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ L × u ∈ L × q ∈ R × v ∈ R × B-ℚ (min p u) (max q v) ε l
-  I ((x , y) , Lx , Ry , (l₁ , l₂)) = (x , y , x , y) , Lx , Lx , Ry , Ry , transport₂ (λ α β → B-ℚ α β ε l) (min-refl x ⁻¹) (max-refl y ⁻¹) iii
-   where
-    i : ℚ-metric y x < ε 
-    i = m1b-lemma (y - x) ε (l₁ , l₂)
-    ii : ℚ-metric y x ≡ ℚ-metric x y
-    ii = ℚ-metric-commutes y x
-    iii : ℚ-metric x y < ε
-    iii = transport (_< ε) ii i
-
+  I : Σ (a , b) ꞉ ℚ × ℚ , a < x × x < b × (0ℚ < (b - a)) × ((b - a) < ε)
+    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < x × x < q × x < v × B-ℚ (min p u) (max q v) ε l
+  I ((a , b) , a<x , x<b , l₁ , l₂)
+   = (a , b , a , b) , a<x , a<x , x<b , x<b , transport₂ (λ α β → B-ℚ α β ε l) (min-refl a ⁻¹) (max-refl b ⁻¹) iii
+    where
+     i : ℚ-metric b a < ε 
+     i = pos-abs-no-increase fe (b - a) ε (l₁ , l₂)
+     ii : ℚ-metric b a ≡ ℚ-metric a b
+     ii = ℚ-metric-commutes b a
+     iii : ℚ-metric a b < ε
+     iii = transport (_< ε) ii i
 
 ℝ-m3 : m3 ℝ B-ℝ
-ℝ-m3 ((Lx , Rx) , iscutx) ((Ly , Ry) , iscuty) ε₁ ε₂ l₁ l₂ l₃ B = ∥∥-functor I B
+ℝ-m3 x y ε₁ ε₂ l₁ l₂ l₃ = ∥∥-functor I
  where
-  I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₁ l₁
-    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε₂ l₂
-  I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = (p , q , u , v) , pLx , uLy , qRx , vRy , ℚ<-trans (ℚ-metric (min p u) (max q v)) ε₁ ε₂ B l₃
-  
+  I : Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε₁ l₁
+    → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε₂ l₂
+  I ((p , q , u , v) , p<x , y<u , x<q , y<v , B)
+   = (p , q , u , v) , p<x , y<u , x<q , y<v , ℚ<-trans (ℚ-metric (min p u) (max q v)) ε₁ ε₂ B l₃ 
+
 ℝ-m4 : m4 ℝ B-ℝ
 ℝ-m4 ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
      ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y)
@@ -908,18 +906,6 @@ mod-convergence-property S RCS (M , f) (ε , l₁) (δ , l₂) = B-ℝ-ε-transp
 
 ℝ-complete-metric-space : complete-metric-space ℝ
 ℝ-complete-metric-space = ℝ-metric-space , ℝ-cauchy-sequences-are-convergent
-
-{-
-continuous : {M₁ : 𝓤 ̇} {M₂ : 𝓥 ̇} → (m₁ : metric-space M₁) → (m₂ : metric-space M₂) → (f : M₁ → M₂) → 𝓤 ̇ 
-continuous {𝓤} {𝓥} {M₁} {M₂} (B₁ , conditions) (B₂ , conditions') f = (c : M₁) → (ε : ℚ) → (l : 0ℚ < ε) → Σ δ ꞉ ℚ , ((l₂ : 0ℚ < δ) → (x : M₁) → B₁ c x δ l₂ → B₂ (f c) (f x) ε l)
-
-addition-ℚ→ℝ : ℚ → ℚ → ℝ
-addition-ℚ→ℝ p q = embedding-ℚ-to-ℝ (p + q)
-
-embedding-continuous : continuous ℚ-metric-space ℝ-metric-space embedding-ℚ-to-ℝ
-embedding-continuous c ε l = {!!}
--}
-
 
 
 
