@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\section{Type Theory}
+\section{Literature Review}
 The mathematical framework within which to work is an important choice. Zermelo-Fraenkel Set Theory (ZFC) is dominant in the modern world, characterised by the axiom of choice. In summary, the axiom says that given a potentially infinite collection of inhabited sets, we can construct a new set by choosing one element from each set in the collection \cite{choiceaxiom}. The axiom gives rise to proofs that are otherwise not provable in the system. 
 
 Constructive mathematics is a framework in which every proof provides a witness. This is clearly advantageous in terms of computation, since proofs written constructively provide an algorithm to obtain an inhabitant of the proof. With a classical proof utilising the axiom of choice, it is not so simple, and producing an algorithm may be very difficult or even impossible. Mathematicians who prefer constructive mathematics may argue that the axiom should not be used, since it is not constructive, and what use is a proof if you cannot provide an example of its application? 
@@ -21,10 +21,29 @@ The power of this system goes even further when considering the consequence of w
 
 In my view, there is no correct answer in choosing which mathematical foundation to work in. I can understand why a classical mathematician would be reluctant to give up the axiom of choice or the law of excluded middle, but also why a constructive mathematician champions the benefits of constructive proofs. The motivation behind a Univalent foundation of mathematics is exciting to me, I can envision a world where all mathematical proofs are readily available, regardless of foundational system, in verifiably correct libraries, and with algorithms available for constructive proofs. While it may be more difficult to write certain proofs constructively, I think it is a small price to pay, and a classical mathematician should have no worries in using a constructive version of a proof, and may continue to work classically by adding the axiom of choice to Univalent Foundations.
 
-There are developments of the Reals that exist, namely {TODO : ADD SOURCE} a Coq library by Andreij Bauer and a non-constructive Agda development.
+%There are developments of the Reals that exist, namely {TODO : ADD SOURCE} a Coq library by Andreij Bauer and a non-constructive Agda development.
 
-With the above in mind, writing a constructive library for the Dedekind Reals is an exciting project for me. It poses various challenges, in that I cannot simply copy and paste classical proofs, and with a background of mostly classical mathematics it forces me to think in a constructive way. I have to take care with definitions to ensure they hold constructively, and adapt proofs where necessary to avoid classical arguments. I have the added benefit in that my supervisor Martin Escard\'o has an active development of a library Univalent Type Theory \cite{TypeTopology}, and so my work will contribute to the active development in a relatively new field. The code can be compiled to Haskell code, so my code may be used to write algorithms which need the Reals to an arbitrary degree of precision, which is not possible with the standard floating point representation of real numbers.
+There is another benefit to consider. My development will have exact computation of the reals up to an arbitrary error term. Therefore, I can guarantee the correctness of computation with the reals. This is an important feature, since mathematics drives the modern world, and numerical errors in calculation can have catastrophic consequences. In 1996, the Ariane 501 exploded at an estimated cost of \$300 million \cite{ARIANE1}, due to an overflow of floating point arithmetic. More examples can be found, the Patriot Rocket disaster for one, resulting in the loss of life of 28 individuals \cite{office_patriot_nodate}. 
 
-With the above as perspective, I will be writing this report somebody with a background in classical mathematics, and as such will remark throughout the report on proofs and definitions which are altered due to my choice to work constructively, perhaps with the hope to entice a reader to think in a more constructive way, or to do further reading in the field of constructive mathematics.
+Stevenson discusses in ``A critical look at quality in large-scale" simulations \cite{QualityInSimulation} how these problems arise, and how important validation is in the context of software. Also discussed is the dichotomy of the \textit{cost} of validation. 
+
+Numerical analysis is the study of algorithms with approximate solutions to problems. To consider one example, I am studying numerical linear algebra as a module this year, and the two most important factors when considering algorithms is the time complexity of the algorithm (which may be rudimentarily measured in flops), and the stability of the algorithm. If the algorithm is unstable, then the solution may be far away from the true solution, and this is due to the buildup of errors in the floating point arithmetic during the algorithm. By using exact computation, we can avoid all instability.
+
+Exact computation is not free. As discussed in \cite{QualityInSimulation}, ``time is money", and there are many scenarios in which approximations are more suitable. Efficiency is important, but for applications such as software running in nuclear power plants, or involved in the design of the structures in the plant, safety-critical code is worth the price. The conversation of the correctness of code against efficiency is worth having, but in my view having the option of guaranteed correctness is a worthwhile investment.
+
+\begin{comment}
+% Need to edit this
+
+Due to various choices of representation, my code does not have any claim to efficiency of computation, and even the real number 0 is not computable. The idea is that algorithms can be designed and implemented with isomorphic representations of the reals, which are built using more efficient representations of numbers.  
+
+%Need an extra line here.
+
+It will always be faster to approximate algorithms, but approximations of reals (or even rationals) will always introduce error, which propagates throughout algorithms.
+
+\end{comment}
+
+With the above in mind, writing a constructive library for the Dedekind Reals is an exciting project for me. It poses various challenges, in that I cannot simply copy and paste classical proofs, and with a background of mostly classical mathematics it forces me to think in a constructive way. I have to take care with definitions to ensure they hold constructively, and adapt proofs where necessary to avoid classical arguments. I have the added benefit in that my supervisor Martin Escard\'o has an active development of a library Univalent Type Theory \cite{TypeTopology}, and so my work will contribute to the active development in a relatively new field. 
+
+Throughout this report, I will remark on proofs and definitions which are altered due to my choice to work constructively, perhaps with the hope to entice a reader to think in a more constructive way, or to do further reading in the field of constructive mathematics.
 
 \end{document}
