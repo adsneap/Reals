@@ -329,6 +329,4 @@ instance
 ℝ-equality-from-left-cut' : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ) → Lx ⊆ Ly → Ly ⊆ Lx → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
 ℝ-equality-from-left-cut' x y s t = ℝ-equality-from-left-cut x y (subset-extensionality pe fe s t)
 
-
-
 \end{code}

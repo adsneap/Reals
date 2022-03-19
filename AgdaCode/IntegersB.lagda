@@ -54,15 +54,4 @@ instance
  canonical-map-ℕ-to-ℤ : Canonical-Map ℕ ℤ
  ι {{canonical-map-ℕ-to-ℤ}} = λ x → pos x
 
-{-
-
-_-_ : ℤ → ℤ → ℤ 
-x - pos 0        = x + (- pos 0)
-x - pos (succ y) = x + (- pos (succ y))
-x - negsucc y    = x + (- negsucc y)
-
-
-
--}
-
 \end{code}

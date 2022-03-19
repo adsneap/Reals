@@ -127,7 +127,7 @@ open import NaturalsAddition renaming (_+_ to _ℕ+_)
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import NaturalNumbers-Properties -- TypeTopology
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
-open import IntegersAddition renaming (_+_ to _ℤ+_)
+open import IntegersAddition renaming (_+_ to _ℤ+_) hiding (_-_)
 open import IntegersOrder
 
 positive-order-flip : (m n a b : ℕ) → ((pos (succ m)) , a) ℚₙ< ((pos (succ n)) , b) → ((pos (succ a)) , m) ℚₙ> ((pos (succ b)) , n)

@@ -12,7 +12,7 @@ open import UF-Base hiding (_≈_) --TypeTopology
 open import UF-FunExt --TypeTopology
 
 open import IntegersB
-open import IntegersAddition renaming (_+_ to _ℤ+_)
+open import IntegersAddition renaming (_+_ to _ℤ+_) hiding (_-_)
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
 open import IntegersNegation renaming (-_ to ℤ-_)
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)

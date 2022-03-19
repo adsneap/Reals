@@ -17,7 +17,7 @@ open import UF-FunExt --TypeTopology
 open import UF-Subsingletons --TypeTopology
 
 open import IntegersAbs
-open import IntegersAddition renaming (_+_ to _ℤ+_)
+open import IntegersAddition renaming (_+_ to _ℤ+_) hiding (_-_)
 open import IntegersB
 open import IntegersMultiplication renaming (_*_ to _ℤ*_)
 open import IntegersOrder

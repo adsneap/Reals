@@ -267,4 +267,9 @@ negation-dist x (negsucc y) = negation-dist₁ x y
 ℤ-sum-of-inverse-is-zero' : (x : ℤ) → (- x) + x ≡ pos 0
 ℤ-sum-of-inverse-is-zero' x = ℤ+-comm (- x) x ∙ ℤ-sum-of-inverse-is-zero x
 
+_-_ : ℤ → ℤ → ℤ
+a - b = a + (- b)
+
+infixl 31 _-_
+
 \end{code}
