@@ -32,6 +32,8 @@ open import DedekindReals pe pt fe
 open import MetricSpaceRationals fe pt pe
 open PropositionalTruncation pt
 
+
+ -- Need to generalise this , y - x ≡ a , 0 < a
 exists-2/3-n : (x y p : ℚ) → x < y → 0ℚ < p → Σ n ꞉ ℕ , (((⟨2/3⟩^ n) * (y - x)) < p)
 exists-2/3-n x y (p , α) l₁ l₂ = V use-limit
  where
@@ -88,7 +90,6 @@ exists-2/3-n x y (p , α) l₁ l₂ = V use-limit
           (p , α) * ((y - x) * multiplicative-inverse fe (y - x) I) ≡⟨ ap ((p , α) *_) (ℚ*-inverse-product-is-one fe (y - x) I) ⟩
           (p , α) * 1ℚ ≡⟨ ℚ-mult-right-id fe (p , α) ⟩
           p , α ∎
-
 
 ral-lemma : (α β : ℚ) → (n : ℕ) → β ≡ 2/3 * α → ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡ (rec 2/3 (λ k → k * 2/3) n * β)
 ral-lemma α β n e = ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡⟨ refl ⟩

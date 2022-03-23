@@ -195,21 +195,21 @@ pos-div-to-nat-div (succ a) (succ b) (negsucc x , p) = 𝟘-elim (product-positi
              pos k - pos (k ℕ+ succ r)          ≡⟨ ap (λ z → pos k - pos z) e₂ ⟩
              pos k - pos (succ d)               ∎
         V : negsucc a ≡ negsucc (succ q) ℤ* pos (succ d) + pos k
-        V = negsucc a                                                          ≡⟨ refl ⟩
+        V = negsucc a                                                          ≡⟨ refl               ⟩
             - pos (succ a)                                                     ≡⟨ ap -_ (ap pos e₁)  ⟩
-            - pos (succ q ℕ* succ d ℕ+ succ r)                                 ≡⟨ i ⟩
-            - (pos (succ q ℕ* succ d) + pos (succ r))                          ≡⟨ ii ⟩
-            (- pos (succ q ℕ* succ d)) - pos (succ r)                          ≡⟨ iii ⟩
-            (- pos (succ q) ℤ* pos (succ d)) - pos (succ r)                    ≡⟨ iv ⟩
-            (- pos (succ q) ℤ* pos (succ d)) + (pos k - pos (succ d))          ≡⟨ v ⟩
-            (- pos (succ q) ℤ* pos (succ d)) - pos (succ d) + pos k            ≡⟨ vi ⟩
-            (- pos (succ d) ℤ* pos (succ q)) - pos (succ d) + pos k            ≡⟨ vii ⟩
-            (- pos (succ d)) ℤ* pos (succ q) - pos (succ d) + pos k            ≡⟨ viii ⟩
-            (- pos (succ d)) ℤ* pos (succ q) - pos (succ d) ℤ* pos 1 + pos k   ≡⟨ ix ⟩
-            (- pos (succ d)) ℤ* (pos (succ q) + pos 1) + pos k                 ≡⟨ refl ⟩
-            (- pos (succ d)) ℤ* pos (succ (succ q)) + pos k                    ≡⟨ x ⟩
-            (- pos (succ d) ℤ* pos (succ (succ q))) + pos k                    ≡⟨ xi ⟩
-            (- pos (succ (succ q)) ℤ* pos (succ d)) + pos k                    ≡⟨ xii ⟩
+            - pos (succ q ℕ* succ d ℕ+ succ r)                                 ≡⟨ i                  ⟩
+            - (pos (succ q ℕ* succ d) + pos (succ r))                          ≡⟨ ii                 ⟩
+            (- pos (succ q ℕ* succ d)) - pos (succ r)                          ≡⟨ iii                ⟩
+            (- pos (succ q) ℤ* pos (succ d)) - pos (succ r)                    ≡⟨ iv                 ⟩
+            (- pos (succ q) ℤ* pos (succ d)) + (pos k - pos (succ d))          ≡⟨ v                  ⟩
+            (- pos (succ q) ℤ* pos (succ d)) - pos (succ d) + pos k            ≡⟨ vi                 ⟩
+            (- pos (succ d) ℤ* pos (succ q)) - pos (succ d) + pos k            ≡⟨ vii                ⟩             
+            (- pos (succ d)) ℤ* pos (succ q) - pos (succ d) + pos k            ≡⟨ viii               ⟩
+            (- pos (succ d)) ℤ* pos (succ q) - pos (succ d) ℤ* pos 1 + pos k   ≡⟨ ix                 ⟩
+            (- pos (succ d)) ℤ* (pos (succ q) + pos 1) + pos k                 ≡⟨ refl               ⟩
+            (- pos (succ d)) ℤ* pos (succ (succ q)) + pos k                    ≡⟨ x                  ⟩
+            (- pos (succ d) ℤ* pos (succ (succ q))) + pos k                    ≡⟨ xi                 ⟩
+            (- pos (succ (succ q)) ℤ* pos (succ d)) + pos k                    ≡⟨ xii                ⟩
             negsucc (succ q) ℤ* pos (succ d) + pos k                           ∎
              where
               i    = ap -_ (pos-addition-equiv-to-ℕ (succ q ℕ* (succ d)) (succ r) ⁻¹)
@@ -230,7 +230,7 @@ pos-div-to-nat-div (succ a) (succ b) (negsucc x , p) = 𝟘-elim (product-positi
  where
   I : x ℤ* (α + β) ≡ y + z
   I = x ℤ* (α + β)    ≡⟨ distributivity-mult-over-ℤ' α β x ⟩
-      x ℤ* α + x ℤ* β ≡⟨ ap₂ _+_ αₚ βₚ ⟩
+      x ℤ* α + x ℤ* β ≡⟨ ap₂ _+_ αₚ βₚ                      ⟩  
       y + z           ∎
 
 ℤ-∣-respects-addition-of-multiples : (x y z k l : ℤ) → x ∣ y → x ∣ z → x ∣ (y ℤ* k + z ℤ* l)
@@ -239,7 +239,7 @@ pos-div-to-nat-div (succ a) (succ b) (negsucc x , p) = 𝟘-elim (product-positi
   I : x ℤ* (α ℤ* k + β ℤ* l) ≡ y ℤ* k + z ℤ* l
   I = x ℤ* (α ℤ* k + β ℤ* l)        ≡⟨ distributivity-mult-over-ℤ' (α ℤ* k) (β ℤ* l) x ⟩
       x ℤ* (α ℤ* k) + x ℤ* (β ℤ* l) ≡⟨ ap₂ _+_ (ℤ*-assoc x α k ⁻¹) (ℤ*-assoc x β l ⁻¹) ⟩
-      x ℤ* α ℤ* k + x ℤ* β ℤ* l     ≡⟨ ap₂ _+_ (ap (_ℤ* k) αₚ) (ap (_ℤ* l) βₚ) ⟩
+      x ℤ* α ℤ* k + x ℤ* β ℤ* l     ≡⟨ ap₂ _+_ (ap (_ℤ* k) αₚ) (ap (_ℤ* l) βₚ)          ⟩
       y ℤ* k + z ℤ* l               ∎
 
 \end{code}

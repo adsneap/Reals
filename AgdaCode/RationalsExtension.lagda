@@ -53,10 +53,10 @@ bijective-and-monotonic : (f : ℚ → ℚ)
                         → bijection-preserves-monotone f g
 bijective-and-monotonic f g f-preserves-order f-g-bijection = γ
  where
-  γ : (p q : ℚ) → (p < q) ⇔ (g p < g q)
+  γ : (p q : ℚ) → p < q ⇔ g p < g q
   γ p q = ltr , rtl
    where
-    apply-order-preversation : (g p < g q) ⇔ (f (g p) < f (g q))
+    apply-order-preversation : g p < g q ⇔ f (g p) < f (g q)
     apply-order-preversation = f-preserves-order (g p) (g q)
 
     ltr : p < q → g p < g q
@@ -128,12 +128,12 @@ f→f̂ f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhab
      where
       i : f (g k) ≡ k
       i = pr₂ (f-g-bijective k)
-      ii : ∃ q ꞉ ℚ , (g k < q) × q ∈ L
+      ii : ∃ q ꞉ ℚ , g k < q × q ∈ L
       ii = (pr₁ (rounded-left-x (g k))) k-L
-      iii : Σ q ꞉ ℚ , (g k < q) × q ∈ L → Σ p ꞉ ℚ , (k < p) × p ∈ left
-      iii (q , (l , q-L)) = (f q) , vii , vi
+      iii : Σ q ꞉ ℚ , g k < q × q ∈ L → Σ p ꞉ ℚ , k < p × p ∈ left
+      iii (q , (l , q-L)) = f q , vii , vi
        where
-        iv : (g k < q) → (f (g k) < f q)
+        iv : g k < q → f (g k) < f q
         iv = pr₁ (f-order-preserving (g k) q)
         v : g (f q) ∈ L
         v = transport (_∈ L) (pr₁ (f-g-bijective q) ⁻¹) q-L
@@ -141,51 +141,51 @@ f→f̂ f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhab
         vi = transport (_∈ L) (pr₁ (f-g-bijective q) ⁻¹) q-L
         vii : k < f q
         vii = transport (_< f q) i (iv l)
-    II : ∃ p ꞉ ℚ , (k < p) × p ∈ left → k ∈ left
+    II : ∃ p ꞉ ℚ , k < p × p ∈ left → k ∈ left
     II e = ∥∥-rec (∈-is-prop left k) i e
      where
-      i : Σ p ꞉ ℚ , (k < p) × p ∈ left → k ∈ left
+      i : Σ p ꞉ ℚ , k < p × p ∈ left → k ∈ left
       i (p , (l , p-L)) = iv ∣ (g p) , iii , p-L ∣
        where
-        ii : (k < p) ⇔ (g k < g p)
+        ii : k < p ⇔ g k < g p
         ii = bijective-and-monotonic f g f-order-preserving f-g-bijective k p
         iii : g k < g p
         iii = (pr₁ ii) l
-        iv : ∃ p' ꞉ ℚ , (g k < p') × p' ∈ L → g k ∈ L
+        iv : ∃ p' ꞉ ℚ , g k < p' × p' ∈ L → g k ∈ L
         iv = pr₂ (rounded-left-x (g k))
 
   rounded-right' : rounded-right right
   rounded-right' k = I , II
    where
-    I : k ∈ right → ∃ q ꞉ ℚ , (q < k) × q ∈ right
+    I : k ∈ right → ∃ q ꞉ ℚ , q < k × q ∈ right
     I k-R = ∥∥-functor ii i
      where
-      i : ∃ q ꞉ ℚ , (q < g k) × q ∈ R
+      i : ∃ q ꞉ ℚ , q < g k × q ∈ R
       i = pr₁ (rounded-right-x (g k)) k-R
-      ii : Σ p ꞉ ℚ , (p < g k) × p ∈ R → Σ q ꞉ ℚ , (q < k) × q ∈ right
+      ii : Σ p ꞉ ℚ , p < g k × p ∈ R → Σ q ꞉ ℚ , (q < k) × q ∈ right
       ii (p , (l , p-R)) = (f p) , (transport (f p <_) iv iii) , transport (_∈ R) (pr₁ (f-g-bijective p) ⁻¹) p-R
        where
-        iii : (f p < f (g k))
+        iii : f p < f (g k)
         iii = (pr₁ (f-order-preserving p (g k))) l
         iv : f (g k) ≡ k
         iv = pr₂ (f-g-bijective k)
-    II : ∃ q ꞉ ℚ , (q < k) × q ∈ right → k ∈ right
+    II : ∃ q ꞉ ℚ , q < k × q ∈ right → k ∈ right
     II e = ∥∥-rec (∈-is-prop right k) i e
      where
-      i : Σ q ꞉ ℚ , (q < k) × q ∈ right → k ∈ right
+      i : Σ q ꞉ ℚ , q < k × q ∈ right → k ∈ right
       i (q , (l , q-R)) = iv ∣ (g q) , (iii , q-R) ∣
        where
-        ii : (q < k) ⇔ (g q < g k)
+        ii : q < k ⇔ g q < g k
         ii = bijective-and-monotonic f g f-order-preserving f-g-bijective q k
         iii : g q < g k
         iii = (pr₁ ii) l
-        iv : ∃ q ꞉ ℚ , (q < g k) × q ∈ R → g k ∈ R
+        iv : ∃ q ꞉ ℚ , q < g k × q ∈ R → g k ∈ R
         iv = pr₂ (rounded-right-x (g k))
 
   disjoint' : disjoint left right
   disjoint' p q l = (pr₂ I) II
    where
-    I : (p < q) ⇔ (g p < g q)
+    I : p < q ⇔ g p < g q
     I = bijective-and-monotonic f g f-order-preserving f-g-bijective p q
     II : g p < g q
     II = disjoint-x (g p) (g q) l
@@ -193,7 +193,7 @@ f→f̂ f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhab
   located' : located left right
   located' p q l = III
    where
-    I : (p < q) ⇔ (g p < g q)
+    I : p < q ⇔ g p < g q
     I = bijective-and-monotonic f g f-order-preserving f-g-bijective p q
     II : p < q → g p < g q
     II = pr₁ I
@@ -256,7 +256,7 @@ open import RationalsNegation
 ℚ-pred : ℚ → ℚ
 ℚ-pred q = q - 1ℚ
 
-<-ℚ-succ : (p q : ℚ) → (p < q) ⇔ (ℚ-succ p < ℚ-succ q)
+<-ℚ-succ : (p q : ℚ) → p < q ⇔ ℚ-succ p < ℚ-succ q
 <-ℚ-succ p q = i , ii
  where
   i : p < q → ℚ-succ p < ℚ-succ q
@@ -277,12 +277,12 @@ open import RationalsNegation
   i : ℚ-pred (ℚ-succ r) ≡ r
   i = ℚ+-assoc fe r 1ℚ (- 1ℚ) ∙ ℚ-inverse-intro fe r 1ℚ ⁻¹ 
   ii : ℚ-succ (ℚ-pred r) ≡ r
-  ii = ℚ-succ (ℚ-pred r) ≡⟨ by-definition ⟩
-       r - 1ℚ + 1ℚ       ≡⟨ ℚ+-assoc fe r (- 1ℚ) 1ℚ ⟩
-       r + ((- 1ℚ) + 1ℚ) ≡⟨ ap (r +_) (ℚ+-comm (- 1ℚ) 1ℚ) ⟩
+  ii = ℚ-succ (ℚ-pred r) ≡⟨ by-definition                           ⟩
+       r - 1ℚ + 1ℚ       ≡⟨ ℚ+-assoc fe r (- 1ℚ) 1ℚ                 ⟩
+       r + ((- 1ℚ) + 1ℚ) ≡⟨ ap (r +_) (ℚ+-comm (- 1ℚ) 1ℚ)           ⟩
        r + (1ℚ - 1ℚ)     ≡⟨ ap (r +_) (ℚ-inverse-sum-to-zero fe 1ℚ) ⟩
        r + 0ℚ            ≡⟨ ℚ-zero-right-neutral fe r ⟩
-       r ∎
+       r                 ∎
 
 ℝ-succ : ℝ → ℝ
 ℝ-succ = f→f̂ ℚ-succ ℚ-pred <-ℚ-succ ℚ-succ-pred
@@ -309,10 +309,10 @@ open import DedekindRealsOrder pe pt fe
 ℚ-succ-preserves-order : (p : ℚ) → p < ℚ-succ p
 ℚ-succ-preserves-order p = ℚ<-addition-preserves-order'' fe p 1ℚ (0 , refl)
 
-test : (x : ℚ) -> (ι x) < ℝ-succ (ι x)
+test : (x : ℚ) -> (ι x) < ℝ-succ (ι x) -- With Todds Help
 test x = transport (ι x <_) (ℚ-succ-behaviour-preserved x ⁻¹)
            (embedding-preserves-order x (ℚ-succ x)
-             (ℚ-succ-preserves-order x)) -- (embedding-preserves-order x (ℚ-succ x))
+             (ℚ-succ-preserves-order x)) 
 
 {-
 ℝ-succ-preserves-order : (x : ℝ) → x < ℝ-succ x

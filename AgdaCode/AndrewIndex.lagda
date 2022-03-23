@@ -35,10 +35,10 @@ import IntegersB
 import IntegersAbs
 import IntegersAddition
 import IntegersOrder
-import IntegersDivision -- Clean first pass up to hear
+import IntegersDivision 
 import IntegersHCF
 import IntegersMultiplication
-import IntegersNegation
+import IntegersNegation 
 
 import ncRationals
 import ncRationalsOperations
@@ -54,11 +54,11 @@ import RationalsField
 import RationalsLimits
 import RationalsMinMax
 import RationalsMultiplication
-import RationalsNegation
+import RationalsNegation -- Clean pass up to here
 import RationalsOrder
 
 import DedekindReals
-import DedekindRealsAddition
+import DedekindRealsAddition 
 import DedekindRealsProperties
 import DedekindRealsOrder
 

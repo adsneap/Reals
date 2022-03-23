@@ -50,7 +50,6 @@ i-squared = to-×-≡ refl refl
 
 
 
-
 \end{code}
 
 

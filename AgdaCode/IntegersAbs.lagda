@@ -228,7 +228,6 @@ greater-than-zero-mult-trans : (x y : ℤ) → greater-than-zero x → greater-t
 greater-than-zero-mult-trans x (negsucc y) l r = 𝟘-elim r
 greater-than-zero-mult-trans x (pos y)     l r = gtzmt₀ x y l r
 
-
 {-
 ℤ-not-equal-to-succ : (x : ℤ) → ¬ (x ≡ succℤ x)
 ℤ-not-equal-to-succ = ℤ-induction base step₁ step₂

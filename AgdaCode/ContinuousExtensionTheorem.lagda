@@ -221,7 +221,7 @@ Now we have that the function from ℚ-ℝ-id is continuous. We want to extend t
 \begin{code}
 
 open import DedekindRealsOrder pe pt fe
-open import DedekindRealsAddition pe pt fe renaming (_+_ to _ℝ+_)
+-- open import DedekindRealsAddition pe pt fe renaming (_+_ to _ℝ+_)
 {-
 ℝ-no-maximum : (x : ℝ) → Σ y ꞉ ℝ , y < x ∔ x < y
 ℝ-no-maximum x = {!weak-linearity ? ? ? ?!}
@@ -440,27 +440,77 @@ rationals-extension f = {!!}
   this = {!!}
 -}
 
+open import UF-Subsingletons-FunExt
+
+\end{code}
+
+I believe the conditions below are along the right lines.
+
+Do need to find a way to seperate the b out.
+
+Roundedness, disjointedness seem trivial... by density of rationals.
+
+Roundedness : 
+
+Locatedness could be difficult. I cannot get inhabitedness.
+
+
+Left Cut  : (b ε : ℚ) → 0ℚ < ε → ∃ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → p < f b - ε)
+Right Cut : (b ε : ℚ) → 0ℚ < ε → ∃ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b + ε)
+
+I believe these are along the lines of the condition.
+Maybe the b need to be existential instead universal.
+
+Motivation for these cuts:
+
+We want : f̂ (ι p) ≡ ι (f p)
+          ∀ ε > 0 , ∃ δ > 0 , | x - a | < δ → | f̂ x - f̂ a | < ε
+
+In particular, specialising to rationals, we want:
+          ∀ b , ∀ ε > 0 , ∃ δ > 0 , | x - (ι b) | < δ → | f̂ x - f̂ (ι b) | < ε
+
+                                                      → | f̂ x - ι (f b) | < ε
+                                                      → ι (f b) - ε < f̂ x  < ι (f b) + ε
+                                                      → ι (f b - ε) < f̂ x  < ι (f b + ε)   <- reals order
+                                                      → f b - ε     < f̂ x  < f b + ε       <- cuts
+
+This gives us a clue as to what the cuts should be. In particular, consider p and q as follows:
+
+Perhaps the idea is to let p = f b - ε, and manipulate expressions.
+I believe the following is equivalent:
+
+                  p < f b - ε < f̂ x < f b + ε < q
+
+
+
+\begin{code}
+
 f^' : (f g : ℚ → ℚ)
     → continuous ℚ-metric-space ℚ-metric-space g
     → ℝ → ℝ
-f^' f f-cont e r = z
+f^' f f-cont e x = z
  where
   z : ℝ
-  z =  (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
+  z = (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
    where
-
- -- CONDITION,
- --   ∀ ε > 0, ∃ δ > 0 , x < r < y × | x - y | < δ → | f r - ? | < ε 
-
     L : ℚ-subset-of-propositions
-    L p = {!!} , {!!}
+    L p = condition , ∃-is-prop
+     where
+     condition : 𝓤₀ ̇
+     condition = ∃ b ꞉ ℚ , (((ε , l₁) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι b) δ l₂ → p < f b - ε)
     
     R : ℚ-subset-of-propositions
-    R q = {!f q !} , {!!} 
+    R q = condition , ∃-is-prop
+     where
+      condition : 𝓤₀ ̇
+      condition = ∃ b ꞉ ℚ , (((ε , l₁) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι b) δ l₂ → f b + ε < q)
     
     inhabited-left-z : inhabited-left L
     inhabited-left-z = {!!}
-      
+     where
+      t : ∃ p ꞉ ℚ , p ∈ lower-cut-of x
+      t = inhabited-from-real-L x 
+
     inhabited-right-z : inhabited-right R
     inhabited-right-z = {!!}
 
@@ -468,21 +518,146 @@ f^' f f-cont e r = z
     rounded-left-z : rounded-left L
     rounded-left-z p = ltr , rtl
      where
-      ltr : {!!}
-      ltr = {!!}
+      ltr : p ∈ L → ∃ p' ꞉ ℚ , p < p' × p' ∈ L
+      ltr p<x = {!!}
+        
       rtl : {!!}
       rtl = {!!}
      
     
     rounded-right-z : rounded-right R
     rounded-right-z = {!!}
-    
-    disjoint-z : disjoint L R
-    disjoint-z = {!!}
-    
+     
     located-z : located L R
     located-z = {!!}
+
+    disjoint-z : disjoint L R
+    disjoint-z = disjoint→trans L R located-z I
+     where
+      I : (q : ℚ) → ¬ (q ∈ L × q ∈ R)
+      I q (q<z , z<q) = ∥∥-rec 𝟘-is-prop II (binary-choice q<z z<q)
+       where
+        II : (Σ b ꞉ ℚ , (((ε , l₁) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι b) δ l₂ → q < f b - ε))
+           × (Σ c ꞉ ℚ , (((ε , l₁) : ℚ₊) → Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι c) δ l₂ → f c + ε < q))
+           → 𝟘
+        II ((b , h) , c , g) = III (h (1ℚ , (0 , refl))) (g (1ℚ , (0 , refl)))
+         where
+          III : (Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι b) δ l₂ → q < f b - 1ℚ)
+              → (Σ (δ , l₂) ꞉ ℚ₊ , B-ℝ x (ι c) δ l₂ → f c + 1ℚ < q)
+              → 𝟘
+          III h' g' = IV (h' {!!} , g' {!!})
+           where
+            IV : ¬ (q < f b - 1ℚ × f c + 1ℚ < q)
+            IV = {!!}
+            -- Now , by continuity of f.
+            -- x - b < δ
+            -- c - x < δ
+            -- c - b < 2 δ
+            --           
+        {-
+        II : (Σ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - ε)))
+           × (Σ c ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι c) δ l₁ → q < f c + ε)))
+           → 𝟘
+        II ((b , h) , c , g) = V (h 1ℚ (0 , refl)) (g 1ℚ (0 , refl))
+         where
+          III : Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - 1ℚ)
+          III = h 1ℚ (0 , refl)
+          IV : {!!}
+          IV = {!!}
+          V : (Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - 1ℚ))
+            → (Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι c) δ l₁ → q < f c + 1ℚ))
+            → {!!}
+          V = {!!}
+         -}
+
+
+\end{code}
+
+f^' : (f g : ℚ → ℚ)
+    → continuous ℚ-metric-space ℚ-metric-space g
+    → ℝ → ℝ
+f^' f f-cont e x = z
+ where
+  z : ℝ
+  z = (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
+   where
+    L : ℚ-subset-of-propositions
+    L p = condition , ∃-is-prop
+     where
+     condition : 𝓤₀ ̇
+     condition = ∃ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → p < f b - ε))
+    
+    R : ℚ-subset-of-propositions
+    R q = condition , ∃-is-prop
+     where
+      condition : 𝓤₀ ̇
+      condition = ∃ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b + ε))
+    
+    inhabited-left-z : inhabited-left L
+    inhabited-left-z = {!!}
+     where
+      t : ∃ p ꞉ ℚ , p ∈ lower-cut-of x
+      t = inhabited-from-real-L x 
+
+    inhabited-right-z : inhabited-right R
+    inhabited-right-z = {!!}
+
+
+    rounded-left-z : rounded-left L
+    rounded-left-z p = ltr , rtl
+     where
+      ltr : p ∈ L → ∃ p' ꞉ ℚ , p < p' × p' ∈ L
+      ltr p<x = ∥∥-functor I p<x 
+       where
+        I : Σ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → p < f b - ε))
+          → Σ p' ꞉ ℚ , p < p' × p' ∈ L
+        I (b , f) = {!!} , {!!}
+         where
+          using-b : {!!}
+          using-b = {!!}
+          by-density : {!!}
+          by-density = {!!}
+        
+      rtl : {!!}
+      rtl = {!!}
+     
+    
+    rounded-right-z : rounded-right R
+    rounded-right-z = {!!}
+     
+    located-z : located L R
+    located-z = {!!}
+
+    disjoint-z : disjoint L R
+    disjoint-z = disjoint→trans L R located-z I
+     where
+      I : (q : ℚ) → ¬ (q ∈ L × q ∈ R)
+      I q (q<z , z<q) = ∥∥-rec 𝟘-is-prop II (binary-choice q<z z<q)
+       where
+        II : (Σ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - ε)))
+           × (Σ c ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι c) δ l₁ → q < f c + ε)))
+           → 𝟘
+        II ((b , h) , c , g) = V (h 1ℚ (0 , refl)) (g 1ℚ (0 , refl))
+         where
+          III : Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - 1ℚ)
+          III = h 1ℚ (0 , refl)
+          IV : {!!}
+          IV = {!!}
+          V : (Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → q < f b - 1ℚ))
+            → (Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι c) δ l₁ → q < f c + 1ℚ))
+            → {!!}
+          V = {!!}
 
 
 
 \end{code}
+
+     where
+      I : ∃ (a , b) ꞉ ℚ × ℚ , a < x × x < b × 0ℚ < b - a × b - a < 1ℚ
+      I = ℝ-arithmetically-located x 1ℚ (0 , refl)
+      II : Σ (a , b) ꞉ ℚ × ℚ , a < x × x < b × 0ℚ < b - a × b - a < 1ℚ
+         → Σ p ꞉ ℚ , ((a ε : ℚ) → 0ℚ < ε → ∃ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι a) δ l₁ → p < f a - ε))
+      II ((a , b) , a<x , x<b , l₁ , l₂) = (f a) , III
+       where
+        III : (a' ε : ℚ) → 0ℚ < ε → ∃ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι a') δ l₁ → f a < f a' - ε)
+        III a' ε l = ∣ 1ℚ , (λ l₃ B → {!!}) ∣

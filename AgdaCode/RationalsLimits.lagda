@@ -73,17 +73,17 @@ sandwich-theorem L f g h (k , k-greater) lim-f lim-h = lim-g
         h-close' : ℚ-metric (h n) L < ε
         h-close' = h-close n (≤-trans N₂ N n (≤-trans N₂ (ℕ-max N₁ N₂) N N₂-small N₁N₂-small) less)
 
-        obtain-inequalities : ((- ε) < (f n - L)) × ((f n - L) < ε)
-                            → ((- ε) < (h n - L)) × ((h n - L) < ε)
+        obtain-inequalities : - ε < f n - L × f n - L < ε
+                            → - ε < h n - L × h n - L < ε
                             → ℚ-metric (g n) L < ε
         obtain-inequalities (l₁ , l₂) (l₃ , l₄) = ℚ<-to-abs fe (g n - L) ε (I , II)
          where
-          k-greater' : (f n ≤ g n) × (g n ≤ h n)
+          k-greater' : f n ≤ g n × g n ≤ h n
           k-greater' = k-greater n (≤-trans k N n k-small less)
           
-          I : (- ε) < (g n - L)
-          I = ℚ<-≤-trans fe (-  ε) (f n - L) (g n - L) l₁ (ℚ≤-addition-preserves-order fe (f n) (g n) (- L) (pr₁ k-greater'))
-          II : (g n - L) < ε
+          I : - ε < g n - L
+          I = ℚ<-≤-trans fe (- ε) (f n - L) (g n - L) l₁ (ℚ≤-addition-preserves-order fe (f n) (g n) (- L) (pr₁ k-greater'))
+          II : g n - L < ε
           II = ℚ≤-<-trans fe (g n - L) (h n - L) ε (ℚ≤-addition-preserves-order fe (g n) (h n) (- L) (pr₂ k-greater')) l₄
 
 0f : ℕ → ℚ
@@ -96,7 +96,7 @@ sandwich-theorem L f g h (k , k-greater) lim-f lim-h = lim-g
   f-conv n less = transport (_< ε) I l
    where
     I : ℚ-metric (0f n) 0ℚ ≡ 0ℚ
-    I = ℚ-metric (0f n) 0ℚ ≡⟨ by-definition ⟩
+    I = ℚ-metric (0f n) 0ℚ    ≡⟨ by-definition ⟩
         abs (0ℚ - 0ℚ)         ≡⟨ by-definition ⟩
         abs 0ℚ                ≡⟨ by-definition ⟩
         0ℚ ∎
@@ -140,15 +140,15 @@ open import ncRationals
 ⟨1/sn⟩-converges ((negsucc x , a) , ε)    l = 𝟘-elim (negative-not-greater-than-zero x a l)
 ⟨1/sn⟩-converges ((pos (succ x) , a) , ε) l = q ℕ+ 1 , conclusion 
  where
-  rough-N : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (succ a ≡ q ℕ* succ x ℕ+ r) × (r < succ x)
+  rough-N : Σ q ꞉ ℕ , Σ r ꞉ ℕ , (succ a ≡ q ℕ* succ x ℕ+ r) × r < succ x
   rough-N = division (succ a) x
   q = pr₁ rough-N
   r = pr₁ (pr₂ rough-N)
   
-  γ : succ a < (succ x ℕ* (q ℕ+ 1))
+  γ : succ a < succ x ℕ* (q ℕ+ 1)
   γ = transport₂ _<_ ii iii i
    where
-    i : (q ℕ* succ x ℕ+ r) < (q ℕ* succ x ℕ+ succ x)
+    i : q ℕ* succ x ℕ+ r < q ℕ* succ x ℕ+ succ x
     i = <-n-monotone-left r (succ x) (q ℕ* succ x) (pr₂ (pr₂ (pr₂ rough-N)))
 
     ii : q ℕ* succ x ℕ+ r ≡ succ a 
@@ -156,12 +156,12 @@ open import ncRationals
 
     iii : q ℕ* succ x ℕ+ succ x ≡ succ x ℕ* (q ℕ+ 1)
     iii = q ℕ* succ x ℕ+ succ x      ≡⟨ ap₂ _ℕ+_ (mult-commutativity q (succ x)) (mult-right-id (succ x) ⁻¹) ⟩
-          succ x ℕ* q ℕ+ succ x ℕ* 1 ≡⟨ distributivity-mult-over-nat (succ x) q 1 ⁻¹ ⟩
-          succ x ℕ* (q ℕ+ 1) ∎
+          succ x ℕ* q ℕ+ succ x ℕ* 1 ≡⟨ distributivity-mult-over-nat (succ x) q 1 ⁻¹                         ⟩
+          succ x ℕ* (q ℕ+ 1)         ∎
   ζ : pos (succ a) < pos (succ x ℕ* (q ℕ+ 1))
   ζ = ℕ-order-respects-ℤ-order (succ a) (succ x ℕ* (q ℕ+ 1)) γ
 
-  conclusion : (n : ℕ) → (q ℕ+ 1) ≤ n → ℚ-metric (⟨1/sn⟩ n) 0ℚ < ((pos (succ x) , a) , ε)
+  conclusion : (n : ℕ) → q ℕ+ 1 ≤ n → ℚ-metric (⟨1/sn⟩ n) 0ℚ < ((pos (succ x) , a) , ε)
   conclusion 0 l' = 𝟘-elim l'
   conclusion (succ n) l' = IV
    where
@@ -173,12 +173,12 @@ open import ncRationals
       where
        τ : pos (succ x ℕ* (q ℕ+ 1)) ≡ pos (succ q) ℤ* pos (succ x)
        τ = pos (succ x ℕ* (q ℕ+ 1))     ≡⟨ pos-multiplication-equiv-to-ℕ (succ x) (q ℕ+ 1) ⁻¹ ⟩
-           pos (succ x) ℤ* pos (q ℕ+ 1) ≡⟨ by-definition ⟩
-           pos (succ x) ℤ* pos (succ q) ≡⟨ ℤ*-comm (pos (succ x)) (pos (succ q)) ⟩
+           pos (succ x) ℤ* pos (q ℕ+ 1) ≡⟨ by-definition                                      ⟩
+           pos (succ x) ℤ* pos (succ q) ≡⟨ ℤ*-comm (pos (succ x)) (pos (succ q))              ⟩
            pos (succ q) ℤ* pos (succ x) ∎
-       α : (pos (succ a) ℤ* pos 1) < (pos (succ q) ℤ* pos (succ x))  
+       α : pos (succ a) ℤ* pos 1 < pos (succ q) ℤ* pos (succ x) 
        α = transport₂ _<_ (ℤ-mult-right-id (pos (succ a))) τ ζ
-       β : (pos (succ q) < pos (succ n)) ∔ (pos (succ q) ≡ pos (succ n)) → (pos (succ a) , x) ℚₙ< (pos (succ n) , 0)
+       β : pos (succ q) < pos (succ n) ∔ (pos (succ q) ≡ pos (succ n)) → (pos (succ a) , x) ℚₙ< (pos (succ n) , 0)
        β (inl less) = ℚₙ<-trans (pos (succ a) , x) (pos (succ q) , 0) (pos (succ n) , 0) α less
        β (inr equal) = transport (λ - → (pos (succ a) , x) ℚₙ< (- , 0)) equal α
      
@@ -189,12 +189,12 @@ open import ncRationals
      IV = transport (_< ((pos (succ x) , a) , ε)) i iv
       where
        i : toℚ (pos 1 , n) ≡ abs (toℚ ((pos 1) , n) - 0ℚ)
-       i = toℚ (pos 1 , n)                               ≡⟨ by-definition ⟩
-           toℚ (ℚₙ-abs (pos 1 , n))                      ≡⟨ toℚ-abs fe (pos 1 , n) ⁻¹ ⟩
+       i = toℚ (pos 1 , n)                               ≡⟨ by-definition                                                ⟩
+           toℚ (ℚₙ-abs (pos 1 , n))                      ≡⟨ toℚ-abs fe (pos 1 , n) ⁻¹                                     ⟩
            abs (toℚ (pos 1 , n))                         ≡⟨ ap (λ - → abs (toℚ -)) (ℚₙ-zero-right-neutral (pos 1 , n) ⁻¹) ⟩
-           abs (toℚ ((pos 1 , n) ℚₙ+ (pos 0 , 0)))       ≡⟨ by-definition ⟩
-           abs (toℚ ((pos 1 , n) ℚₙ+ (ℚₙ- (pos 0 , 0)))) ≡⟨ ap abs (toℚ-subtraction fe (pos 1 , n) (pos 0 , 0) ⁻¹) ⟩
-           abs (toℚ (pos 1 , n) - 0ℚ) ∎
+           abs (toℚ ((pos 1 , n) ℚₙ+ (pos 0 , 0)))       ≡⟨ by-definition                                                 ⟩
+           abs (toℚ ((pos 1 , n) ℚₙ+ (ℚₙ- (pos 0 , 0)))) ≡⟨ ap abs (toℚ-subtraction fe (pos 1 , n) (pos 0 , 0) ⁻¹)        ⟩
+           abs (toℚ (pos 1 , n) - 0ℚ)                   ∎
 
        ii : toℚ (pos 1 , n) < toℚ (pos (succ x) , a)
        ii = toℚ-< (pos 1 , n) (pos (succ x) , a) III
@@ -209,23 +209,23 @@ limits-lemma : (k : ℕ) → ((pos 1 , succ k) ℚₙ* (pos 2 , 2)) ℚₙ≤ (p
 limits-lemma k = k , I
  where
   I : pos 2 ℤ* pos (succ (succ (succ k))) ℤ+ pos k ≡ pos 1 ℤ* pos (succ (pred (succ (succ k) ℕ* 3)))
-  I = pos 2 ℤ* pos (succ (succ (succ k))) ℤ+ pos k ≡⟨ by-definition ⟩
-      pos 2 ℤ* pos (k ℕ+ 3) ℤ+ pos k               ≡⟨ ℤ+-comm (pos 2 ℤ* pos (k ℕ+ 3)) (pos k) ⟩
-      pos k ℤ+ pos 2 ℤ* pos (k ℕ+ 3)               ≡⟨ ap (λ z → pos k ℤ+ pos 2 ℤ* z) (pos-addition-equiv-to-ℕ k 3 ⁻¹) ⟩
-      pos k ℤ+ pos 2 ℤ* (pos k ℤ+ pos 3)           ≡⟨ ap (pos k ℤ+_) (distributivity-mult-over-ℤ' (pos k) (pos 3) (pos 2) ) ⟩
-      pos k ℤ+ (pos 2 ℤ* pos k ℤ+ pos 6)           ≡⟨ ℤ+-assoc (pos k) (pos 2 ℤ* pos k) (pos 6) ⁻¹ ⟩
-      pos k ℤ+ pos 2 ℤ* pos k ℤ+ pos 6             ≡⟨ ap (λ z → z ℤ+ pos 2 ℤ* pos k ℤ+ pos 6) (ℤ-mult-left-id (pos k) ⁻¹) ⟩
-      pos 1 ℤ* pos k ℤ+ pos 2 ℤ* pos k ℤ+ pos 6    ≡⟨ ap (_ℤ+ pos 6) (distributivity-mult-over-ℤ (pos 1) (pos 2) (pos k) ⁻¹) ⟩
-      (pos 3) ℤ* pos k ℤ+ pos 6                    ≡⟨ ap (_ℤ+ pos 6) (ℤ*-comm (pos 3) (pos k)) ⟩
-      pos k ℤ* pos 3 ℤ+ pos 6                      ≡⟨ distributivity-mult-over-ℤ (pos k) (pos 2) (pos 3) ⁻¹ ⟩
-      (pos k ℤ+ pos 2) ℤ* pos 3                    ≡⟨ ap (_ℤ* pos 3) (pos-addition-equiv-to-ℕ k 2) ⟩
-      pos (k ℕ+ 2) ℤ* pos 3                        ≡⟨ by-definition ⟩
-      pos (succ (succ k)) ℤ* pos 3                 ≡⟨ denom-setup (succ k) 2 ⁻¹ ⟩
-      pos (succ (pred (succ (succ k) ℕ* 3)))       ≡⟨ ℤ-mult-left-id (pos (succ (pred (succ (succ k) ℕ* 3)))) ⁻¹ ⟩
+  I = pos 2 ℤ* pos (succ (succ (succ k))) ℤ+ pos k ≡⟨ by-definition                                                          ⟩
+      pos 2 ℤ* pos (k ℕ+ 3) ℤ+ pos k                  ≡⟨ ℤ+-comm (pos 2 ℤ* pos (k ℕ+ 3)) (pos k)                                ⟩
+      pos k ℤ+ pos 2 ℤ* pos (k ℕ+ 3)                  ≡⟨ ap (λ z → pos k ℤ+ pos 2 ℤ* z) (pos-addition-equiv-to-ℕ k 3 ⁻¹)        ⟩
+      pos k ℤ+ pos 2 ℤ* (pos k ℤ+ pos 3)              ≡⟨ ap (pos k ℤ+_) (distributivity-mult-over-ℤ' (pos k) (pos 3) (pos 2))   ⟩
+      pos k ℤ+ (pos 2 ℤ* pos k ℤ+ pos 6)              ≡⟨ ℤ+-assoc (pos k) (pos 2 ℤ* pos k) (pos 6) ⁻¹                           ⟩
+      pos k ℤ+ pos 2 ℤ* pos k ℤ+ pos 6                ≡⟨ ap (λ z → z ℤ+ pos 2 ℤ* pos k ℤ+ pos 6) (ℤ-mult-left-id (pos k) ⁻¹)    ⟩
+      pos 1 ℤ* pos k ℤ+ pos 2 ℤ* pos k ℤ+ pos 6       ≡⟨ ap (_ℤ+ pos 6) (distributivity-mult-over-ℤ (pos 1) (pos 2) (pos k) ⁻¹) ⟩
+      (pos 3) ℤ* pos k ℤ+ pos 6                       ≡⟨ ap (_ℤ+ pos 6) (ℤ*-comm (pos 3) (pos k))                               ⟩
+      pos k ℤ* pos 3 ℤ+ pos 6                         ≡⟨ distributivity-mult-over-ℤ (pos k) (pos 2) (pos 3) ⁻¹                  ⟩ 
+      (pos k ℤ+ pos 2) ℤ* pos 3                       ≡⟨ ap (_ℤ* pos 3) (pos-addition-equiv-to-ℕ k 2)                           ⟩ 
+      pos (k ℕ+ 2) ℤ* pos 3                           ≡⟨ by-definition                                                          ⟩
+      pos (succ (succ k)) ℤ* pos 3                    ≡⟨ denom-setup (succ k) 2 ⁻¹                                              ⟩
+      pos (succ (pred (succ (succ k) ℕ* 3)))          ≡⟨ ℤ-mult-left-id (pos (succ (pred (succ (succ k) ℕ* 3)))) ⁻¹             ⟩
       pos 1 ℤ* pos (succ (pred (succ (succ k) ℕ* 3))) ∎
 
 
-⟨2/3⟩^n-squeezed : Σ N ꞉ ℕ  , ((n : ℕ) → N ≤ n → (0f n ≤ (⟨2/3⟩^ n)) × ((⟨2/3⟩^ n) ≤ ⟨1/sn⟩ n))
+⟨2/3⟩^n-squeezed : Σ N ꞉ ℕ  , ((n : ℕ) → N ≤ n → (0f n ≤ (⟨2/3⟩^ n)) × (⟨2/3⟩^ n) ≤ ⟨1/sn⟩ n)
 ⟨2/3⟩^n-squeezed = 1 , I
  where
   γ : 0ℚ ≤ 2/3
@@ -282,9 +282,9 @@ limits-lemma k = k , I
  where
   I : 0ℚ < (⟨2/3⟩^ n)
   I = ⟨2/3⟩^n-positive n
-  II : 0ℚ < ((⟨2/3⟩^ n) * 2/3)
+  II : 0ℚ < (⟨2/3⟩^ n) * 2/3
   II = ℚ<-pos-multiplication-preserves-order (⟨2/3⟩^ n) 2/3 I (1 , refl)
-  III : (⟨2/3⟩^ n) * 2/3 ≡ ((⟨2/3⟩^ (succ n)))
+  III : (⟨2/3⟩^ n) * 2/3 ≡ (⟨2/3⟩^ (succ n))
   III = ⟨2/3⟩-to-mult fe n ⁻¹
 
 \end{code}
@@ -292,7 +292,7 @@ limits-lemma k = k , I
 We want to have a universal property for dependent types
 
 \begin{code}
-
+{-
 dependent-type-universal-property : {X : 𝓤 ̇} → (A B : X → 𝓤 ̇) → ((x : X) → A x × B x) → ((x : X) → A x) × ((x : X) → B x)
 dependent-type-universal-property A B f = (λ x → pr₁ (f x)) , (λ x → pr₂ (f x))
 
@@ -309,6 +309,7 @@ dependent-type-universal-property-equivalence A B = dependent-type-universal-pro
   III (f , g) x = f x , g x
   IV : III ∘ dependent-type-universal-property A B ∼ id
   IV _ = refl
+-}
 
 generalised-dependent-type-universal-property : {X : 𝓤 ̇} → (A : X → 𝓤 ̇) → (P : (x : X) → A x → 𝓤 ̇)
                                                           → (∀ x → Σ a ꞉ A x , P x a)
