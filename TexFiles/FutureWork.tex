@@ -1,0 +1,20 @@
+\documentclass[ProjectReport]{subfiles}
+
+\begin{document}
+
+\section{Future Work}
+
+When I started this project, the goal was to formalise the proof that the Dedekind Reals are a Complete Archimedean Ordered Field. I was not able to complete this goal wihtin the time period of the project, however I have formalised the proof that Reals are a group with respect to addition, and have two different avenues to add multiplication and finish the formalisation. Clearly, the initial extension of the project is to finish the formalisation. In the short term, I will continue working on the continuous extension theorem, which will provide a general framework for extending continuous functions and is more beneficial than a direct implementation of multiplication. If all else fails, I can implement multiplication directly, and prove the remaining field axioms. This will be a lengthy process, but the difficulty is related only to the amount of cases to consider, and I don't see any obstacles aside from time.
+
+\subsection{Exact Computation}
+
+Due to various choices of representation, my code does not have any claim to efficiency of computation. I have chosen representations of numbers that are conducive to writing nice \textit{proofs}. As an explicit example, there would be an added layer of difficulty to use a binary representation of natural numbers to formalise the reals. Using binary induction is possible, but adds complexity to proofs that are much simpler using natural induction. 
+
+As such, for the purpose of exact computation it would be prudent to have isomorphic representations which are more suitable for the purposes of efficient computation. A nice extension of this project would be to write these efficient representations, showing that they are isomorphic to my definitions, and provide an interface for exact computation of real numbers. This comes with comes with a guarantee of correctness of both precision of the real, and any algorithms used.
+
+Of course, exact computation will be slower than the heavily studied efficient algorithms for floating point arithmetic, but this is a small price to pay for guaranteed correctness, to whatever degree of precision you are interested in. 
+It will always be faster to approximate algorithms, but approximations of reals (or even rationals) will always introduce errors, which propagates throughout algorithms. 
+
+%TODO: Add another section here.
+
+\end{document}
