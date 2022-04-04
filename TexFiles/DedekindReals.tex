@@ -80,13 +80,13 @@ To tackle this problem, I used an idea from the same paper \cite[Proposition 11.
 
 %TODO ADD CODE FOR ARITHMETIC LOCATEDNESS%.
 
-The intuition behind Arithmetic Locatedness of the reals is that we can locate a real number $x$ to any degree of precision we wish. For any $epsilon > 0$, we can an interval $(p , q)$ with $x$ located somewhere in this interval. If we had Arithmetic Locatedness of the reals, then we could apply \cite[Lemma 11.16]{bauer_taylor_2009} to complete the addition operator. By writing Arithmetic Locatedness in Agda, leaving the proof as a hole, I managed to finish the implementation of addition directly.
+The intuition behind Arithmetic Locatedness of the reals is that we can locate a real number $x$ to any degree of precision we wish. For any $\epsilon > 0$, we can an interval $(p , q)$ with $x$ located somewhere in this interval. If we had Arithmetic Locatedness of the reals, then we could apply \cite[Lemma 11.16]{bauer_taylor_2009} to complete the addition operator. By writing Arithmetic Locatedness in Agda, leaving the proof as a hole, I managed to finish the implementation of addition directly.
 
 %TODO: Add code for addition, cleaned up
 
 The next step is clearly to prove that the reals are arithmetically located. A full discussion can be found later in this report, but for now it suffices to say that the first attempt was not successful. With the experience of implementing the embedding from \AgdaFunction{ℚ} to \AgdaFunction{ℝ}, and addition of reals sans the proof of arithmetic locatedness, I decided it was worth trying a different approach to implement the operations.
 
-\section{Extensions}
+\subsection{Extensions}
 
 Extensions of functions are an intuitive concept. Suppose we have sets $X, Y$ and $Z$, with $X \subset Y$, and a function $f : X \to Z$. A function $g : Y \to Z$ is considered an extension of $f$ if $g$ agrees with $f$ for every $x \in X$. We would like to implement addition, multiplication and inverses on the reals, and we notice that we already have these operations for reals, and that the rationals may be embedded in the reals. The question is, then, can we extend these functions from the rationals to the reals?
 
@@ -94,7 +94,7 @@ Extensions of functions are an intuitive concept. Suppose we have sets $X, Y$ an
 
 One study of extensions is ``McShane-Whitney extensions in constructive analysis" \cite{petrakis2020mcshane} which discusses more complicated extensions than I am interested in, and is a dense read for my current knowledge of constructive mathematics, but there is an topical note in the introduction that says ''general extension theorems are rare and usually have interesting topological consequences". 
 
-Usually by imposing some conditions on the function we want to extend, we can find a unique extension to the new space. In this section I will discuss two extensions. Martin provided me with a reference to Simmons, "Introduction to Topology and Modern Analysis", with the goal of working towards Theorem D, \cite[Page 78]{simmons1983introduction}. The theorem is as follows:
+Usually by imposing some conditions on the function we want to extend, we can find a unique extension to the new space. In this section I will discuss two extensions.My supervisor provided me with a reference to Simmons, "Introduction to Topology and Modern Analysis", with the goal of working towards Theorem D, \cite[Page 78]{simmons1983introduction}. The theorem is as follows:
 
 Let $X$ be a metric space, let $Y$ be a complete metric space, and let $A$ be a dense subspace of $X$. If f is a uniformly continuous mapping of $A$ into $Y$, then $f$ can be extended uniquely to a uniformly continuous mapping $g$ of $X$ into $Y$.
 
@@ -106,7 +106,7 @@ As a proof of the concept of the extension of functions, I will now discuss a di
 
 \subsection{Monotonic Extension Theorem}
 
-This theorem was suggested to me by Martin, who sketched out the proof for me in a Google Jamboard. If $f$ is rational valued function on the rationals, and $f$ is a monotonic function, and there exists a function $g$ where $f$ and $g$ are bijective, then there exists an unique extension $\hat{f}$ where $\hat{f}$ is a real valued function on the reals.
+This theorem was suggested to me by my supervisor, who sketched out the proof for me in a Google Jamboard. If $f$ is rational valued function on the rationals, and $f$ is a monotonic function, and there exists a function $g$ where $f$ and $g$ are bijective, then there exists an unique extension $\hat{f}$ where $\hat{f}$ is a real valued function on the reals.
 
 We begin by proving a lemma. If $f$ and $g$ are bijective, and $f$ is strictly monotone, then $g$ is strictly monotone.
 
@@ -122,9 +122,8 @@ And finally, we can prove that this function preserves the behaviour of $f$. Tha
 
 This proof of concept was successful, I proved that given a monotonic function with a bijection on the rationals, I can extend it to the reals. Of course, there is a reason that this is a proof of concept and not the end of the story; montonicity is a very strong condition. There are many functions which are not monotone, with multiplication being a particular example. This theorem is not strong enough for me to obtain the operations I need to prove that the Dedekind Reals are a field, and so we look back to the continuous extension theorem. Multiplication is continuous, so with that we should be able to extend multiplication of rationals to the reals.
 
-\subsection{Continuous Extension Theorem}
 
-As discussed before, in order to prove this theorem, it's first necessary to formalise every concept mentioned in the proof. We first turn out attention to metric spaces.
+As discussed before, in order to prove the continuous extension theorem, it's first necessary to formalise every concept included in the proof. We first turn our attention to metric spaces.
 
 \section{Metric Spaces}
 
@@ -142,29 +141,35 @@ Recalling the continuous extension theorem in Simmons, we require that both the 
 
 \subsection{Rationals Metric Space}
 
-I don't need to think too hard about a distance function for the rationals. Given $\epsilon > 0$, and $x , y \in \AgdaFunction{Q}$ we simply want to have the usual distance between $x$ and $y$ smaller than $\epsilon$. 
+The distance function for Rationals is taken to be the standard metric. Given $\epsilon > 0$, and $x , y \in \AgdaFunction{Q}$ we want to bound the standard distance between $x$ and $y$ smaller than $\epsilon$. 
 
 To define this, it was necessary to extend my implementation of the rationals to include absolute values, and formalise many properties of the absolute value function. 
 
 %TODO, add code for absolute value functions.
 
-With this, I can define the metric for the set of rationals, and prove that the rationals are a metric space with respect to the alternative axioms. As a side note, it would be nice in the future that the alternative definition of the metric space is equivalent to the standard definition. I had imagined that absolute values would be difficult to work with, but I found that the proofs were intuitive and this section of the project progressed nicely.
+With this, I can define the metric for the set of rationals, and prove that the rationals are a metric space with respect to the alternative axioms. It would be nice in the future to prove that the alternative definition of the metric space is equivalent to the standard definition. This is not necessary, and I think this stems from a desire to be similar to classical mathematics. 
+
+I had imagined that absolute values would be difficult to work with, but I found that the proofs were intuitive and this section of the project progressed nicely. One proof I found amusing is the proof that the absolute value functions is distributive over multiplication. There are a lot of proofs that you can \textit{see}, without having to refer to literature, but I could not figure out a way to prove this, and after consulting text books realising it requires a simple case analysis of the inputs.
 
 \subsection{Dedekind Reals Metric Space}
 
-The first thing we need is a distance function for the Dedekind Reals. Martin knew of a suitable distance function. We say that two reals are $\epsilon$-close if we can find a pair of rationals, one either side of each real such that the the distance between the furthest value on each side is less than $\epsilon$. 
+The first thing we need is a distance function for the Dedekind Reals. My supervisor knew of a suitable distance function. We say that two reals are $\epsilon$-close if we can find a pair of rationals, one either side of each real such that the the distance between the furthest value on each side is less than $\epsilon$. 
 
 %TODO: ADD CODE AND PICTURE HERE
 
 This definition is equivalent to the standard definition of the metric. The intuition behind the definition is that we locate the two reals to some level of precision, then the reals are at most as far as way as the bounds of the precision. For example, if $a < x < b$, and $c < y < d$, then $x$ and $y$ are within the interval $[min a c , max b d]$, so the difference between them is at most $| min a c - max b d |$.
 
-To define this metric, I first need the min and max operations on rational numbers. It was surprisingly difficult to formalise these operations. This was a case where working constructively complicated the implementation of the operations. 
+To define this metric, I first need the min and max operations on rational numbers. It was surprisingly difficult to formalise these operations. This was a case where working within type theory complicated the implementation of the operations. I wanted to define the operations using $<$ and $\leq$, and the fact that rationals number are trichotomous with respect to order. 
+
+%Add min max
+
+%Defining min and max in this way means that I need to prove properties of min and max by first 
 
 %https://github.com/adsneap/Reals/commit/96c706a0f3c60a81f2fb8e957aca9cf46abee08b#diff-ebfc21b3aa729aeacbde135384ac5e98f1878d8c588a1b74996f9940a01694e8R23
 
 %Not sure whether to talk about this more.
 
-It is left to prove that the reals are a metric space with respect to the above metric. The second and third conditions are easy to prove using order transitivity and commutativity of min and max. The other properties provided particular challenge. It turns out that to prove m1b for the reals, I needed to prove that the reals are arithmetically located, which I abandoned earlier in my work due to it's difficulty.
+It is left to prove that the reals are a metric space with respect to the above metric. The second and third conditions are easy to prove using order transitivity and commutativity of min and max. The other properties provided to be a particular challenge. It turns out that to prove m1b for the reals, I needed to prove that the reals are arithmetically located, which I abandoned earlier in my work due to it's difficulty.
 
 \subsubsection{Arithmetic Locatedness of Reals}
 
@@ -176,10 +181,80 @@ A naive approach might take one side, and move closer repeatedly using roundedne
 
 By trisecting the interval $(p,q)$, we obtain rationals $a,b$ with $p<a<b<q$, with each sub interval a third of the difference of the whole interval. By using locatedness of the interval, we see that $a < x$ or $b < x$. We now have a new interval, either $(p,b)$ or $(a,q)$, which is $2/3$ the size of the original interval. By repeatedly applying trisections, we will find an interval smaller than any arbitrary $\epsilon$. 
 
-
 %INCORRECT. NEED 2/3^n < \epsilon
-The crux of the proof relies on the following: given $a,\epsilon : \AgdaFunction{Q}$, with $a , \epsilon > 0$ there exists $n : N$ such that $\frac{2}{3}^n * a < \epsilon$. This statement is clearly true, but fiendishly difficult to prove. Martin suggested formalising logarithms, but after some initial work I decided that it would be too difficult for me to implement this way, and temporarily abandoned the proof while I worked on Metric Spaces. After realising that I need this proof for the work on metric spaces too, I turned to it my full attention. I asked one of my Maths Lecturers if it was possible to solve this without using logrithms, and he came up with a nice solution using the binomial expansion of $2/3$. This was a nice proof (as an exercise, try and prove the fact using binomial expansions!), but I still believed this proof would be too difficult to implement in Agda. After a lot of thought, I came up with a proof of my own, by using limits of sequences of Rational Numbers.
+The crux of the proof relies on the following: given $a,\epsilon : \AgdaFunction{Q}$, with $a , \epsilon > 0$ there exists $n : N$ such that $\frac{2}{3}^n * a < \epsilon$. This statement is clearly true, but fiendishly difficult to prove. My supervisor suggested formalising logarithms, but after some initial work I decided that it would be too difficult for me to implement this way, and I temporarily abandoned the proof while I worked on Metric Spaces. After realising that I need this proof for the work on metric spaces too, I turned to it my full attention. I asked one of my Maths Lecturers if it was possible to solve this without using logarithms, and he came up with a nice solution using the binomial expansion of $2/3$. This was a nice proof (as an exercise, try and prove the fact using binomial expansions!), but I still believed this proof would be too difficult to implement in Agda, since I would need to formalise summations and manipulations of sums. After a lot of thought, I came up with a proof of my own, by using limits of sequences of Rational Numbers.
 
+\subsubsection{Limits of Rational Sequences}
+
+Given the Metric Space defined above, the limit is defined as it is in classical mathematics. 
+
+%TODO Limit definition
+
+By proving the sandwich theorem by for sequences of rational numbers, I proved that result that I needed. There were several intermediate results needed. Trivially, the constant sequence which maps natural numbers to the rational number $0$ converges to $0$. 
+
+%TODO: AGDA CODE
+
+With some algebraic work, I proved that $0$ is the limit of the sequence defined by $S : N \to Q$ with $S(n) = \frac{1}{n+1}$. We cannot choose $1/n$, because unfortunately the first term of the sequence the sandwich only occurs when the sequence $\frac{1}{n}$ is shifted by one.
+
+%TODO: Add AGDA CODE
+
+Now, I prove that this sequence is indeed sandwiched by the constant $0$ sequence and $\frac{1}{n+1}$. A problem arose during the proof of this function. I haven't identified the exact cause, but for anything more than very simple inequalities of rational numbers, trying to compile the code results in an infinite hang. With thanks to de Jong, the solution is to put any offending inequalities into an abstract sub-proof. This prevents Agda from unfolding the proof, which speeds up type-checking. 
+
+This is enough to make the RationalsLimits file compile, but is not enough for some inequalities, and a further measure is required. By adding the a command line option to the Agda file: --experimental-lossy-unification \cite{lossy_unification}. Unfortunately, as the documentation describes, this is sound, but not complete. There are some expressions that no longer type-check that normally would with this option in place, however for my purposes it has allowed to compile files that otherwise don't. It is important to note that it doesn't allow anything to compile that shouldn't, so for now I view the necessity of the use of this option a limitation of Agda, and with more development on the language it may be be necessary to use the option in the future.
+
+With the proof that this sequence converges, I can now finish the proof that the Dedekind Reals are Arithmetically Located. I can locate any real to any degree of error, bounding it below and above by rational approximations of the real. This is a major result, I suspect one of the biggest results related to the Dedekind Reals, and I put it to immediate use.
+
+\subsubsection{Dedekind Reals Satisfy Axioms}
+
+A large portion of the project was spent on proving that the Dedekind Reals are a complete metric space. Due to the nature of proofs which involve the Dedekind Reals, the proofs are long, and certainly difficult to understand without a description of proof alongside the Agda code. Unfortunately, due to time constraints I have been unable to provide this for most of the proofs in this project, and I will reflect on this in the discussion section of this report.
+
+Conditions 2 and 3 are proved easily using properties of order and the metric for rational numbers. 
+
+%Agda Code for Metric Space
+
+Part b of property 1 follows easily from Arithmetic Locatedness of Reals.
+
+%Agda Code
+
+Part a of property 1 is more difficult, and requires a lot of algebraic manipulation. It also required me to learn how to prove that two reals are equal. Since reals are defined in terms of subsets of rational numbers, we need to determine when subsets of types are equal. Unfortunately, in this mathematical settings it is not possible to directly prove that two subsets are equal (unless they are definitionally equal). Similarly to function extensionality, we must postulate propositional extensionality.
+
+%AGDA CODE
+
+Given two propositions of a type, we can prove they are equal if we can establish an ``if and only if" relationship between inhabitants of the propositions. The Dedekind Reals are defined in terms of two subsets of rationals; the lower cut and the upper cut. Discussion within my supervisor resulted in a proof that allows me to establish equality of a Real, given that the lower subsets of each are equal. This is useful machinery to avoid duplicate code, since usually the proofs for the upper and lower cuts are symmetric.
+
+%AGDA CODE
+
+Now, it is possible to prove part a of property 1. 
+
+%AGDA CODE
+
+Property 4 was not an easy proof. I spent a long time trying to come up with an \textit{efficient} proof, since otherwise we have an explosion of cases, due to the use of min and max in the metric for Dedekind Reals. I did manage to the proof, but it is still very large. I suspect that it is possible to reduce the proof to a few lines, but in the interest of moving forward with the project I resorted to considering a lot of cases and directly proving each case. This results in a proof which is extremely difficult to read and follow, but as usual, since the proof type-checks it is certainly \textit{correct}.
+
+\subsubsection{Completeness of Metric Space}
+
+A complete metric space is a metric space in which every Cauchy sequence converges. The definition is encapsulated by the following types. 
+
+%Agda Code
+
+For the classical version of the CET, it is required that the target domain is a complete metric space. Assuming that I would need to have this assumption to prove the CET from rationals to Dedekind reals, I proved that the Dedekind reals are a complete metric space with respect to our chosen metric. 
+
+I use the approach of the HoTT book, which first defines a Cauchy approximation sequence, and provides a partial proof that every Cauchy approximation sequence has a limit \cite[Theorem 11.2.12]{hottbook}.
+
+%First, we define the limit. The idea is intuitive, 
+
+The proof states that ``it is clear that $L_y$ and $U_y$ are inhabited, rounded and disjoint". While it was clear the author, it wasn't so clear to me, and I couldn't find any reference to a complete version of this proof. I devised a proof for my own for roundedness, but owe thanks to Ambridge for help with the proof of inhabitedness, and de Jong for the proof of disjointness.
+
+For disjointness, it was helpful to prove a lemma, proving the equivalence of the two versions of disjointness in the definition of a Dedekind real. 
+
+%TODO: Agda code
+
+With the proof that this limit exists, it remains to show that it is indeed the limit of the Cauchy approximation sequence. This proof is given \cite{hottbook}, although due to my alternate definition of a metric space, I struggled to reformulate the proof for my own work. By slowly working through the proof on paper, I eventually managed to adapt it for my library.
+
+By proving that every Cauchy sequence has a modulus of convergence, and that every Cauchy sequence satisfies some Cauchy approximation sequence (with help from my supervisor), I completed the proof that the Reals are a complete metric space.
+
+- Continuous extension theorem (and possibilities)
+- Direct implementation of addition, group with respect to addition
+- Direct multiplication
 
 \end{document}
 

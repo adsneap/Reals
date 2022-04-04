@@ -5,13 +5,44 @@
 
 \section{Background}
 
-I am a fourth year student undertaking a Masters project. I also completed a project in my third year: \url{https://adsneap.github.io/CSProject}.
+\subsection{Personal Background}
 
-This project builds on my third year project, where I learned how to implement mathematical proofs in Agda. The secondary goal, which unfortunately was not achieved due to time constraints, was to show that the Dedekind Reals are a Dedekind-Complete Archimedean Ordered Field. I defined the Dedekind Reals, by first constructing the Integers and Rationals, but did not progress any further. Both projects are built on top of Martin Escardo's Type Topology library \cite{TypeTopology}.
+I am a fourth year student undertaking a 40 credit MSci project. I also completed a 40 credit project in my third year, as required for my joint Maths and Computer Science degree: \url{https://adsneap.github.io/CSProject}. In my third year project, I learned how to implement mathematical proofs in Agda. The secondary goal, which was not achieved due to time constraints, was to show that the Dedekind Reals are a Dedekind-Complete Archimedean Ordered Field. I defined the Dedekind Reals, by first constructing the Integers and Rationals, but did not progress any further. The project are built on top of Martin Escardo's Type Topology library \cite{TypeTopology}. I love working in the intersection of computer science and mathematics, and so formalising mathematics using type theory as the framework is very appealing to me, and the main reason I chose to continue working in this area.
 
-This library is written in the dependently type programming language Agda. Similarly to Coq and Lean, Agda may be used as a proof assistant, however for my work I prefer to view it as a tool for proof verification. When building a library, certainly many of the initial proofs may be auto-solved by Agda, but in my experience asking Agda to look for a proof results in an indefinite hang due to the size of the terms I am working with. If Agda compiles the code, then I can sure that the proofs I am writing is correct up to the interpretation of the types I write, but I cannot rely on Agda to auto-generate proofs for me.
+\subsection{Agda}
 
+This library is written in the dependently type programming language Agda. Similarly to Coq and Lean, Agda may be used as a proof assistant. At it's core, Agda is a functional programming language. A computer scientist with Haskell experience will find Agda to be very familiar. Like Haskell, Agda is strongly typed, however Agda differs from Haskell in that it allows for dependent types. Consequently, Agda is a suitable language for proving mathematical theorems. 
 
+Given a mathematical statement, we can write is as a Type, and the function which produces an output of that Type can be seen as a proof that Type. Dependent Types give us the flexibility to express properties of programs \cite{AgdaDependentTypes}. Strong typing means that there is no room for ambiguity. It is enforced that every term has a Type, so there is no scope for problematic calls to functions with inputs of inappropriate types. These two properties of Agda together are powerful. We can write programs which compute values according to our specification, and the output values must conform the specification. 
 
+To give an explicit example, we can write the specification that a list is sorted. In Haskell, you can write a function which sorts a list, but in Agda we can go further and \textit{prove} that the function sorts the list, (i.e it conforms to the specification). This extends, of course, to mathematical statements. We can write the statement ``there exists a natural number between 70 and 100, which is divisible by 24" as a Type, and a proof of this statement gives an algorithm for finding such a number, and moreover it is guaranteed to be correct. 
+
+In this project, I am building on top of my supervisor's Type Topology library, which is a library of ``Various new theorems in univalent mathematics written in Agda" \cite{TypeTopology}. The library is deliberately minimal and assumes as little as possible for each proof, using ``principles of HoTT/UF, \ldots and classical mathematics as explicit assumptions for the theorems \ldots that require them." In some sense, this library provides me with the mathematical language in which I write my proofs. I write proofs in Agda, in MLTT, and by the Curry-Howard correspondence we have the mathematical interpretation of the proofs.  The next section serves as an brief introduction to the types I use in my work, and their analogous object in mathematics.
+
+\subsection{Mathematics in Type Theory}
+
+In type theory, every object has a type. We declare types in the following way:
+
+\TypeExample
+
+The type \AgdaDatatype{ℤ} defines the integers. The integers live in the lowest universe, which in TypeTopology is denoted by U0 {TODO : ADD COMMAND FOR U0}. A universe is a type whose elements are also types. There are two constructors, \AgdaInductiveConstructor{pos} and \AgdaInductiveConstructor{negsucc} which are functions that allow us to construct Integers. For example, by applying the natural number \AgdaInductiveConstructor{zero} to the function \AgdaInductiveConstructor{pos}, we obtain the integer \AgdaInductiveConstructor{pos}\AgdaSpace\AgdaInductiveConstructor{zero} which has type \AgdaDatatype{ℤ}, denoted as
+\AgdaInductiveConstructor{pos zero}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaPrimitive{ℤ}.
+
+I will now introduce the types that correspond to the language of mathematics, described by the Curry-Howard correspondence. 
+
+In type theory, a mathematical statement can be written as a type, or more explicitly propositions are types. Not all types are propositions, however, so it must be proven that a given type is a proposition. This amounts to proving that a proof of the type is unique. 
+
+-- Unit
+-- Empty
+-- Sigma
+-- Function Extensionality
+-- Prop Ext
+-- Prop Trunc
+
+\begin{comment}
+When building a library, certainly many of the initial proofs may be auto-solved by Agda, but in my experience asking Agda to look for a proof results in an indefinite hang due to the size of the terms I am working with. If Agda compiles the code, then I can sure that the proofs I am writing is correct up to the interpretation of the types I write, but I cannot rely on Agda to auto-generate proofs for me.
+\end{comment}
 
 \end{document}

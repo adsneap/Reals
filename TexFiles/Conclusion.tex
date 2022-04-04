@@ -1,0 +1,25 @@
+\documentclass[ProjectReport]{subfiles}
+
+\begin{document}
+
+\section{Conclusion}
+
+The initial goal of this project was to formalise the complete ordered Archimedean field in Agda. After initial direct attempts at defining operations with Dedekind Real domains, it became clear that formalisation involving reals is laborious, since we must prove that the four conditions of a Dedekind Cut are satisfied. As such, the scope became wider, in a search to find an approach which avoided direct implementation.
+
+The Continuous Extension Theorem was identified by my supervisor as a candidate alternative, but although extension theorems have been widely studied, it is not easy to find constructive proofs applicable to my own work. Hence, I formalised Metrics Spaces, using an alternative definition which avoids the use of Reals, and proved that the Dedekind Reals and Rationals are Metric Spaces. This required formalising more operators of rationals and their properties, including the min, max and absolute value operations. It also required the particularly challenging proof that the Reals are Arithmetically Located, which I worked on over the course of the project, and finally proved using the sandwich theorem for sequences of rationals numbers.
+
+I proved that the Reals are a Complete Metric Space, which was the second most challenging proof in this project. In particular, proving that the limit of a Cauchy sequence satisfies disjointedness took weeks of thought, and assistance from Escardo, Ambridge and de Jong, even though it is claimed that is ``is clear" that it is disjoint \cite[Theorem.11.2.12]{hottbook}.
+
+Over the course of this project, I have developed a deeper appreciation of the importance of clean code. This is important for any form of code, but of particular importance when the code is a proof. While it may be true that the proofs in this project \textit{correct}, it doesn't serve any pedagogical purpose if it is difficult to understand the idea behind the proof. I believe the cleanliness of the code should be on the same pedestal as the correctness. If the code is not self-documenting, then a description in mathematical prose should be provided. At various points in the project I became frustrated because I couldn't understand a proof in literature (or the proof wasn't given), and there is no excuse to pass on this frustration to readers of my own code. 
+
+I have also appreciated experimenting with my work flow, trying to work on different proofs when I am finding a particular one too difficult. Unfortunately, I fell back into this trap at the end of the project, working on the continuous extension theorem for too long, and making only small incremental progress. I realise that I need to make concerted efforts to acknowledge more precisely the best time to work on a different problem, to be more productive with my time.
+
+I discussed the concept of minimal hypothesis, and how I let go the notion that my work should be ``mathematically pure" in favour of elegance and readability of proofs.
+
+I have discussed the potential avenues for extensions of this project. The efficiency of computation with reals is particularly interesting to me, and I would like to explore implementing efficient representations of Naturals, Integers and Rationals, to investigate the impact of exact computation on efficiency, compared floating point arithmetic. Another area of interest of mine is formalise the Cauchy Reals, and show that they can be embedded in the Dedekind Reals, with inspiration from the HoTT Book \cite[Section 11.3]{hottbook}.
+
+More generally, I am excited to discover more applications of my project, and in particular topological explorations of the Reals, and how they may be used and understood in the the context of Homotopy Type Theory.
+
+I would like to thank Martin Escardo, Todd Waugh Ambridge and Tom de Jong, for helping to me learn and understand the ideas behind many of the proofs in this project, and sketching pen and paper proofs for me to implement in Agda.
+
+\end{document}
