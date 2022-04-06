@@ -123,8 +123,8 @@ HCF = course-of-values-induction (λ n → (b : ℕ) → Σ h ꞉ ℕ , is-hcf h
         ii f ((α , αₚ) , β , βₚ) = γ f ((hcflemma f β (q * α) r e₂) , (α , αₚ))
          where
           e₂ : f * β ≡ f * (q * α) + r
-          e₂ = f * β           ≡⟨ βₚ                                             ⟩
-               b               ≡⟨ e₀                                             ⟩
+          e₂ = f * β           ≡⟨ βₚ                                            ⟩
+               b               ≡⟨ e₀                                            ⟩
                q * succ n + r  ≡⟨ ap (λ z → q * z + r) (αₚ ⁻¹)                  ⟩
                q * (f * α) + r ≡⟨ ap (_+ r) (mult-associativity q f α ⁻¹)       ⟩
                q * f * α + r   ≡⟨ ap (λ z → z * α + r) (mult-commutativity q f) ⟩

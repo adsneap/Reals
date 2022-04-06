@@ -41,7 +41,7 @@ x *ℝ y  = (L , R) , {!!}
   R q = (∃ (a , b , c , d) ꞉ ℚ × ℚ × ℚ × ℚ , a < x × x < b × c < y × y < d × max₄ (a * c) (a * d) (b * c) (b * d) < q) , ∃-is-prop
 
 
-infixl 30 _*ℝ_
+infixl 31 _*ℝ_
 
 ℝ*-comm : (x y : ℝ) → x *ℝ y ≡ y *ℝ x
 ℝ*-comm x y = ℝ-equality-from-left-cut' (x *ℝ y) (y *ℝ x) left right
@@ -63,8 +63,19 @@ infixl 30 _*ℝ_
             min₄ (c * a) (c * b) (a * d) (d * b)            ≡⟨ ap (λ α → min₄ (c * a) (c * b) α (d * b)) (ℚ*-comm a d)           ⟩   
             min₄ (c * a) (c * b) (d * a) (d * b)            ∎
             
-  left : (p : ℚ) → p < (x *ℝ y) → p < (y *ℝ x)
+  left : (p : ℚ) → p < x *ℝ y → p < y *ℝ x
   left p = ∥∥-functor (generalised x y p)
               
-  right : (p : ℚ) → p < (y *ℝ x) → p < (x *ℝ y)
+  right : (p : ℚ) → p < y *ℝ x → p < x *ℝ y
   right p = ∥∥-functor (generalised y x p)
+
+ℝ*-assoc : (x y z : ℝ) → x *ℝ y *ℝ z ≡ x *ℝ (y *ℝ z)
+ℝ*-assoc x y z = ℝ-equality-from-left-cut' (x *ℝ y *ℝ z) (x *ℝ (y *ℝ z)) left right
+ where
+  left : (p : ℚ) → p < x *ℝ y *ℝ z → p < x *ℝ (y *ℝ z)
+  left p = ∥∥-functor I
+   where
+    I : {!!}
+    I = {!!}
+  right : {!!}
+  right = {!!}

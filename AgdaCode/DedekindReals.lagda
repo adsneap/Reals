@@ -329,4 +329,7 @@ instance
 ℝ-equality-from-left-cut' : (((Lx , Rx) , isCutx) ((Ly , Ry) , isCuty) : ℝ) → Lx ⊆ Ly → Ly ⊆ Lx → ((Lx , Rx) , isCutx) ≡ ((Ly , Ry) , isCuty)
 ℝ-equality-from-left-cut' x y s t = ℝ-equality-from-left-cut x y (subset-extensionality pe fe s t)
 
+type-of-locator-for-reals : Set₁
+type-of-locator-for-reals = (x : ℝ) → (p q : ℚ) → p < x ∔ x < q
+
 \end{code}

@@ -49,7 +49,7 @@ import FieldAxioms
 import Rationals
 import RationalsAbs
 import RationalsAddition
-import RationalsExtension
+-- import RationalsExtension
 import RationalsField
 import RationalsLimits
 import RationalsMinMax

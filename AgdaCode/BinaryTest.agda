@@ -2,5 +2,6 @@
 
 open import SpartanMLTT
 
-data βℕ : ? where
+data βℕ : {!!} where
+ 
 

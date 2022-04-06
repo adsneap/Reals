@@ -83,8 +83,11 @@ addition-associativity-lemma x y u v = x + y + (u + v) ≡⟨ addition-associati
                                        x + y + u + v   ∎
 
 distributivity-mult-over-nat' : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
-distributivity-mult-over-nat' x y = induction refl step
+distributivity-mult-over-nat' x y = induction base step
  where
+  base : (x + y) * 0 ≡ x * 0 + y * 0
+  base = refl
+  
   step : (k : ℕ)
        → (x + y) * k      ≡ x * k + y * k
        → (x + y) * succ k ≡ x * succ k + y * succ k

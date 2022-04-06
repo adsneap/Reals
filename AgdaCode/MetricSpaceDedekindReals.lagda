@@ -53,7 +53,7 @@ B-ℝ-ε-transport x y ε ε' e l₁ l₂ = ∥∥-functor I
     → Σ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε' l₂
   I ((p , q , u , v) , pLx , uLy , qRx , vRy , B) = ((p , q , u , v) , pLx , uLy , qRx , vRy , transport (ℚ-metric (min p u) (max q v) <_) e B)
 
-ℝ-m1a-lemma : (((Lx , Rx) , _) ((Ly , Ry) , _) : ℝ) → ((ε : ℚ) → (ε>0 : 0ℚ < ε) → ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p ∈ Lx × u ∈ Ly × q ∈ Rx × v ∈ Ry × B-ℚ (min p u) (max q v) ε ε>0) → Lx ⊆ Ly
+ℝ-m1a-lemma : (x y : ℝ) → ((ε : ℚ) → (ε>0 : 0ℚ < ε) → ∃ (p , q , u , v) ꞉ ℚ × ℚ × ℚ × ℚ , p < x × u < y × x < q × y < v × B-ℚ (min p u) (max q v) ε ε>0) → lower-cut-of x ⊆ lower-cut-of y
 ℝ-m1a-lemma ((Lx , Rx) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x) ((Ly , Ry) , inhabited-left-y , inhabited-right-y , rounded-left-y , rounded-right-y , disjoint-y , located-y) f k kLx = ∥∥-rec Ly-is-prop α obtain-k'
  where
   Ly-is-prop : is-prop (k ∈ Ly)
@@ -902,7 +902,6 @@ mod-convergence-property S RCS (M , f) (ε , l₁) (δ , l₂) = B-ℝ-ε-transp
                 (3/4 + 1/4) * ε             ≡⟨ ap (_* ε) (ℚ+-comm 3/4 1/4 ∙ 1/4+3/4 fe) ⟩
                 1ℚ * ε                      ≡⟨ ℚ-mult-left-id fe ε ⟩
                 ε ∎
-
 
 ℝ-complete-metric-space : complete-metric-space ℝ
 ℝ-complete-metric-space = ℝ-metric-space , ℝ-cauchy-sequences-are-convergent

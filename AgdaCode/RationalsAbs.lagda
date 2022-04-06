@@ -17,11 +17,12 @@ open import IntegersMultiplication renaming (_*_ to _ℤ*_)
 open import IntegersOrder 
 open import NaturalsMultiplication renaming (_*_ to _ℕ*_)
 open import ncRationals
-open import ncRationalsOperations renaming (abs to ℚₙ-abs) renaming (-_ to ℚₙ-_) hiding (_+_)
+open import ncRationalsOperations renaming (abs to ℚₙ-abs) renaming (-_ to ℚₙ-_) hiding (_+_) hiding (_*_)
 open import Rationals
 open import RationalsAddition
 open import RationalsNegation
 open import RationalsOrder
+open import RationalsMultiplication
 
 module RationalsAbs where
 
@@ -309,6 +310,85 @@ pos-abs-no-increase fe q ε (l₁ , l₂) = IV
   III : - ε < q
   III = ℚ<-trans (- ε) 0ℚ q II l₁
   IV : abs q < ε
-  IV = ℚ<-to-abs fe q ε (III , l₂) 
+  IV = ℚ<-to-abs fe q ε (III , l₂)
+
+abs-mult : Fun-Ext → (x y : ℚ) → abs x * abs y ≡ abs (x * y)
+abs-mult fe x y = case-split (ℚ-dichotomous' fe x 0ℚ) (ℚ-dichotomous' fe y 0ℚ)
+ where
+  case1 : 0ℚ ≤ x → 0ℚ ≤ y → abs x * abs y ≡ abs (x * y)
+  case1 l₁ l₂ = abs x * abs y  ≡⟨ ap (_* abs y) (abs-of-pos-is-pos fe x l₁)                                         ⟩
+                x * abs y      ≡⟨ ap (x *_) (abs-of-pos-is-pos fe y l₂)                                             ⟩
+                x * y          ≡⟨ abs-of-pos-is-pos fe (x * y) (ℚ≤-pos-multiplication-preserves-order x y l₁ l₂) ⁻¹ ⟩
+                abs (x * y)    ∎
+
+  case2 : (0ℚ > x) → (0ℚ > y) → abs x * abs y ≡ abs (x * y)
+  case2 l₁ l₂ = goal
+   where
+    0<-x : 0ℚ < - x
+    0<-x = ℚ<-swap'' fe x l₁
+    0<-y : 0ℚ < - y
+    0<-y = ℚ<-swap'' fe y l₂
+
+    remove-negatives : (- x) * (- y) ≡ x * y
+    remove-negatives = (- x) * (- y)     ≡⟨ ℚ-subtraction-dist-over-mult fe x (- y)     ⟩
+                       - x * (- y)       ≡⟨ ap -_ (ℚ*-comm x (- y))                     ⟩
+                       - (- y) * x       ≡⟨ ap -_ (ℚ-subtraction-dist-over-mult fe y x) ⟩
+                       - (- y * x)       ≡⟨ ℚ-minus-minus fe (y * x) ⁻¹                 ⟩
+                       y * x             ≡⟨ ℚ*-comm y x                                 ⟩
+                       x * y             ∎
+
+    0<x*y : 0ℚ < x * y
+    0<x*y = transport (0ℚ <_) remove-negatives (ℚ<-pos-multiplication-preserves-order (- x) (- y) 0<-x 0<-y)
+    
+    goal : abs x * abs y ≡ abs (x * y)
+    goal = abs x * abs y     ≡⟨ ap (_* abs y) (ℚ-abs-neg-equals-pos fe x)        ⟩
+           abs (- x) * abs y ≡⟨ ap (_* abs y) (abs-of-pos-is-pos' fe (- x) 0<-x) ⟩
+           (- x) * abs y     ≡⟨ ap ((- x) *_) (ℚ-abs-neg-equals-pos fe y)        ⟩
+           (- x) * abs (- y) ≡⟨ ap ((- x) *_) (abs-of-pos-is-pos' fe (- y) 0<-y) ⟩
+           (- x) * (- y)     ≡⟨ remove-negatives                                 ⟩
+           x * y             ≡⟨ abs-of-pos-is-pos' fe (x * y) 0<x*y ⁻¹           ⟩
+           abs (x * y)       ∎
+
+  case3 : (a b : ℚ) → 0ℚ ≤ a → b < 0ℚ → abs a * abs b ≡ abs (a * b)
+  case3 a b l₁ l₂ = abs a * abs b ≡⟨ ap (_* abs b) (abs-of-pos-is-pos fe a l₁)                   ⟩
+                    a * abs b     ≡⟨ ap (a *_) (ℚ-abs-neg-equals-pos fe b)                       ⟩
+                    a * abs (- b) ≡⟨ ap (a *_) (abs-of-pos-is-pos' fe (- b) (ℚ<-swap'' fe b l₂)) ⟩
+                    a * (- b)     ≡⟨ ℚ*-comm a (- b)                                             ⟩
+                    (- b) * a     ≡⟨ ℚ-subtraction-dist-over-mult fe b a                         ⟩
+                    - b * a       ≡⟨ ap -_ (ℚ*-comm b a)                                         ⟩
+                    - a * b       ≡⟨ abs-of-pos-is-pos fe (- a * b) (ℚ≤-swap' fe (a * b) I) ⁻¹   ⟩
+                    abs (- a * b) ≡⟨ ℚ-abs-neg-equals-pos fe (a * b) ⁻¹                          ⟩
+                    abs (a * b)   ∎
+
+   where
+    first : 0ℚ ≤ - b
+    first = ℚ≤-swap' fe b (ℚ<-coarser-than-≤ b 0ℚ l₂)
+    second : 0ℚ ≤ a * (- b)
+    second = ℚ≤-pos-multiplication-preserves-order a (- b) l₁ first
+    third : - (a * (- b)) ≤ - 0ℚ
+    third = ℚ≤-swap fe 0ℚ (a * (- b)) second
+    I : a * b ≤ 0ℚ
+    I = transport₂ _≤_ II ℚ-minus-zero-is-zero third
+     where
+      II : - (a * (- b)) ≡ a * b
+      II = - a * (- b) ≡⟨ ap -_ (ℚ*-comm a (- b))                     ⟩
+           - (- b) * a ≡⟨ ap -_ (ℚ-subtraction-dist-over-mult fe b a) ⟩
+           - (- b * a) ≡⟨ ℚ-minus-minus fe (b * a) ⁻¹                 ⟩
+           b * a       ≡⟨ ℚ*-comm b a                                 ⟩
+           a * b       ∎
+
+  case-split : x < 0ℚ ∔ 0ℚ ≤ x → y < 0ℚ ∔ 0ℚ ≤ y → abs x * abs y ≡ abs (x * y)
+  case-split (inl l₁) (inl l₂) = case2 l₁ l₂
+  case-split (inl l₁) (inr l₂) = goal
+   where
+    goal : abs x * abs y ≡ abs (x * y)
+    goal = abs x * abs y ≡⟨ ℚ*-comm (abs x) (abs y) ⟩
+           abs y * abs x ≡⟨ case3 y x l₂ l₁         ⟩
+           abs (y * x)   ≡⟨ ap abs (ℚ*-comm y x)    ⟩
+           abs (x * y)   ∎
+  case-split (inr l₁) (inl l₂) = case3 x y l₁ l₂
+  case-split (inr l₁) (inr l₂) = case1 l₁ l₂
+
+
 
 \end{code}

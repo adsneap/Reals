@@ -34,7 +34,7 @@ open import MetricSpaceRationals fe pt pe
 open import MetricSpaceAltDef pt fe pe
 
 _limit-of_ : (L : ℚ) → (f : ℕ → ℚ) → 𝓤₀ ̇
-L limit-of f = ∀ (ε : ℚ) → 0ℚ < ε → Σ N ꞉ ℕ , ((n : ℕ) → N ≤ n → ℚ-metric  (f n) L < ε)
+L limit-of f = ∀ (ε : ℚ) → 0ℚ < ε → Σ N ꞉ ℕ , ((n : ℕ) → N ≤ n → ℚ-metric (f n) L < ε)
 
 sandwich-theorem : (L : ℚ) → (f g h : ℕ → ℚ) → (Σ k ꞉ ℕ , ((k' : ℕ) → k ≤ k' → f k' ≤ g k' × g k' ≤ h k')) →  L limit-of f → L limit-of h → L limit-of g
 sandwich-theorem L f g h (k , k-greater) lim-f lim-h = lim-g
@@ -230,7 +230,7 @@ limits-lemma k = k , I
  where
   γ : 0ℚ ≤ 2/3
   γ = toℚ-≤ (pos 0 , 0) (pos 2 , 2) (2 , by-definition)
-  I : (n : ℕ) → 1 ≤ n → (0f n ≤ (⟨2/3⟩^ n)) × ((⟨2/3⟩^ n) ≤ ⟨1/sn⟩ n)
+  I  : (n : ℕ) → 1 ≤ n → (0f n ≤ (⟨2/3⟩^ n)) × ((⟨2/3⟩^ n) ≤ ⟨1/sn⟩ n)
   I 0 l = 𝟘-elim l
   I (succ n) l = II , III
    where
