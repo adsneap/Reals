@@ -1,0 +1,47 @@
+\documentclass[ProjectReport]{subfiles}
+
+\begin{document}
+
+\section{Discussion}
+
+\subsection{Progress}
+Over the course of this project, I have formalised a large amount of work on this constructive library for Dedekind Reals. I have proven that the Dedekind Reals are a complete metric space, and the rationals are a metric space. I have shown that monotonic functions with rational domain and codomains can be extended to functions with real domain and codomains. I have built the framework to prove that continuous functions can also be extended. I have defined and shown that addition of reals is a group. I have defined order of reals and proved properties of order of real numbers. I have defined the limit of sequences of rationals, and proved the sandwich theorem for such sequences. I have proved that the reals are arithmetically located. In order to prove that the Reals are a complete metric space, I defined Cauchy and convergent sequences, and proved that every Cauchy sequence of real numbers converges to a limit.
+
+\subsection{Code Quality}
+My first major observation throughout this project is that the \textit{quality} of my code has been an issue. A mathematician can look at a proof and have a sense of the cleanliness of a proof. When working interactively using a proof assistant, you build up a proof the same way you would build one on paper. Sometimes you are working on a proof and require a lemma, so you prove the lemma and use that to finish your proof. Some proofs require many lemmas. The key difference is at the end, you write up your proofs in a way that clear and legible, which is important for two reasons; you want to be able to understand your work when you read over it, and you want other people to be able to understand the proof. In Agda, it is easy to prove a lemma without the usual level of elegance with which one would write a proof, and then move on, forgetting to clean up the code.
+
+For some, this may not be a problem. Recalling that in this context, \textit{proofs} are \textit{programs}, an end user might only care that the program is correct. If you write a program with the right type, and it type-checks, an end user might not care about specific implementations of the program, as long it as it correct. If the code is not presentable, it is much harder to go back and read the proof, to try and remember the ideas behind the proof, not only for the write but anybody trying to learn from the work. By making the mistake of not keeping my code clean throughout the project, there have been various occasions, for example to have presentable code for this report, where I have had to rewrite proofs, and this can be just as difficult as writing the proof in the first place if the methods you employed are not clear. 
+
+With this in mind, I have developed a deeper appreciation of clean code throughout this project. Writing code is an art form, and it is easy to be too focused on the bigger picture, forgetting about the smaller details which hold the picture together.
+
+\subsection{Prioritisation}
+
+Throughout the project, I have had a tendency to try and work on something difficult for longer than I should. For example, I spent a few weeks early in the project trying to prove the Arithmetic Locatedness of the Reals. This was not a fruitful endeavor, I had to abandon the attempt. I believe it would have been more productive to focus my work elsewhere sooner. As it turned out, I had to come back to this proof, and with a bit more experience working with the reals I was able to return to the problem and find a solution. 
+One might argue that this was only possible because of my prior work, and the perspective you gain by considering a problem for a long time. I would agree with this to an extent, but I think there is a critical point where you should switch to working on a different problem. Each time I began working on a different problem throughout this project, I would make progress. 
+
+There is a good reason why this is a difficult balance. Working on proofs tends to be a sequential process, so working on something else usually means assuming that what you are currently working on is correct. It is entirely feasible to postulate proofs (by leaving it as a hole in Agda), and it turns out that it is not possible to prove it. As a result, I have been reluctant to jump ahead of difficult proofs. An area of improvement for me is to more swiftly identify when I should stop working a problem, and work productively on a different problem.
+
+\subsection{Identifying Proofs}
+
+At the heart of formalising mathematics is \textit{choosing} (if there is a choice) the best approach. I have found that constructive analysis has been particularly challenging. Certainly there has been a wealth of work on constructive analysis (see \cite{troelstra1988constructivism} or \cite{Bishop1987-BISCA-2}), but this work tends to be from a purely mathematical perspective, without references to Type Theory. As such, most of the proofs in my work have been constructed ``in my own words", sometimes using \textit{ideas} from proofs found in literature. An egregious example can be seen in the \cite[TODO : CITE PROPERLY]{hottbook}, which states the definition of a proof, claiming that ``it is clear that"
+%TODO clean up
+
+Unfortunately, it was not so clear to me, and it took a few weeks for me to work through the proof, with help from Todd, and Tom de Jong who suggested a strategy for proving the disjointedness of the limit of Cauchy sequences. It can be frustrating to not understand a proof, whilst knowing that it can be solved. 
+
+On the other hand, it is extremely satisfying to write a proof which you have constructed on your own. I am very proud of my proof that there exists some $n$ such that $(\frac{2}{3})^n < p$ for any positive $p$. As I mentioned previously, I had multiple suggestions, but eventually came up with my own strategy using the sandwich theorem. It is satisfying regardless to construct a proof based on ideas found in literature, but even more so when develop the proof completely on your own, and prove that your idea for the proof is correct. 
+
+\subsection{Minimal Hypotheses}
+
+In my last report, I talked about the concept of assuming the absolute minimal required in order to prove a mathematical lemma, or theorem. Mathematically speaking, a theorem is stronger when it requires fewer assumptions, because it is then applicable to more situations. As such, a ``perfect" development would prioritise assuming the minimal hypothesis for each and every proof. 
+
+Consider now a proof which I updated over the course of this new project. Originally, I formulated and \href{https://adsneap.github.io/CSProject/Rationals.html#27337}{proved it without the use of function extensionality}. 
+
+%Insert the updated code here.
+
+It is appreciable not only how the readability increases, but how it is much easier to understand how the proof works. The drawback is that in order to write the proof in the above way, I am required to assume function extensionality. In the first variation, there is an amalgamation of algebraic manipulation of Integers, without a clear reason why this is necessary, whereas in the updated proof it is clear exactly what the chosen point is, and how it is proved that is is between the two arbitrary rationals. 
+
+Previously, I believed that the development should be ``pure", and that every proof should only assume what is absolutely necessary to complete the proof, but after discovering situations such as the above, I find myself leaning towards the side of elegance. There is an argument to be made that assuming more than is necessary is anti-construcivist. 
+
+My belief that for the purposes of this project, it is not so important that my specific implementation of certain proofs involving rationals assumes function extensionality. Firstly, the rationals were built with the intention of being used for the Dedekind Reals, which requires liberal use of function extensionality, and is globally assumed in files which use the Reals. Secondly, is it unlikely that these rationals will be used outside the context of the Dedekind Reals. If I needed another version which explicitly excluded function extensionality, I could trivially formalise them, but for scope of this project, and for the purpose of elegance, I deemed it unnecessary.
+
+\end{document}
