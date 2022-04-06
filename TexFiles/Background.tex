@@ -19,7 +19,7 @@ Mathematical statements are represented by types, and functions which produce an
 
 To give an explicit example, we can write the specification that a list is sorted. In Haskell, you can write a function which sorts a list, but in Agda we can go further and \textit{prove} that the function sorts the list. This extends to mathematical statements. We can write the statement ``there exists a natural number between 70 and 100, which is divisible by 24" as a type, and a proof of this statement gives an algorithm for finding such a number which is guaranteed to be correct.
 
-In this project, I am building on top of my supervisor's Type Topology library, which is a library of ``various new theorems in univalent mathematics written in Agda" \cite{TypeTopology}. The library is deliberately minimal and assumes as little as possible for each proof, using ``principles of HoTT/UF, \ldots and classical mathematics as explicit assumptions for the theorems \ldots that require them". This library provides me with the mathematical language in which I write my proofs. I write proofs in Agda, in MLTT, and by the Curry-Howard correspondence we have the mathematical interpretation of the proofs.  The next section serves as an brief introduction to the types I use in my work, and their analogous object in mathematics, as described the mentioned correspondence.
+In this project, I am building on top of my supervisor's Type Topology library, which is a library of ``various new theorems in univalent mathematics written in Agda" \cite{TypeTopology}. The library is deliberately minimal and assumes as little as possible for each proof, using ``principles of HoTT/UF, \ldots and classical mathematics as explicit assumptions for the theorems \ldots that require them". This library provides me with the mathematical language in which I write my proofs. I write proofs in Agda, in MLTT. By the Curry-Howard correspondence, we have a mathematical interpretation of the proofs.
 
 \subsection{Mathematics in Type Theory}
 
@@ -27,21 +27,36 @@ In type theory, every object has a type. We declare types in the following way:
 
 \TypeExample
 
-The type \AgdaDatatype{ℤ} defines the integers. The integers live in the lowest universe, which in TypeTopology is denoted by U0 {TODO : ADD COMMAND FOR U0}. A universe is a type whose elements are also types. There are two constructors, \AgdaInductiveConstructor{pos} and \AgdaInductiveConstructor{negsucc} which are functions that allow us to construct Integers. For example, by applying the natural number \AgdaInductiveConstructor{zero} to the function \AgdaInductiveConstructor{pos}, we obtain the integer \AgdaInductiveConstructor{pos}\AgdaSpace\AgdaInductiveConstructor{zero} which has type \AgdaDatatype{ℤ}, denoted as
+The type \AgdaDatatype{ℤ} defines the integers. There are two constructors, \AgdaInductiveConstructor{pos} and \AgdaInductiveConstructor{negsucc} which are functions that allow us to construct integers. For example, by applying the natural number \AgdaInductiveConstructor{zero} to the function \AgdaInductiveConstructor{pos}, we obtain the integer \AgdaInductiveConstructor{pos}\AgdaSpace\AgdaInductiveConstructor{zero} which has type \AgdaDatatype{ℤ}, denoted as
 \AgdaInductiveConstructor{pos zero}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
 \AgdaPrimitive{ℤ}.
+The integers live in the lowest universe, which in TypeTopology is denoted by \AgdaDatatype{$\mathcal{U}_0$}. Universes are sometimes called Set. A universe is a type whose elements are also types.
 
 I will now introduce the types that correspond to the language of mathematics, described by the Curry-Howard correspondence. 
 
-In type theory, a mathematical statement can be written as a type, or more explicitly propositions are types. Not all types are propositions, however, so it must be proven that a given type is a proposition. This amounts to proving that a proof of the type is unique. 
+\begin{itemize}
+    \item The unit type \AgdaOne \ has a unique element \AgdaStar \ \AgdaSymbol{:} \AgdaOne. We can interpret this type as an      encoding of truth. 
+    \item The empty type \AgdaZero \ has no inhabitants. A function \AgdaFunction{not-true} \AgdaSymbol{:} A \to \ \AgdaZero \ is a proof that the type A has no inhabitants. If it is a statement, it is a proof that the statement is not true.
+    \item The plus type \AgdaPlus \ which has two constructors, \AgdaInductiveConstructor{inl} \AgdaSymbol{:} X \to \ X \AgdaPlusA \ Y, and \AgdaInductiveConstructor{inr} \AgdaSymbol{:} Y \to \ X \AgdaPlusA \ Y. This encapsulate the disjoint union of two types, and equivalently logical disjunction.
+    \item The sigma type, which can be expressed in the form \AgdaDatatype{$\Sigma$} x \AgdaSymbol{:} X \AgdaDatatype{,} b. This is a dependent type, because b may depend on x. Logically, this may be viewed as the statement that there exists some x, such that b(x) is true. 
+    \item The cartesian product \AgdaTimes \ is a special case of the sigma type, where b does not depend on x, and can be expressed as X \AgdaTimesA \ B. This is viewed as conjunction.
+    \item The arrow \to \ represents implication.
+    \item Equality is captured by the rather subtle identity type \AgdaEqual. There is a single constructor \\ \AgdaInductiveConstructor{refl} \AgdaSymbol{:} \AgdaSymbol{(}x \AgdaSymbol{:} X\AgdaSymbol{)} \to \ x \AgdaEqualA \ x. This can be read as ``for all x of type X, by definition, x is equal to x".
+\end{itemize}
 
--- Unit
--- Empty
--- Sigma
--- Function Extensionality
--- Prop Ext
--- Prop Trunc
+I also make use of three assumptions within this development, which cannot be proved within this particular framework.
+
+\begin{itemize}
+    \item Function extensionality is the assumption that functions which are pointwise equal, then they are equal. 
+    \item Propositional extensionality is the assumption that if two types P and Q are propositions (statements, or subsingletons), and P \to \ Q, and Q \to \ P, then P \AgdaEqualA \ Q.
+    \item Propositional truncation allows us to truncate types. Working constructively, we always provide inhabitants for our proofs. There are situations where we want to ``forget" such a witness, because we do not want to know the particular witness, but do want to know that and inhabitant of the type exists.
+
+\end{itemize}
+
+Assuming the above types does not pose a problem to computation. Algorithms may be produced without assumptions, but they are needed to make observations about the properties of the algorithms, and in particular the correctness of the algorithm. Given a specification, you could say ``here as a value x, and assuming functional extensionality holds here is the proof that x satisfies the specification". 
+
+To introduce how proofs work before delving into the realm of numbers, first consider the following examples.
 
 \begin{comment}
 When building a library, certainly many of the initial proofs may be auto-solved by Agda, but in my experience asking Agda to look for a proof results in an indefinite hang due to the size of the terms I am working with. If Agda compiles the code, then I can sure that the proofs I am writing is correct up to the interpretation of the types I write, but I cannot rely on Agda to auto-generate proofs for me.

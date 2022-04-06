@@ -14,6 +14,14 @@
  }
 
 \usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
 \usepackage{comment}
 
 \usepackage[links]{TexFiles/Latex/agda}
@@ -37,8 +45,19 @@
 \newunicodechar{₂}{\ensuremath{_{2}}}
 %Should try and finder a nicer version of this character
 \newunicodechar{꞉}{\textfallback{:}}
+\newunicodechar{⋆}{\textfallback{\star}}
+
 %\AgdaTarget{ℤ} Perhaps test later
 
+\newcommand{\AgdaOne}{\AgdaDatatype{$\mathbb{1}$}}
+\newcommand{\AgdaPlus}{\AgdaDatatype{\_$+$\_}}
+\newcommand{\AgdaTimes}{\AgdaDatatype{\_$\times$\_}}
+\newcommand{\AgdaTimesA}{\AgdaDatatype{$\times$}}
+\newcommand{\AgdaEqual}{\AgdaDatatype{\_$\equiv$\_}}
+\newcommand{\AgdaEqualA}{\AgdaDatatype{$\equiv$}}
+\newcommand{\AgdaPlusA}{\AgdaDatatype{$+$}}
+\newcommand{\AgdaZero}{\AgdaDatatype{$\mathbb{0}$}}
+\newcommand{\AgdaStar}{\AgdaInductiveConstructor{⋆}}
 \input{TexFiles/Latex/ReportCode} % This needs to be after the Unicode stuff
 %\input{Latex/DedekindRealsOrder}
 \input{TexFiles/Latex/DedekindRealsOrder}
