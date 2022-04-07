@@ -158,13 +158,13 @@ ral-lemma α β n e = ((rec 2/3 (λ k → k * 2/3) n * 2/3) * α) ≡⟨ refl �
       IV : ((⟨2/3⟩^ succ n) * (y' - x)) < p
       IV = transport (_< p) (ral-lemma (y - x) (y' - x) n e₂) l₄
 
-trans→disjoint : (L R : ℚ-subset-of-propositions) → disjoint L R → (q : ℚ) → ¬ (q ∈ L × q ∈ R)
+trans→disjoint : (L R : 𝓟 ℚ) → disjoint L R → (q : ℚ) → ¬ (q ∈ L × q ∈ R)
 trans→disjoint L R dis q (qL , qR) = ℚ<-not-itself q I
  where
   I : q < q
   I = dis q q (qL , qR)
 
-disjoint→trans : (L R : ℚ-subset-of-propositions) → located L R →  ((q : ℚ) → ¬ (q ∈ L × q ∈ R)) → disjoint L R
+disjoint→trans : (L R : 𝓟 ℚ) → located L R →  ((q : ℚ) → ¬ (q ∈ L × q ∈ R)) → disjoint L R
 disjoint→trans L R loc dis p q (pL , qR) = I (ℚ-trichotomous fe p q)
  where
   I : p < q ∔ (p ≡ q) ∔ q < p → p < q

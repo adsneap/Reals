@@ -1,7 +1,4 @@
-Andrew Sneap
-
-
-\begin{code}
+\begin{code}[hide]
 
 {-# OPTIONS --without-K --exact-split --safe #-}
 
@@ -29,28 +26,60 @@ module DedekindReals
 
 open PropositionalTruncation pt
 
-ℚ-subset-of-propositions : 𝓤₁ ̇
-ℚ-subset-of-propositions = 𝓟 ℚ
+\end{code}
 
-ℚ-subset-of-propositions-is-set : is-set ℚ-subset-of-propositions
-ℚ-subset-of-propositions-is-set = powersets-are-sets fe pe
+\newcommand{\RealsCode}{
+\AgdaNoSpaceAroundCode{}
 
-inhabited-left : (L : ℚ-subset-of-propositions) → 𝓤₀ ̇
-inhabited-left L = (∃ p ꞉ ℚ , p ∈ L) 
+\begin{code}
 
-inhabited-right : (R : ℚ-subset-of-propositions) → 𝓤₀ ̇
+inhabited-left : (L : 𝓟 ℚ) → 𝓤₀ ̇
+inhabited-left L = (∃ p ꞉ ℚ , p ∈ L)
+
+inhabited-right : (R : 𝓟 ℚ) → 𝓤₀ ̇
 inhabited-right R = (∃ q ꞉ ℚ , q ∈ R)
 
-inhabited-left-is-prop : (L : ℚ-subset-of-propositions) → is-prop (inhabited-left L)
-inhabited-left-is-prop L = ∃-is-prop
-
-inhabited-right-is-prop : (R : ℚ-subset-of-propositions) → is-prop (inhabited-right R)
-inhabited-right-is-prop R = ∃-is-prop
-
-rounded-left : (L : ℚ-subset-of-propositions) → 𝓤₀ ̇
+rounded-left : (L : 𝓟 ℚ) → 𝓤₀ ̇
 rounded-left L = (x : ℚ) → (x ∈ L ⇔ (∃ p ꞉ ℚ , (x < p) × p ∈ L))
 
-rounded-left-a : (L : ℚ-subset-of-propositions) → rounded-left L → (x y : ℚ) → x ≤ y → y ∈ L → x ∈ L
+rounded-right : (R : 𝓟 ℚ) → 𝓤₀ ̇
+rounded-right R = (x : ℚ) → x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R)
+
+disjoint : (L R : 𝓟 ℚ) → 𝓤₀ ̇
+disjoint L R = (p q : ℚ) → p ∈ L × q ∈ R → p < q
+
+located : (L R : 𝓟 ℚ) → 𝓤₀ ̇
+located L R = (p q : ℚ) → p < q → p ∈ L ∨ q ∈ R
+
+isCut : (L R : 𝓟 ℚ) → 𝓤₀ ̇
+isCut L R = inhabited-left L
+          × inhabited-right R
+          × rounded-left L
+          × rounded-right R
+          × disjoint L R
+          × located L R
+
+ℝ : 𝓤₁ ̇
+ℝ = Σ (L , R) ꞉ 𝓟 ℚ × 𝓟 ℚ , isCut L R
+
+\end{code}
+
+\AgdaSpaceAroundCode{}
+}
+
+
+\begin{code}[hide]
+
+subset-of-ℚ-is-set : is-set (𝓟 ℚ)
+subset-of-ℚ-is-set = powersets-are-sets fe pe
+
+inhabited-left-is-prop : (L : 𝓟 ℚ) → is-prop (inhabited-left L)
+inhabited-left-is-prop L = ∃-is-prop
+
+inhabited-right-is-prop : (R : 𝓟 ℚ) → is-prop (inhabited-right R)
+inhabited-right-is-prop R = ∃-is-prop
+
+rounded-left-a : (L : 𝓟 ℚ) → rounded-left L → (x y : ℚ) → x ≤ y → y ∈ L → x ∈ L
 rounded-left-a L r x y l y-L = II (ℚ≤-split fe x y l)
  where
   I : (∃ p ꞉ ℚ , (x < p) × p ∈ L) → x ∈ L
@@ -59,16 +88,13 @@ rounded-left-a L r x y l y-L = II (ℚ≤-split fe x y l)
   II (inl l) = I ∣ y , (l , y-L) ∣
   II (inr r) = transport (_∈ L) (r ⁻¹) y-L
 
-rounded-left-b : (L : ℚ-subset-of-propositions) → rounded-left L → (x : ℚ) → x ∈ L → (∃ p ꞉ ℚ , (x < p) × p ∈ L)
+rounded-left-b : (L : 𝓟 ℚ) → rounded-left L → (x : ℚ) → x ∈ L → (∃ p ꞉ ℚ , (x < p) × p ∈ L)
 rounded-left-b L r x x-L = (pr₁ (r x)) x-L
 
-rounded-left-c : (L : ℚ-subset-of-propositions) → rounded-left L → (x y : ℚ) → x < y → y ∈ L → x ∈ L
+rounded-left-c : (L : 𝓟 ℚ) → rounded-left L → (x y : ℚ) → x < y → y ∈ L → x ∈ L
 rounded-left-c L r x y l yL = pr₂ (r x) ∣ y , (l , yL) ∣
 
-rounded-right : (R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-rounded-right R = (x : ℚ) → x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R)
-
-rounded-right-a : (R : ℚ-subset-of-propositions) → rounded-right R → (x y : ℚ) → x ≤ y → x ∈ R → y ∈ R
+rounded-right-a : (R : 𝓟 ℚ) → rounded-right R → (x y : ℚ) → x ≤ y → x ∈ R → y ∈ R
 rounded-right-a R r x y l x-R = II (ℚ≤-split fe x y l)
  where
   I : (∃ p ꞉ ℚ , (p < y) × p ∈ R) → y ∈ R 
@@ -77,45 +103,32 @@ rounded-right-a R r x y l x-R = II (ℚ≤-split fe x y l)
   II (inl r) = I ∣ x , (r , x-R) ∣
   II (inr r) = transport (_∈ R) r x-R
 
-rounded-right-b : (R : ℚ-subset-of-propositions) → rounded-right R → (x : ℚ) → x ∈ R → (∃ q ꞉ ℚ , (q < x) × q ∈ R)
+rounded-right-b : (R : 𝓟 ℚ) → rounded-right R → (x : ℚ) → x ∈ R → (∃ q ꞉ ℚ , (q < x) × q ∈ R)
 rounded-right-b R r x x-R = (pr₁ (r x)) x-R
 
-rounded-right-c : (R : ℚ-subset-of-propositions) → rounded-right R → (x y : ℚ) → x < y → x ∈ R → y ∈ R
+rounded-right-c : (R : 𝓟 ℚ) → rounded-right R → (x y : ℚ) → x < y → x ∈ R → y ∈ R
 rounded-right-c R r x y l xR = pr₂ (r y) ∣ x , (l , xR) ∣
 
-rounded-left-is-prop : (L : ℚ-subset-of-propositions) → is-prop (rounded-left L)
+rounded-left-is-prop : (L : 𝓟 ℚ) → is-prop (rounded-left L)
 rounded-left-is-prop L = Π-is-prop fe δ
  where
   δ : (x : ℚ) → is-prop (x ∈ L ⇔ (∃ p ꞉ ℚ , (x < p) × p ∈ L))
   δ x = ×-is-prop (Π-is-prop fe (λ _ → ∃-is-prop)) (Π-is-prop fe (λ _ → ∈-is-prop L x))
 
-rounded-right-is-prop : (R : ℚ-subset-of-propositions) → is-prop (rounded-right R)
+rounded-right-is-prop : (R : 𝓟 ℚ) → is-prop (rounded-right R)
 rounded-right-is-prop R = Π-is-prop fe δ
  where
   δ : (x : ℚ) → is-prop (x ∈ R ⇔ (∃ q ꞉ ℚ , (q < x) × q ∈ R))
   δ x = ×-is-prop (Π-is-prop fe (λ _ → ∃-is-prop)) (Π-is-prop fe (λ _ → ∈-is-prop R x))
 
-disjoint : (L R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-disjoint L R = (p q : ℚ) → p ∈ L × q ∈ R → p < q
-
-disjoint-is-prop : (L R : ℚ-subset-of-propositions) → is-prop (disjoint L R)
+disjoint-is-prop : (L R : 𝓟 ℚ) → is-prop (disjoint L R)
 disjoint-is-prop L R = Π₃-is-prop fe (λ x y _ → ℚ<-is-prop x y)
 
-located : (L R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-located L R = (p q : ℚ) → p < q → p ∈ L ∨ q ∈ R
-
-located-is-prop : (L R : ℚ-subset-of-propositions) → is-prop (located L R)
+located-is-prop : (L R : 𝓟 ℚ) → is-prop (located L R)
 located-is-prop L R = Π₃-is-prop fe (λ _ _ _ → ∨-is-prop)
 
-isCut : (L R : ℚ-subset-of-propositions) → 𝓤₀ ̇
-isCut L R = inhabited-left L
-          × inhabited-right R
-          × rounded-left L
-          × rounded-right R
-          × disjoint L R
-          × located L R
 
-isCut-is-prop : (L R : ℚ-subset-of-propositions) → is-prop (isCut L R)
+isCut-is-prop : (L R : 𝓟 ℚ) → is-prop (isCut L R)
 isCut-is-prop L R = ×-is-prop (inhabited-left-is-prop L)
                    (×-is-prop (inhabited-right-is-prop R)
                    (×-is-prop (rounded-left-is-prop L)
@@ -123,16 +136,13 @@ isCut-is-prop L R = ×-is-prop (inhabited-left-is-prop L)
                    (×-is-prop (disjoint-is-prop L R)
                               (located-is-prop L R)))))
 
-ℝ : 𝓤₁ ̇
-ℝ = Σ (L , R) ꞉ ℚ-subset-of-propositions × ℚ-subset-of-propositions , isCut L R
-
 ℝ-is-set : is-set ℝ
-ℝ-is-set = Σ-is-set (×-is-set ℚ-subset-of-propositions-is-set ℚ-subset-of-propositions-is-set) λ (L , R) → props-are-sets (isCut-is-prop L R)
+ℝ-is-set = Σ-is-set (×-is-set subset-of-ℚ-is-set subset-of-ℚ-is-set) λ (L , R) → props-are-sets (isCut-is-prop L R)
 
-lower-cut-of : ℝ → ℚ-subset-of-propositions
+lower-cut-of : ℝ → 𝓟 ℚ
 lower-cut-of ((L , R) , _) = L
 
-upper-cut-of : ℝ → ℚ-subset-of-propositions
+upper-cut-of : ℝ → 𝓟 ℚ
 upper-cut-of ((L , R) , _) = R
 
 in-lower-cut : ℚ → ℝ → 𝓤₀ ̇

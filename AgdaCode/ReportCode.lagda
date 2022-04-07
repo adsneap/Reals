@@ -44,14 +44,14 @@ data 𝟘 : 𝓤₀ ̇ where
 }
 
 
-\begin{code}
+\begin{code}[hide]
 open import SpartanMLTT
 \end{code}
 
 \newcommand{\ListDef}{
 \AgdaNoSpaceAroundCode{}
 \begin{code}
-data List (X : 𝓤 ̇) : 𝓤 ̇ where
+data List (X : 𝓤₀ ̇) : 𝓤₀ ̇ where
  []    : List X
  _::_  : X → List X → List X
 \end{code}

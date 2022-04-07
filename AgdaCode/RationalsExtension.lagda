@@ -130,9 +130,9 @@ f→f̂ f g f-order-preserving f-g-bijective ((L , R) , inhabited-left-x , inhab
   x : ℝ
   x = ((L , R) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
 
-  left : ℚ-subset-of-propositions
+  left : 𝓟 ℚ
   left p = (g p ∈ L) , ∈-is-prop L (g p)
-  right : ℚ-subset-of-propositions
+  right : 𝓟 ℚ
   right q = g q ∈ R , ∈-is-prop R (g q)
 
   inhabited-left' : inhabited-left left
@@ -374,10 +374,10 @@ composition-of-monotonic-functions : (f g : ℚ → ℚ → ℚ)
                                    → ℝ → ℝ → ℝ 
 composition-of-monotonic-functions f g f-preserves-order f-g-bijective x y = (L , R) , inhabited-left' , inhabited-right' , rounded-left' , rounded-right' , disjoint' , located'
  where
-  L : ℚ-subset-of-propositions
+  L : 𝓟 ℚ
   L p = (∃ a ꞉ ℚ , a < x × g p a < y) , ∃-is-prop
    
-  R : ℚ-subset-of-propositions
+  R : 𝓟 ℚ
   R q = (∃ b ꞉ ℚ , x < b × y < g q b) , ∃-is-prop
 
   inhabited-left' : inhabited-left L

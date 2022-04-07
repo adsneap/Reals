@@ -545,14 +545,14 @@ f^' f f-cont x = z
     by-continuity : ℚ → ℚ₊ → ℚ₊
     by-continuity z ε = obtain-delta ℚ-metric-space ℚ-metric-space f f-cont z ε
  
-    L : ℚ-subset-of-propositions
+    L : 𝓟 ℚ
     L p = condition , ∃-is-prop
      where
      condition : 𝓤₀ ̇
      condition = ∃ (u , v) ꞉ ℚ × ℚ , Σ (ε , l) ꞉ ℚ₊ , u < x × x < v × p < f u - ε × B-ℚ u v (pr₁ (by-continuity u (ε , l))) (pr₂ (by-continuity u (ε , l)))
 
     
-    R : ℚ-subset-of-propositions
+    R : 𝓟 ℚ
     R q = condition , ∃-is-prop
      where
       condition : 𝓤₀ ̇
@@ -598,13 +598,13 @@ f^' f f-cont x = z
   z : ℝ
   z = (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
    where
-    L : ℚ-subset-of-propositions
+    L : 𝓟 ℚ
     L p = condition , ∃-is-prop
      where
      condition : 𝓤₀ ̇
      condition = ∃ (u , v) ꞉ ℚ × ℚ , Σ (ε , _) ꞉ ℚ₊ , u < x × x < v × p < ℚ-min (f u) (f v) - ε
     
-    R : ℚ-subset-of-propositions
+    R : 𝓟 ℚ
     R q = condition , ∃-is-prop
      where
       condition : 𝓤₀ ̇
@@ -662,13 +662,13 @@ f^' f f-cont e x = z
   z : ℝ
   z = (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z
    where
-    L : ℚ-subset-of-propositions
+    L : 𝓟 ℚ
     L p = condition , ∃-is-prop
      where
      condition : 𝓤₀ ̇
      condition = ∃ b ꞉ ℚ , ((ε : ℚ) → 0ℚ < ε → Σ δ ꞉ ℚ , ((l₁ : 0ℚ < δ) → B-ℝ x (ι b) δ l₁ → p < f b - ε))
     
-    R : ℚ-subset-of-propositions
+    R : 𝓟 ℚ
     R q = condition , ∃-is-prop
      where
       condition : 𝓤₀ ̇

@@ -33,7 +33,7 @@ _+_ : ℝ → ℝ → ℝ
  where
   x : ℝ
   x = ((L-x , R-x) , inhabited-left-x , inhabited-right-x , rounded-left-x , rounded-right-x , disjoint-x , located-x)
-  L-z R-z : ℚ-subset-of-propositions
+  L-z R-z : 𝓟 ℚ
   L-z p = (∃ (r , s) ꞉ ℚ × ℚ , r ∈ L-x × s ∈ L-y × (p ≡ r ℚ+ s)) , ∃-is-prop
   R-z q = (∃ (r , s) ꞉ ℚ × ℚ , r ∈ R-x × s ∈ R-y × (q ≡ r ℚ+ s)) , ∃-is-prop
   
@@ -317,9 +317,9 @@ open import RationalsMultiplication renaming (_*_ to _ℚ*_)
 -_ : ℝ → ℝ
 -_ x = (L , R) , inhabited-left-z , inhabited-right-z , rounded-left-z , rounded-right-z , disjoint-z , located-z 
  where
-  L : ℚ-subset-of-propositions
+  L : 𝓟 ℚ
   L p = (∃ r ꞉ ℚ , r > x × (p ≡ ℚ- r)) , ∃-is-prop
-  R : ℚ-subset-of-propositions
+  R : 𝓟 ℚ
   R q = (∃ r ꞉ ℚ , r < x × (q ≡ ℚ- r)) , ∃-is-prop
   
   inhabited-left-z : inhabited-left L

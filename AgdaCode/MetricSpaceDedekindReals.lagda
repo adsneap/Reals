@@ -309,10 +309,10 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
   type-of-approx : ((α , l₁) (β , l₂) : ℚ₊) → B-ℝ (f (α , l₁)) (f (β , l₂)) (α + β) (ℚ<-adding-zero α β l₁ l₂)
   type-of-approx = approximation-condition
   
-  Ly : ℚ-subset-of-propositions
+  Ly : 𝓟 ℚ
   Ly q = (∃ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-lower-cut (q + ε + θ) (f (ε , l₁))) , ∃-is-prop
 
-  Ry : ℚ-subset-of-propositions
+  Ry : 𝓟 ℚ
   Ry q = (∃ ((ε , l₁) , (θ , l₂)) ꞉ ℚ₊ × ℚ₊ , in-upper-cut (q - ε - θ) (f (ε , l₁))) , ∃-is-prop
 
   inhabited-left-y : inhabited-left Ly -- Todd helped extensively
@@ -533,9 +533,9 @@ cauchy-approximation-limit-exists (f , approximation-condition) = y , y-is-limit
     q+2ε<r-2ε : q+2ε < r-2ε
     q+2ε<r-2ε = transport (q+2ε <_) last-two-equal q+2ε<q+3ε
     
-    Lε : ℚ-subset-of-propositions
+    Lε : 𝓟 ℚ
     Lε = lower-cut-of (f ε₊)
-    Rε : ℚ-subset-of-propositions
+    Rε : 𝓟 ℚ
     Rε = upper-cut-of (f ε₊)
     
     I : q+2ε ∈ Lε ∨ r-2ε ∈ Rε
