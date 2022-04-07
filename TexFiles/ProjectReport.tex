@@ -31,8 +31,6 @@
 \usepackage{amssymb}
 \usepackage{mathrsfs}
 
-%\AgdaNoSpaceAroundCode
-
 \usepackage{fontspec,unicode-math}
 \setmathfont{XITS Math}
 \setsansfont{XITS Math}
@@ -59,9 +57,12 @@
 \newcommand{\AgdaPlusA}{\AgdaDatatype{$+$}}
 \newcommand{\AgdaZero}{\AgdaDatatype{$\mathbb{0}$}}
 \newcommand{\AgdaStar}{\AgdaInductiveConstructor{⋆}}
+
+%TC:ignore
 \input{TexFiles/Latex/ReportCode} % This needs to be after the Unicode stuff
-%\input{Latex/DedekindRealsOrder}
 \input{TexFiles/Latex/DedekindRealsOrder}
+\input{TexFiles/Latex/DedekindRealsCode}
+%TC:endignore
 
 \title{Formalising Complete Fields in Agda}
 \author{Andrew Sneap - 1980030}
