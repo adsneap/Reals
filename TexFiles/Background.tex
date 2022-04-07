@@ -27,6 +27,8 @@ In type theory, every object has a type. We declare types in the following way:
 
 \TypeExample
 
+
+
 The type \AgdaDatatype{ℤ} defines the integers. There are two constructors, \AgdaInductiveConstructor{pos} and \AgdaInductiveConstructor{negsucc} which are functions that allow us to construct integers. For example, by applying the natural number \AgdaInductiveConstructor{zero} to the function \AgdaInductiveConstructor{pos}, we obtain the integer \AgdaInductiveConstructor{pos}\AgdaSpace\AgdaInductiveConstructor{zero} which has type \AgdaDatatype{ℤ}, denoted as
 \AgdaInductiveConstructor{pos zero}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
@@ -56,7 +58,20 @@ I also make use of three assumptions within this development, which cannot be pr
 
 Assuming the above types does not pose a problem to computation. Algorithms may be produced without assumptions, but they are needed to make observations about the properties of the algorithms, and in particular the correctness of the algorithm. Given a specification, you could say ``here as a value x, and assuming functional extensionality holds here is the proof that x satisfies the specification". 
 
-To introduce how proofs work before delving into the realm of numbers, first consider the following examples.
+To introduce how proofs work before delving into the realm of numbers, first consider the following example. \\
+
+\ListDef \\
+
+\MapDef \\
+
+We have defined here the type of lists, and a map function which maps each element of a list to a new element produced by a function $f$. We can prove properties about the map function. \\
+
+\MapProofs \\
+
+The first is a proof that mapping a list with the identity function doesn't change the list. The proof is inductive, first considering the base case of an empty list, and then the inductive case using an inductive hypothesis.
+
+The second proves mapping the composition of two functions is the same as mapping each function successively on a list. 
+
 
 \begin{comment}
 When building a library, certainly many of the initial proofs may be auto-solved by Agda, but in my experience asking Agda to look for a proof results in an indefinite hang due to the size of the terms I am working with. If Agda compiles the code, then I can sure that the proofs I am writing is correct up to the interpretation of the types I write, but I cannot rely on Agda to auto-generate proofs for me.

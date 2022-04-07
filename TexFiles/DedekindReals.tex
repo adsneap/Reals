@@ -3,27 +3,31 @@
 \begin{document}
 
 \section{Dedekind Reals}
-\subsection{Strategy}
+\subsection{Goals}
 
-To summarise, the goal of the project is to formalise the Complete Archimedean field in Agda, building on top of the TypeTopology library. In my third year project, I defined the Dedekind Reals, and showed that there is an embedding from \AgdaFunction{ℚ} to \AgdaFunction{ℝ}. 
+In my third year project, I defined the Dedekind reals, and showed that there is an embedding from \AgdaFunction{ℚ} to \AgdaFunction{ℝ}. 
 
-The goal is to show that this definition of the Reals, equipped with the usual addition and multiplication satisfies the constructive field axioms, and further show that the field is complete and Archimedean. As such, we break down the goal into sub-goals. 
+
+
+The natural goal is to show that this definition of the Reals, equipped with the usual addition and multiplication operators satisfies the constructive field axioms, and further show that the field is complete and Archimedean. This describes the reals as we view them intuitively, as a continuous line with no gaps stretching infinitely in two directions.
+
+As such, we break down the goal into sub-goals. 
 
 \begin{itemize}
-    \item Define Addition, Multiplication and Inverse Operations
-    \item Define Order, Apartness Relations
-    \item Show that the Dedekind Reals equipped with the above satisfy constructive field axioms
-    \item Show that the Dedekind Reals are Archimedean
-    \item Show that the Dedekind Reals are complete
+    \item Define addition, multiplication and inverse operations
+    \item Define order, apartness relations
+    \item Show that the Dedekind reals equipped with the above satisfy the constructive field axioms
+    \item Show that the Dedekind reals are Archimedean
+    \item Show that the Dedekind reals are Dedekind-complete
 \end{itemize}
 
 The following sections describes my approach and progress towards each sub-goal.
 
 \subsection{Order and Apartness Relations}
 
-Although I did not develop these until towards the end of the project, I will first define these relations as they are trivial in comparison to the other goals.
+Although I did not develop these until towards the end of the project, I will first define these relations as they are trivial in comparison to the other goals. 
 
-\RealsOrder
+\RealsOrder 
 
 The definitions for order and non-strict order are intuitive. I define them as in the HoTT Book \cite[Section 11.2.1]{hottbook}. The notion behind strict order is that if we can find some rational between two reals $x$ and $y$, then $x < y$. Note the use of the overloaded operators; for strict order we have two distinct relations which compare rationals and reals. The first says that $q$ is in the upper cut of $x$, and the second that says $q$ is in the lower cut of $y$. This is very useful syntactic sugar, since it much clearer for a reader than the more formal $q \in$ upper-cut-of $x$.
 
