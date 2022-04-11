@@ -46,5 +46,4 @@ Here are direct links to each file listed in the Agda Index.
 - [MetricSpaceDedekindReals](https://adsneap.github.io/Reals/MetricSpaceDedekindReals.html)
 
 - [ContinuousExtensionTheorem](https://adsneap.github.io/Reals/ContinuousExtensionTheorem.html)
-
 - [FieldRationals](https://adsneap.github.io/Reals/FieldRationals.html)
