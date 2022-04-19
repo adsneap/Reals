@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>PropTychonoff</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Background">Martin Escardo 29 April 2014.
+
+A proposition-indexed product of pointed compact sets is itself
+compact. But the assumption that a proposition-indexed product of
+compact sets is compact gives weak excluded middle (negative
+propositions are decidable).
+
+The definition of compactness (or exhaustive searchability) is
+
+    compact∙ A = (p : A → 𝟚) → Σ a₀ ꞉ A , p a₀ ≡ ₁ → (a : A) → p a ≡ ₁
+
+With excluded middle for propositions, the above claim is not
+surprising, because
+
+    (𝟘 → Y) = Y^𝟘 ≃ 𝟙 (which is always compact),
+    (𝟙 → Y) = Y^𝟙 ≃ Y (which is compact if Y is),
+
+and excluded middle for a proposition X amounts to X=𝟘 or X=𝟙, so
+that
+
+    Y^X is compact if Y is compact and X is a proposition.
+
+The point is that
+
+    (1) We can reach this conclusion without excluded middle.
+
+    (2) This also holds for dependent products:
+
+        Π x : X , Y x is compact if X is a proposition and Y x is
+        compact for every x : X.
+
+        (This product is also written (x : X) → Y x or Π Y in Agda.)
+
+Our Agda proof below can be written rather concisely by expanding the
+definitions. We deliberately don&#39;t do that, so that we have a rigorous
+informal proof side-by-side with the formal proof. We proceed in a
+series of trivial steps, hopefully in the most natural way (although
+we had a convoluted path to this supposedly natural way).
+
+</a><a id="1341" class="Markup">\begin{code}</a>
+
+<a id="1355" class="Symbol">{-#</a> <a id="1359" class="Keyword">OPTIONS</a> <a id="1367" class="Pragma">--without-K</a> <a id="1379" class="Pragma">--exact-split</a> <a id="1393" class="Pragma">--safe</a> <a id="1400" class="Pragma">--auto-inline</a> <a id="1414" class="Symbol">#-}</a>
+
+<a id="1419" class="Keyword">open</a> <a id="1424" class="Keyword">import</a> <a id="1431" href="SpartanMLTT.html" class="Module">SpartanMLTT</a>
+
+<a id="1444" class="Keyword">open</a> <a id="1449" class="Keyword">import</a> <a id="1456" href="UF-FunExt.html" class="Module">UF-FunExt</a>
+
+<a id="1467" class="Keyword">module</a> <a id="1474" href="PropTychonoff.html" class="Module">PropTychonoff</a> <a id="1488" class="Symbol">(</a><a id="1489" href="PropTychonoff.html#1489" class="Bound">fe</a> <a id="1492" class="Symbol">:</a> <a id="1494" href="UF-FunExt.html#983" class="Function">FunExt</a><a id="1500" class="Symbol">)</a> <a id="1502" class="Keyword">where</a>
+
+<a id="1509" class="Keyword">open</a> <a id="1514" class="Keyword">import</a> <a id="1521" href="CompactTypes.html" class="Module">CompactTypes</a>
+<a id="1534" class="Keyword">open</a> <a id="1539" class="Keyword">import</a> <a id="1546" href="Two-Properties.html" class="Module">Two-Properties</a>
+<a id="1561" class="Keyword">open</a> <a id="1566" class="Keyword">import</a> <a id="1573" href="UF-Base.html" class="Module">UF-Base</a>
+<a id="1581" class="Keyword">open</a> <a id="1586" class="Keyword">import</a> <a id="1593" href="UF-Subsingletons.html" class="Module">UF-Subsingletons</a>
+<a id="1610" class="Keyword">open</a> <a id="1615" class="Keyword">import</a> <a id="1622" href="UF-PropIndexedPiSigma.html" class="Module">UF-PropIndexedPiSigma</a>
+<a id="1644" class="Keyword">open</a> <a id="1649" class="Keyword">import</a> <a id="1656" href="UF-Equiv.html" class="Module">UF-Equiv</a>
+<a id="1665" class="Keyword">open</a> <a id="1670" class="Keyword">import</a> <a id="1677" href="UF-EquivalenceExamples.html" class="Module">UF-EquivalenceExamples</a>
+
+<a id="1701" class="Markup">\end{code}</a><a id="1711" class="Background">
+
+A crucial lemma is
+
+    prop-indexed-product : is-prop X → (a : X) → Π Y ≅ Y a
+
+This is proved in the module Prop-indexed-product. Although it has a
+subtle proof, it should be intuitively clear, as X has at most one
+element by hypothesis, and if the element is a:X then the product Π Y
+should be isomorphic to its only factor Y a.
+
+With this observation, the following proof should be self-contained,
+if we recall again the definition of compact set from the module
+CompacTypes:
+
+    compact∙ A = (p : A → 𝟚) → Σ a₀ ꞉ A , p a₀ ≡ ₁ → (a : A) → p a ≡ ₁
+
+Recall also that such an a₀ is called a universal witness for the predicate p.
+
+</a><a id="2345" class="Markup">\begin{code}</a>
+
+<a id="prop-tychonoff"></a><a id="2359" href="PropTychonoff.html#2359" class="Function">prop-tychonoff</a> <a id="2374" class="Symbol">:</a> <a id="2376" class="Symbol">{</a><a id="2377" href="PropTychonoff.html#2377" class="Bound">X</a> <a id="2379" class="Symbol">:</a> <a id="2381" href="Universes.html#274" class="Generalizable">𝓤</a> <a id="2383" href="Universes.html#417" class="Function Operator">̇</a> <a id="2385" class="Symbol">}</a> <a id="2387" class="Symbol">{</a><a id="2388" href="PropTychonoff.html#2388" class="Bound">Y</a> <a id="2390" class="Symbol">:</a> <a id="2392" href="PropTychonoff.html#2377" class="Bound">X</a> <a id="2394" class="Symbol">→</a> <a id="2396" href="Universes.html#276" class="Generalizable">𝓥</a> <a id="2398" href="Universes.html#417" class="Function Operator">̇</a> <a id="2400" class="Symbol">}</a>
+               <a id="2417" class="Symbol">→</a> <a id="2419" href="UF-Subsingletons.html#487" class="Function">is-prop</a> <a id="2427" href="PropTychonoff.html#2377" class="Bound">X</a>
+               <a id="2444" class="Symbol">→</a> <a id="2446" class="Symbol">((</a><a id="2448" href="PropTychonoff.html#2448" class="Bound">x</a> <a id="2450" class="Symbol">:</a> <a id="2452" href="PropTychonoff.html#2377" class="Bound">X</a><a id="2453" class="Symbol">)</a> <a id="2455" class="Symbol">→</a> <a id="2457" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="2466" class="Symbol">(</a><a id="2467" href="PropTychonoff.html#2388" class="Bound">Y</a> <a id="2469" href="PropTychonoff.html#2448" class="Bound">x</a><a id="2470" class="Symbol">))</a>
+               <a id="2488" class="Symbol">→</a> <a id="2490" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="2499" class="Symbol">(</a><a id="2500" href="Pi.html#182" class="Function">Π</a> <a id="2502" href="PropTychonoff.html#2388" class="Bound">Y</a><a id="2503" class="Symbol">)</a>
+<a id="2505" href="PropTychonoff.html#2359" class="Function">prop-tychonoff</a> <a id="2520" class="Symbol">{</a><a id="2521" href="PropTychonoff.html#2521" class="Bound">𝓤</a><a id="2522" class="Symbol">}</a> <a id="2524" class="Symbol">{</a><a id="2525" href="PropTychonoff.html#2525" class="Bound">𝓥</a><a id="2526" class="Symbol">}</a> <a id="2528" class="Symbol">{</a><a id="2529" href="PropTychonoff.html#2529" class="Bound">X</a><a id="2530" class="Symbol">}</a> <a id="2532" class="Symbol">{</a><a id="2533" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="2534" class="Symbol">}</a> <a id="2536" href="PropTychonoff.html#2536" class="Bound">X-is-prop</a> <a id="2546" href="PropTychonoff.html#2546" class="Bound">ε</a> <a id="2548" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="2550" class="Symbol">=</a> <a id="2552" href="PropTychonoff.html#6877" class="Function">γ</a>
+ <a id="2555" class="Keyword">where</a>
+  <a id="2563" href="PropTychonoff.html#2563" class="Function">have</a> <a id="2568" class="Symbol">:</a> <a id="2570" class="Symbol">(</a><a id="2571" href="GeneralNotation.html#1668" class="Function">type-of</a> <a id="2579" href="PropTychonoff.html#2546" class="Bound">ε</a> <a id="2581" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="2583" class="Symbol">((</a><a id="2585" href="PropTychonoff.html#2585" class="Bound">x</a> <a id="2587" class="Symbol">:</a> <a id="2589" href="PropTychonoff.html#2529" class="Bound">X</a><a id="2590" class="Symbol">)</a> <a id="2592" class="Symbol">→</a> <a id="2594" href="CompactTypes.html#4291" class="Function">compact∙</a><a id="2602" class="Symbol">(</a><a id="2603" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="2605" href="PropTychonoff.html#2585" class="Bound">x</a><a id="2606" class="Symbol">)))</a>
+       <a id="2617" href="Sigma.html#571" class="Function Operator">×</a> <a id="2619" class="Symbol">(</a><a id="2620" href="GeneralNotation.html#1668" class="Function">type-of</a> <a id="2628" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="2630" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="2632" class="Symbol">(</a><a id="2633" href="Pi.html#182" class="Function">Π</a> <a id="2635" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="2637" class="Symbol">→</a> <a id="2639" href="Two.html#142" class="Datatype">𝟚</a><a id="2640" class="Symbol">))</a>
+  <a id="2645" href="PropTychonoff.html#2563" class="Function">have</a> <a id="2650" class="Symbol">=</a> <a id="2652" href="Identity-Type.html#176" class="InductiveConstructor">refl</a> <a id="2657" href="Sigma-Type.html#202" class="InductiveConstructor Operator">,</a> <a id="2659" href="Identity-Type.html#176" class="InductiveConstructor">refl</a>
+
+  <a id="2667" href="PropTychonoff.html#2667" class="Function">hip</a> <a id="2671" class="Symbol">:</a> <a id="2673" class="Symbol">(</a><a id="2674" href="PropTychonoff.html#2674" class="Bound">x</a> <a id="2676" class="Symbol">:</a> <a id="2678" href="PropTychonoff.html#2529" class="Bound">X</a><a id="2679" class="Symbol">)</a> <a id="2681" class="Symbol">→</a> <a id="2683" href="Pi.html#182" class="Function">Π</a> <a id="2685" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="2687" href="UF-Equiv.html#1162" class="Function Operator">≃</a> <a id="2689" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="2691" href="PropTychonoff.html#2674" class="Bound">x</a>
+  <a id="2695" href="PropTychonoff.html#2667" class="Function">hip</a> <a id="2699" class="Symbol">=</a> <a id="2701" href="UF-PropIndexedPiSigma.html#1185" class="Function">prop-indexed-product</a> <a id="2722" class="Symbol">(</a><a id="2723" href="PropTychonoff.html#1489" class="Bound">fe</a> <a id="2726" href="PropTychonoff.html#2521" class="Bound">𝓤</a> <a id="2728" href="PropTychonoff.html#2525" class="Bound">𝓥</a><a id="2729" class="Symbol">)</a> <a id="2731" href="PropTychonoff.html#2536" class="Bound">X-is-prop</a>
+
+<a id="2742" class="Markup">\end{code}</a><a id="2752" class="Background">
+
+The essence of the first part of the proof is this:
+
+</a><a id="2807" class="Markup">\begin{code}</a>
+
+  <a id="2823" href="PropTychonoff.html#2823" class="Function">crude</a> <a id="2829" class="Symbol">:</a> <a id="2831" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="2833" class="Symbol">→</a> <a id="2835" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="2844" class="Symbol">(</a><a id="2845" href="Pi.html#182" class="Function">Π</a> <a id="2847" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="2848" class="Symbol">)</a>
+  <a id="2852" href="PropTychonoff.html#2823" class="Function">crude</a> <a id="2858" href="PropTychonoff.html#2858" class="Bound">x</a> <a id="2860" class="Symbol">=</a> <a id="2862" href="CompactTypes.html#16775" class="Function">equiv-compact∙</a> <a id="2877" class="Symbol">(</a><a id="2878" href="UF-Equiv.html#6476" class="Function">≃-sym</a><a id="2883" class="Symbol">(</a><a id="2884" href="PropTychonoff.html#2667" class="Function">hip</a> <a id="2888" href="PropTychonoff.html#2858" class="Bound">x</a><a id="2889" class="Symbol">))</a> <a id="2892" class="Symbol">(</a><a id="2893" href="PropTychonoff.html#2546" class="Bound">ε</a> <a id="2895" href="PropTychonoff.html#2858" class="Bound">x</a><a id="2896" class="Symbol">)</a>
+
+<a id="2899" class="Markup">\end{code}</a><a id="2909" class="Background">
+
+But this is very crude for our purposes (or so it seems).  So we
+instead proceed as follows.
+
+The following is what we get from prop-indexed-product, abstractly:
+
+</a><a id="3074" class="Markup">\begin{code}</a>
+
+  <a id="3090" href="PropTychonoff.html#3090" class="Function">f</a> <a id="3092" class="Symbol">:</a> <a id="3094" class="Symbol">(</a><a id="3095" href="PropTychonoff.html#3095" class="Bound">x</a> <a id="3097" class="Symbol">:</a> <a id="3099" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3100" class="Symbol">)</a> <a id="3102" class="Symbol">→</a> <a id="3104" href="Pi.html#182" class="Function">Π</a> <a id="3106" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3108" class="Symbol">→</a> <a id="3110" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3112" href="PropTychonoff.html#3095" class="Bound">x</a>
+  <a id="3116" href="PropTychonoff.html#3090" class="Function">f</a> <a id="3118" href="PropTychonoff.html#3118" class="Bound">x</a> <a id="3120" class="Symbol">=</a> <a id="3122" href="Sigma-Type.html#217" class="Field">pr₁</a> <a id="3126" class="Symbol">(</a><a id="3127" href="PropTychonoff.html#2667" class="Function">hip</a> <a id="3131" href="PropTychonoff.html#3118" class="Bound">x</a><a id="3132" class="Symbol">)</a>
+
+  <a id="3137" href="PropTychonoff.html#3137" class="Function">hrf</a> <a id="3141" class="Symbol">:</a> <a id="3143" class="Symbol">(</a><a id="3144" href="PropTychonoff.html#3144" class="Bound">x</a> <a id="3146" class="Symbol">:</a> <a id="3148" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3149" class="Symbol">)</a> <a id="3151" class="Symbol">→</a> <a id="3153" href="Sigma.html#436" class="Function">Σ</a> <a id="3155" href="PropTychonoff.html#3155" class="Bound">r</a> <a id="3157" href="Sigma.html#436" class="Function">꞉</a> <a id="3159" class="Symbol">(</a><a id="3160" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3162" href="PropTychonoff.html#3144" class="Bound">x</a> <a id="3164" class="Symbol">→</a> <a id="3166" href="Pi.html#182" class="Function">Π</a> <a id="3168" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="3169" class="Symbol">)</a><a id="3170" href="Sigma.html#436" class="Function">,</a> <a id="3172" href="PropTychonoff.html#3155" class="Bound">r</a> <a id="3174" href="Pi.html#531" class="Function Operator">∘</a> <a id="3176" href="PropTychonoff.html#3090" class="Function">f</a> <a id="3178" href="PropTychonoff.html#3144" class="Bound">x</a> <a id="3180" href="Id.html#1581" class="Function Operator">∼</a> <a id="3182" href="Pi.html#462" class="Function">id</a>
+  <a id="3187" href="PropTychonoff.html#3137" class="Function">hrf</a> <a id="3191" href="PropTychonoff.html#3191" class="Bound">x</a> <a id="3193" class="Symbol">=</a> <a id="3195" href="Sigma-Type.html#228" class="Field">pr₂</a> <a id="3199" class="Symbol">(</a><a id="3200" href="Sigma-Type.html#228" class="Field">pr₂</a> <a id="3204" class="Symbol">(</a><a id="3205" href="PropTychonoff.html#2667" class="Function">hip</a> <a id="3209" href="PropTychonoff.html#3191" class="Bound">x</a><a id="3210" class="Symbol">))</a>
+
+  <a id="3216" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3218" class="Symbol">:</a> <a id="3220" class="Symbol">(</a><a id="3221" href="PropTychonoff.html#3221" class="Bound">x</a> <a id="3223" class="Symbol">:</a> <a id="3225" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3226" class="Symbol">)</a> <a id="3228" class="Symbol">→</a> <a id="3230" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3232" href="PropTychonoff.html#3221" class="Bound">x</a> <a id="3234" class="Symbol">→</a> <a id="3236" href="Pi.html#182" class="Function">Π</a> <a id="3238" href="PropTychonoff.html#2533" class="Bound">Y</a>
+  <a id="3242" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3244" href="PropTychonoff.html#3244" class="Bound">x</a> <a id="3246" class="Symbol">=</a> <a id="3248" href="Sigma-Type.html#217" class="Field">pr₁</a> <a id="3252" class="Symbol">(</a><a id="3253" href="PropTychonoff.html#3137" class="Function">hrf</a> <a id="3257" href="PropTychonoff.html#3244" class="Bound">x</a><a id="3258" class="Symbol">)</a>
+
+  <a id="3263" href="PropTychonoff.html#3263" class="Function">hf</a> <a id="3266" class="Symbol">:</a> <a id="3268" class="Symbol">(</a><a id="3269" href="PropTychonoff.html#3269" class="Bound">x</a> <a id="3271" class="Symbol">:</a> <a id="3273" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3274" class="Symbol">)</a> <a id="3276" class="Symbol">(</a><a id="3277" href="PropTychonoff.html#3277" class="Bound">φ</a> <a id="3279" class="Symbol">:</a> <a id="3281" href="Pi.html#182" class="Function">Π</a> <a id="3283" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="3284" class="Symbol">)</a> <a id="3286" class="Symbol">→</a> <a id="3288" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3290" href="PropTychonoff.html#3269" class="Bound">x</a> <a id="3292" class="Symbol">(</a><a id="3293" href="PropTychonoff.html#3090" class="Function">f</a> <a id="3295" href="PropTychonoff.html#3269" class="Bound">x</a> <a id="3297" href="PropTychonoff.html#3277" class="Bound">φ</a><a id="3298" class="Symbol">)</a> <a id="3300" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="3302" href="PropTychonoff.html#3277" class="Bound">φ</a>
+  <a id="3306" href="PropTychonoff.html#3263" class="Function">hf</a> <a id="3309" href="PropTychonoff.html#3309" class="Bound">x</a> <a id="3311" class="Symbol">=</a> <a id="3313" href="Sigma-Type.html#228" class="Field">pr₂</a> <a id="3317" class="Symbol">(</a><a id="3318" href="PropTychonoff.html#3137" class="Function">hrf</a> <a id="3322" href="PropTychonoff.html#3309" class="Bound">x</a><a id="3323" class="Symbol">)</a>
+
+<a id="3326" class="Markup">\end{code}</a><a id="3336" class="Background">
+
+We define a predicate q x : Y x → 𝟚, for each x : X, from the
+predicate p : Π Y → 𝟚 via (part of) the above isomorphism:
+
+</a><a id="3460" class="Markup">\begin{code}</a>
+
+  <a id="3476" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3478" class="Symbol">:</a> <a id="3480" class="Symbol">(</a><a id="3481" href="PropTychonoff.html#3481" class="Bound">x</a> <a id="3483" class="Symbol">:</a> <a id="3485" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3486" class="Symbol">)</a> <a id="3488" class="Symbol">→</a> <a id="3490" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3492" href="PropTychonoff.html#3481" class="Bound">x</a> <a id="3494" class="Symbol">→</a> <a id="3496" href="Two.html#142" class="Datatype">𝟚</a>
+  <a id="3500" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3502" href="PropTychonoff.html#3502" class="Bound">x</a> <a id="3504" href="PropTychonoff.html#3504" class="Bound">y</a> <a id="3506" class="Symbol">=</a> <a id="3508" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="3510" class="Symbol">(</a><a id="3511" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3513" href="PropTychonoff.html#3502" class="Bound">x</a> <a id="3515" href="PropTychonoff.html#3504" class="Bound">y</a><a id="3516" class="Symbol">)</a>
+
+<a id="3519" class="Markup">\end{code}</a><a id="3529" class="Background">
+
+We argue that the following is a universal witness for the
+searchability of the type Π Y wrt the predicate p:
+
+</a><a id="3642" class="Markup">\begin{code}</a>
+
+  <a id="3658" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="3661" class="Symbol">:</a> <a id="3663" href="Pi.html#182" class="Function">Π</a> <a id="3665" href="PropTychonoff.html#2533" class="Bound">Y</a>
+  <a id="3669" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="3672" href="PropTychonoff.html#3672" class="Bound">x</a> <a id="3674" class="Symbol">=</a> <a id="3676" href="Sigma-Type.html#217" class="Field">pr₁</a> <a id="3680" class="Symbol">(</a><a id="3681" href="PropTychonoff.html#2546" class="Bound">ε</a> <a id="3683" href="PropTychonoff.html#3672" class="Bound">x</a> <a id="3685" class="Symbol">(</a><a id="3686" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3688" href="PropTychonoff.html#3672" class="Bound">x</a><a id="3689" class="Symbol">))</a>
+
+<a id="3693" class="Markup">\end{code}</a><a id="3703" class="Background">
+
+By hypothesis, it satisfies:
+
+</a><a id="3735" class="Markup">\begin{code}</a>
+
+  <a id="3751" href="PropTychonoff.html#3751" class="Function">φ₀-spec</a> <a id="3759" class="Symbol">:</a> <a id="3761" class="Symbol">(</a><a id="3762" href="PropTychonoff.html#3762" class="Bound">x</a> <a id="3764" class="Symbol">:</a> <a id="3766" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3767" class="Symbol">)</a> <a id="3769" class="Symbol">→</a> <a id="3771" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3773" href="PropTychonoff.html#3762" class="Bound">x</a> <a id="3775" class="Symbol">(</a><a id="3776" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="3779" href="PropTychonoff.html#3762" class="Bound">x</a><a id="3780" class="Symbol">)</a> <a id="3782" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="3784" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="3786" class="Symbol">→</a> <a id="3788" class="Symbol">(</a><a id="3789" href="PropTychonoff.html#3789" class="Bound">y</a> <a id="3791" class="Symbol">:</a> <a id="3793" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3795" href="PropTychonoff.html#3762" class="Bound">x</a><a id="3796" class="Symbol">)</a> <a id="3798" class="Symbol">→</a> <a id="3800" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3802" href="PropTychonoff.html#3762" class="Bound">x</a> <a id="3804" href="PropTychonoff.html#3789" class="Bound">y</a> <a id="3806" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="3808" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="3812" href="PropTychonoff.html#3751" class="Function">φ₀-spec</a> <a id="3820" href="PropTychonoff.html#3820" class="Bound">x</a> <a id="3822" class="Symbol">=</a> <a id="3824" href="Sigma-Type.html#228" class="Field">pr₂</a> <a id="3828" class="Symbol">(</a><a id="3829" href="PropTychonoff.html#2546" class="Bound">ε</a> <a id="3831" href="PropTychonoff.html#3820" class="Bound">x</a> <a id="3833" class="Symbol">(</a><a id="3834" href="PropTychonoff.html#3476" class="Function">q</a> <a id="3836" href="PropTychonoff.html#3820" class="Bound">x</a><a id="3837" class="Symbol">))</a>
+
+<a id="3841" class="Markup">\end{code}</a><a id="3851" class="Background">
+
+By expanding the definitions, this amounts to:
+
+</a><a id="3901" class="Markup">\begin{code}</a>
+
+  <a id="3917" href="PropTychonoff.html#3917" class="Function">φ₀-spec₀</a> <a id="3926" class="Symbol">:</a> <a id="3928" class="Symbol">(</a><a id="3929" href="PropTychonoff.html#3929" class="Bound">x</a> <a id="3931" class="Symbol">:</a> <a id="3933" href="PropTychonoff.html#2529" class="Bound">X</a><a id="3934" class="Symbol">)</a> <a id="3936" class="Symbol">→</a> <a id="3938" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="3940" class="Symbol">(</a><a id="3941" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3943" href="PropTychonoff.html#3929" class="Bound">x</a> <a id="3945" class="Symbol">(</a><a id="3946" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="3949" href="PropTychonoff.html#3929" class="Bound">x</a><a id="3950" class="Symbol">))</a> <a id="3953" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="3955" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="3957" class="Symbol">→</a> <a id="3959" class="Symbol">(</a><a id="3960" href="PropTychonoff.html#3960" class="Bound">y</a> <a id="3962" class="Symbol">:</a> <a id="3964" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="3966" href="PropTychonoff.html#3929" class="Bound">x</a><a id="3967" class="Symbol">)</a> <a id="3969" class="Symbol">→</a> <a id="3971" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="3973" class="Symbol">(</a><a id="3974" href="PropTychonoff.html#3216" class="Function">h</a> <a id="3976" href="PropTychonoff.html#3929" class="Bound">x</a> <a id="3978" href="PropTychonoff.html#3960" class="Bound">y</a><a id="3979" class="Symbol">)</a> <a id="3981" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="3983" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="3987" href="PropTychonoff.html#3917" class="Function">φ₀-spec₀</a> <a id="3996" class="Symbol">=</a> <a id="3998" href="PropTychonoff.html#3751" class="Function">φ₀-spec</a>
+
+<a id="4007" class="Markup">\end{code}</a><a id="4017" class="Background">
+
+By the definition of f in prop-indexed-product (namely f x φ = φ x):
+
+</a><a id="4089" class="Markup">\begin{code}</a>
+
+  <a id="4105" href="PropTychonoff.html#4105" class="Function">φ₀-spec₁</a> <a id="4114" class="Symbol">:</a> <a id="4116" class="Symbol">(</a><a id="4117" href="PropTychonoff.html#4117" class="Bound">x</a> <a id="4119" class="Symbol">:</a> <a id="4121" href="PropTychonoff.html#2529" class="Bound">X</a><a id="4122" class="Symbol">)</a> <a id="4124" class="Symbol">→</a> <a id="4126" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4128" class="Symbol">(</a><a id="4129" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4131" href="PropTychonoff.html#4117" class="Bound">x</a> <a id="4133" class="Symbol">(</a><a id="4134" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4136" href="PropTychonoff.html#4117" class="Bound">x</a> <a id="4138" href="PropTychonoff.html#3658" class="Function">φ₀</a><a id="4140" class="Symbol">))</a> <a id="4143" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4145" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="4147" class="Symbol">→</a> <a id="4149" class="Symbol">(</a><a id="4150" href="PropTychonoff.html#4150" class="Bound">y</a> <a id="4152" class="Symbol">:</a> <a id="4154" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="4156" href="PropTychonoff.html#4117" class="Bound">x</a><a id="4157" class="Symbol">)</a> <a id="4159" class="Symbol">→</a> <a id="4161" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4163" class="Symbol">(</a><a id="4164" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4166" href="PropTychonoff.html#4117" class="Bound">x</a> <a id="4168" href="PropTychonoff.html#4150" class="Bound">y</a><a id="4169" class="Symbol">)</a> <a id="4171" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4173" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="4177" href="PropTychonoff.html#4105" class="Function">φ₀-spec₁</a> <a id="4186" class="Symbol">=</a> <a id="4188" href="PropTychonoff.html#3917" class="Function">φ₀-spec₀</a>
+
+<a id="4198" class="Markup">\end{code}</a><a id="4208" class="Background">
+
+(So we can&#39;t abstract away the definition/proof of
+prop-indexed-product.)
+
+In particular, with y = f x φ, we get:
+
+</a><a id="4325" class="Markup">\begin{code}</a>
+
+  <a id="4341" href="PropTychonoff.html#4341" class="Function">φ₀-spec₁-particular-case</a> <a id="4366" class="Symbol">:</a> <a id="4368" class="Symbol">(</a><a id="4369" href="PropTychonoff.html#4369" class="Bound">x</a> <a id="4371" class="Symbol">:</a> <a id="4373" href="PropTychonoff.html#2529" class="Bound">X</a><a id="4374" class="Symbol">)</a>
+                           <a id="4403" class="Symbol">→</a> <a id="4405" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4407" class="Symbol">(</a><a id="4408" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4410" href="PropTychonoff.html#4369" class="Bound">x</a> <a id="4412" class="Symbol">(</a><a id="4413" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4415" href="PropTychonoff.html#4369" class="Bound">x</a> <a id="4417" href="PropTychonoff.html#3658" class="Function">φ₀</a><a id="4419" class="Symbol">))</a> <a id="4422" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4424" href="Two.html#165" class="InductiveConstructor">₁</a>
+                           <a id="4453" class="Symbol">→</a> <a id="4455" class="Symbol">(</a><a id="4456" href="PropTychonoff.html#4456" class="Bound">φ</a> <a id="4458" class="Symbol">:</a> <a id="4460" href="Pi.html#182" class="Function">Π</a> <a id="4462" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="4463" class="Symbol">)</a> <a id="4465" class="Symbol">→</a> <a id="4467" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4469" class="Symbol">(</a><a id="4470" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4472" href="PropTychonoff.html#4369" class="Bound">x</a> <a id="4474" class="Symbol">(</a><a id="4475" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4477" href="PropTychonoff.html#4369" class="Bound">x</a> <a id="4479" href="PropTychonoff.html#4456" class="Bound">φ</a><a id="4480" class="Symbol">))</a> <a id="4483" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4485" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="4489" href="PropTychonoff.html#4341" class="Function">φ₀-spec₁-particular-case</a> <a id="4514" href="PropTychonoff.html#4514" class="Bound">x</a> <a id="4516" href="PropTychonoff.html#4516" class="Bound">r</a> <a id="4518" href="PropTychonoff.html#4518" class="Bound">φ</a> <a id="4520" class="Symbol">=</a> <a id="4522" href="PropTychonoff.html#4105" class="Function">φ₀-spec₁</a> <a id="4531" href="PropTychonoff.html#4514" class="Bound">x</a> <a id="4533" href="PropTychonoff.html#4516" class="Bound">r</a> <a id="4535" class="Symbol">(</a><a id="4536" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4538" href="PropTychonoff.html#4514" class="Bound">x</a> <a id="4540" href="PropTychonoff.html#4518" class="Bound">φ</a><a id="4541" class="Symbol">)</a>
+
+<a id="4544" class="Markup">\end{code}</a><a id="4554" class="Background">
+
+Using the fact that g x (f x φ) = φ for any x:X, we get:
+
+</a><a id="4614" class="Markup">\begin{code}</a>
+
+  <a id="4630" href="PropTychonoff.html#4630" class="Function">φ₀-is-universal-witness-assuming-X</a> <a id="4665" class="Symbol">:</a> <a id="4667" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="4669" class="Symbol">→</a> <a id="4671" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4673" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="4676" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4678" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="4680" class="Symbol">→</a> <a id="4682" class="Symbol">(</a><a id="4683" href="PropTychonoff.html#4683" class="Bound">φ</a> <a id="4685" class="Symbol">:</a> <a id="4687" href="Pi.html#182" class="Function">Π</a> <a id="4689" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="4690" class="Symbol">)</a> <a id="4692" class="Symbol">→</a> <a id="4694" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4696" href="PropTychonoff.html#4683" class="Bound">φ</a> <a id="4698" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="4700" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="4704" href="PropTychonoff.html#4630" class="Function">φ₀-is-universal-witness-assuming-X</a> <a id="4739" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4741" href="PropTychonoff.html#4741" class="Bound">r</a> <a id="4743" href="PropTychonoff.html#4743" class="Bound">φ</a> <a id="4745" class="Symbol">=</a>
+     <a id="4752" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4754" href="PropTychonoff.html#4743" class="Bound">φ</a>             <a id="4768" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="4771" href="Id.html#1344" class="Function">ap</a> <a id="4774" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4776" class="Symbol">((</a><a id="4778" href="PropTychonoff.html#3263" class="Function">hf</a> <a id="4781" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4783" href="PropTychonoff.html#4743" class="Bound">φ</a><a id="4784" class="Symbol">)</a><a id="4785" href="Id.html#1263" class="Function Operator">⁻¹</a><a id="4787" class="Symbol">)</a> <a id="4789" href="Id.html#1757" class="Function Operator">⟩</a>
+     <a id="4796" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4798" class="Symbol">(</a><a id="4799" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4801" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4803" class="Symbol">(</a><a id="4804" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4806" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4808" href="PropTychonoff.html#4743" class="Bound">φ</a><a id="4809" class="Symbol">))</a> <a id="4812" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="4815" href="PropTychonoff.html#4341" class="Function">φ₀-spec₁-particular-case</a> <a id="4840" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4842" href="PropTychonoff.html#4884" class="Function">s</a> <a id="4844" href="PropTychonoff.html#4743" class="Bound">φ</a> <a id="4846" href="Id.html#1757" class="Function Operator">⟩</a>
+     <a id="4853" href="Two.html#165" class="InductiveConstructor">₁</a>               <a id="4869" href="Id.html#1839" class="Function Operator">∎</a>
+   <a id="4874" class="Keyword">where</a>
+    <a id="4884" href="PropTychonoff.html#4884" class="Function">s</a> <a id="4886" class="Symbol">=</a> <a id="4888" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4890" class="Symbol">(</a><a id="4891" href="PropTychonoff.html#3216" class="Function">h</a> <a id="4893" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4895" class="Symbol">(</a><a id="4896" href="PropTychonoff.html#3090" class="Function">f</a> <a id="4898" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4900" href="PropTychonoff.html#3658" class="Function">φ₀</a><a id="4902" class="Symbol">))</a> <a id="4905" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="4908" href="Id.html#1344" class="Function">ap</a> <a id="4911" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4913" class="Symbol">(</a><a id="4914" href="PropTychonoff.html#3263" class="Function">hf</a> <a id="4917" href="PropTychonoff.html#4739" class="Bound">x</a> <a id="4919" href="PropTychonoff.html#3658" class="Function">φ₀</a><a id="4921" class="Symbol">)</a> <a id="4923" href="Id.html#1757" class="Function Operator">⟩</a>
+        <a id="4933" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="4935" href="PropTychonoff.html#3658" class="Function">φ₀</a>             <a id="4950" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="4953" href="PropTychonoff.html#4741" class="Bound">r</a> <a id="4955" href="Id.html#1757" class="Function Operator">⟩</a>
+        <a id="4965" href="Two.html#165" class="InductiveConstructor">₁</a>                <a id="4982" href="Id.html#1839" class="Function Operator">∎</a>
+
+<a id="4985" class="Markup">\end{code}</a><a id="4995" class="Background">
+
+Notice that the point x : X vanishes from the conclusion, and so we
+are able to omit it from the hypothesis, which is crucial for what
+follows.
+
+We get the same conclusion if X is empty:
+
+</a><a id="5185" class="Markup">\begin{code}</a>
+
+  <a id="5201" href="PropTychonoff.html#5201" class="Function">φ₀-is-universal-witness-assuming-X→𝟘</a> <a id="5238" class="Symbol">:</a> <a id="5240" class="Symbol">(</a><a id="5241" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="5243" class="Symbol">→</a> <a id="5245" href="Empty-Type.html#139" class="Datatype">𝟘</a><a id="5246" class="Symbol">)</a> <a id="5248" class="Symbol">→</a> <a id="5250" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5252" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="5255" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="5257" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="5259" class="Symbol">→</a> <a id="5261" class="Symbol">(</a><a id="5262" href="PropTychonoff.html#5262" class="Bound">φ</a> <a id="5264" class="Symbol">:</a> <a id="5266" href="Pi.html#182" class="Function">Π</a> <a id="5268" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="5269" class="Symbol">)</a> <a id="5271" class="Symbol">→</a> <a id="5273" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5275" href="PropTychonoff.html#5262" class="Bound">φ</a> <a id="5277" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="5279" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="5283" href="PropTychonoff.html#5201" class="Function">φ₀-is-universal-witness-assuming-X→𝟘</a> <a id="5320" href="PropTychonoff.html#5320" class="Bound">u</a> <a id="5322" href="PropTychonoff.html#5322" class="Bound">r</a> <a id="5324" href="PropTychonoff.html#5324" class="Bound">φ</a> <a id="5326" class="Symbol">=</a> <a id="5328" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5330" href="PropTychonoff.html#5324" class="Bound">φ</a>  <a id="5333" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="5336" href="Id.html#1344" class="Function">ap</a> <a id="5339" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5341" href="PropTychonoff.html#5476" class="Function">claim</a> <a id="5347" href="Id.html#1757" class="Function Operator">⟩</a>
+                                               <a id="5396" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5398" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="5401" href="Id.html#1757" class="Function Operator">≡⟨</a> <a id="5404" href="PropTychonoff.html#5322" class="Bound">r</a> <a id="5406" href="Id.html#1757" class="Function Operator">⟩</a>
+                                               <a id="5455" href="Two.html#165" class="InductiveConstructor">₁</a>    <a id="5460" href="Id.html#1839" class="Function Operator">∎</a>
+
+   <a id="5466" class="Keyword">where</a>
+    <a id="5476" href="PropTychonoff.html#5476" class="Function">claim</a> <a id="5482" class="Symbol">:</a> <a id="5484" href="PropTychonoff.html#5324" class="Bound">φ</a> <a id="5486" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="5488" href="PropTychonoff.html#3658" class="Function">φ₀</a>
+    <a id="5495" href="PropTychonoff.html#5476" class="Function">claim</a> <a id="5501" class="Symbol">=</a> <a id="5503" href="UF-FunExt.html#1284" class="Function">dfunext</a> <a id="5511" class="Symbol">(</a><a id="5512" href="PropTychonoff.html#1489" class="Bound">fe</a> <a id="5515" href="PropTychonoff.html#2521" class="Bound">𝓤</a> <a id="5517" href="PropTychonoff.html#2525" class="Bound">𝓥</a><a id="5518" class="Symbol">)</a> <a id="5520" class="Symbol">(λ</a> <a id="5523" href="PropTychonoff.html#5523" class="Bound">x</a> <a id="5525" class="Symbol">→</a> <a id="5527" href="Empty.html#306" class="Function">unique-from-𝟘</a> <a id="5541" class="Symbol">(</a><a id="5542" href="PropTychonoff.html#5320" class="Bound">u</a> <a id="5544" href="PropTychonoff.html#5523" class="Bound">x</a><a id="5545" class="Symbol">))</a>
+<a id="5548" class="Markup">\end{code}</a><a id="5558" class="Background">
+
+So we would get what we want if we had excluded middle, because X is a
+proposition and the above shows that both X and X → 𝟘 give the desired
+conclusion that φ₀ is a universal witness. But excluded middle is not
+needed.
+
+We shuffle the arguments of φ₀-is-universal-witness-assuming-X:
+
+</a><a id="5846" class="Markup">\begin{code}</a>
+  <a id="5861" href="PropTychonoff.html#5861" class="Function">claim₀</a> <a id="5868" class="Symbol">:</a> <a id="5870" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5872" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="5875" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="5877" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="5879" class="Symbol">→</a> <a id="5881" class="Symbol">(</a><a id="5882" href="PropTychonoff.html#5882" class="Bound">φ</a> <a id="5884" class="Symbol">:</a> <a id="5886" href="Pi.html#182" class="Function">Π</a> <a id="5888" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="5889" class="Symbol">)</a> <a id="5891" class="Symbol">→</a> <a id="5893" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="5895" class="Symbol">→</a> <a id="5897" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="5899" href="PropTychonoff.html#5882" class="Bound">φ</a> <a id="5901" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="5903" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="5907" href="PropTychonoff.html#5861" class="Function">claim₀</a> <a id="5914" href="PropTychonoff.html#5914" class="Bound">r</a> <a id="5916" href="PropTychonoff.html#5916" class="Bound">φ</a> <a id="5918" href="PropTychonoff.html#5918" class="Bound">x</a> <a id="5920" class="Symbol">=</a> <a id="5922" href="PropTychonoff.html#4630" class="Function">φ₀-is-universal-witness-assuming-X</a> <a id="5957" href="PropTychonoff.html#5918" class="Bound">x</a> <a id="5959" href="PropTychonoff.html#5914" class="Bound">r</a> <a id="5961" href="PropTychonoff.html#5916" class="Bound">φ</a>
+
+<a id="5964" class="Markup">\end{code}</a><a id="5974" class="Background">
+
+We then take the contrapositive of the conclusion X → p φ ≡ ₁, and
+use the fact that if a point of the two-point type 𝟚 is ₀, then it is
+not ₁:
+
+</a><a id="6121" class="Markup">\begin{code}</a>
+
+  <a id="6137" href="PropTychonoff.html#6137" class="Function">Claim₁</a> <a id="6144" class="Symbol">:</a> <a id="6146" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6148" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="6151" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6153" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="6155" class="Symbol">→</a> <a id="6157" class="Symbol">(</a><a id="6158" href="PropTychonoff.html#6158" class="Bound">φ</a> <a id="6160" class="Symbol">:</a> <a id="6162" href="Pi.html#182" class="Function">Π</a> <a id="6164" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="6165" class="Symbol">)</a> <a id="6167" class="Symbol">→</a> <a id="6169" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6171" href="PropTychonoff.html#6158" class="Bound">φ</a> <a id="6173" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6175" href="Two.html#158" class="InductiveConstructor">₀</a> <a id="6177" class="Symbol">→</a> <a id="6179" class="Symbol">(</a><a id="6180" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="6182" class="Symbol">→</a> <a id="6184" href="Empty-Type.html#139" class="Datatype">𝟘</a><a id="6185" class="Symbol">)</a>
+  <a id="6189" href="PropTychonoff.html#6137" class="Function">Claim₁</a> <a id="6196" href="PropTychonoff.html#6196" class="Bound">r</a> <a id="6198" href="PropTychonoff.html#6198" class="Bound">φ</a> <a id="6200" class="Symbol">=</a> <a id="6202" href="Negation.html#689" class="Function">contrapositive</a><a id="6216" class="Symbol">(</a><a id="6217" href="PropTychonoff.html#5861" class="Function">claim₀</a> <a id="6224" href="PropTychonoff.html#6196" class="Bound">r</a> <a id="6226" href="PropTychonoff.html#6198" class="Bound">φ</a><a id="6227" class="Symbol">)</a> <a id="6229" href="Pi.html#531" class="Function Operator">∘</a> <a id="6231" href="Two-Properties.html#2352" class="Function">equal-₀-different-from-₁</a>
+
+<a id="6257" class="Markup">\end{code}</a><a id="6267" class="Background">
+
+This concludes the first part of the argument.
+
+We now shuffle the arguments of φ₀-is-universal-witness-assuming-X→𝟘:
+
+</a><a id="6388" class="Markup">\begin{code}</a>
+
+  <a id="6404" href="PropTychonoff.html#6404" class="Function">Claim₂</a> <a id="6411" class="Symbol">:</a> <a id="6413" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6415" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="6418" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6420" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="6422" class="Symbol">→</a> <a id="6424" class="Symbol">(</a><a id="6425" href="PropTychonoff.html#6425" class="Bound">φ</a> <a id="6427" class="Symbol">:</a> <a id="6429" href="Pi.html#182" class="Function">Π</a> <a id="6431" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="6432" class="Symbol">)</a> <a id="6434" class="Symbol">→</a> <a id="6436" class="Symbol">(</a><a id="6437" href="PropTychonoff.html#2529" class="Bound">X</a> <a id="6439" class="Symbol">→</a> <a id="6441" href="Empty-Type.html#139" class="Datatype">𝟘</a><a id="6442" class="Symbol">)</a> <a id="6444" class="Symbol">→</a> <a id="6446" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6448" href="PropTychonoff.html#6425" class="Bound">φ</a> <a id="6450" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6452" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="6456" href="PropTychonoff.html#6404" class="Function">Claim₂</a> <a id="6463" href="PropTychonoff.html#6463" class="Bound">r</a> <a id="6465" href="PropTychonoff.html#6465" class="Bound">φ</a> <a id="6467" href="PropTychonoff.html#6467" class="Bound">u</a> <a id="6469" class="Symbol">=</a> <a id="6471" href="PropTychonoff.html#5201" class="Function">φ₀-is-universal-witness-assuming-X→𝟘</a> <a id="6508" href="PropTychonoff.html#6467" class="Bound">u</a> <a id="6510" href="PropTychonoff.html#6463" class="Bound">r</a> <a id="6512" href="PropTychonoff.html#6465" class="Bound">φ</a>
+
+<a id="6515" class="Markup">\end{code}</a><a id="6525" class="Background">
+
+Combining the two last claims, we get:
+
+</a><a id="6567" class="Markup">\begin{code}</a>
+
+  <a id="6583" href="PropTychonoff.html#6583" class="Function">Claim₃</a> <a id="6590" class="Symbol">:</a> <a id="6592" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6594" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="6597" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6599" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="6601" class="Symbol">→</a> <a id="6603" class="Symbol">(</a><a id="6604" href="PropTychonoff.html#6604" class="Bound">φ</a> <a id="6606" class="Symbol">:</a> <a id="6608" href="Pi.html#182" class="Function">Π</a> <a id="6610" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="6611" class="Symbol">)</a> <a id="6613" class="Symbol">→</a> <a id="6615" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6617" href="PropTychonoff.html#6604" class="Bound">φ</a> <a id="6619" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6621" href="Two.html#158" class="InductiveConstructor">₀</a> <a id="6623" class="Symbol">→</a> <a id="6625" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6627" href="PropTychonoff.html#6604" class="Bound">φ</a> <a id="6629" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6631" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="6635" href="PropTychonoff.html#6583" class="Function">Claim₃</a> <a id="6642" href="PropTychonoff.html#6642" class="Bound">r</a> <a id="6644" href="PropTychonoff.html#6644" class="Bound">φ</a> <a id="6646" class="Symbol">=</a> <a id="6648" href="PropTychonoff.html#6404" class="Function">Claim₂</a> <a id="6655" href="PropTychonoff.html#6642" class="Bound">r</a> <a id="6657" href="PropTychonoff.html#6644" class="Bound">φ</a> <a id="6659" href="Pi.html#531" class="Function Operator">∘</a> <a id="6661" href="PropTychonoff.html#6137" class="Function">Claim₁</a> <a id="6668" href="PropTychonoff.html#6642" class="Bound">r</a> <a id="6670" href="PropTychonoff.html#6644" class="Bound">φ</a>
+
+<a id="6673" class="Markup">\end{code}</a><a id="6683" class="Background">
+
+Finally, we do case analysis on the value of p φ:
+
+</a><a id="6736" class="Markup">\begin{code}</a>
+
+  <a id="6752" href="PropTychonoff.html#6752" class="Function">φ₀-is-universal-witness</a> <a id="6776" class="Symbol">:</a> <a id="6778" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6780" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="6783" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6785" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="6787" class="Symbol">→</a> <a id="6789" class="Symbol">(</a><a id="6790" href="PropTychonoff.html#6790" class="Bound">φ</a> <a id="6792" class="Symbol">:</a> <a id="6794" href="Pi.html#182" class="Function">Π</a> <a id="6796" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="6797" class="Symbol">)</a> <a id="6799" class="Symbol">→</a> <a id="6801" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6803" href="PropTychonoff.html#6790" class="Bound">φ</a> <a id="6805" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6807" href="Two.html#165" class="InductiveConstructor">₁</a>
+  <a id="6811" href="PropTychonoff.html#6752" class="Function">φ₀-is-universal-witness</a> <a id="6835" href="PropTychonoff.html#6835" class="Bound">r</a> <a id="6837" href="PropTychonoff.html#6837" class="Bound">φ</a> <a id="6839" class="Symbol">=</a> <a id="6841" href="Two-Properties.html#439" class="Function">𝟚-equality-cases</a> <a id="6858" class="Symbol">(</a><a id="6859" href="PropTychonoff.html#6583" class="Function">Claim₃</a> <a id="6866" href="PropTychonoff.html#6835" class="Bound">r</a> <a id="6868" href="PropTychonoff.html#6837" class="Bound">φ</a><a id="6869" class="Symbol">)</a> <a id="6871" href="Pi.html#462" class="Function">id</a>
+
+  <a id="6877" href="PropTychonoff.html#6877" class="Function">γ</a> <a id="6879" class="Symbol">:</a> <a id="6881" href="Sigma.html#436" class="Function">Σ</a> <a id="6883" href="PropTychonoff.html#6883" class="Bound">φ₀</a> <a id="6886" href="Sigma.html#436" class="Function">꞉</a> <a id="6888" href="Pi.html#182" class="Function">Π</a> <a id="6890" href="PropTychonoff.html#2533" class="Bound">Y</a> <a id="6892" href="Sigma.html#436" class="Function">,</a> <a id="6894" class="Symbol">(</a><a id="6895" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6897" href="PropTychonoff.html#6883" class="Bound">φ₀</a> <a id="6900" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6902" href="Two.html#165" class="InductiveConstructor">₁</a> <a id="6904" class="Symbol">→</a> <a id="6906" class="Symbol">(</a><a id="6907" href="PropTychonoff.html#6907" class="Bound">φ</a> <a id="6909" class="Symbol">:</a> <a id="6911" href="Pi.html#182" class="Function">Π</a> <a id="6913" href="PropTychonoff.html#2533" class="Bound">Y</a><a id="6914" class="Symbol">)</a> <a id="6916" class="Symbol">→</a> <a id="6918" href="PropTychonoff.html#2548" class="Bound">p</a> <a id="6920" href="PropTychonoff.html#6907" class="Bound">φ</a> <a id="6922" href="Identity-Type.html#135" class="Datatype Operator">≡</a> <a id="6924" href="Two.html#165" class="InductiveConstructor">₁</a><a id="6925" class="Symbol">)</a>
+  <a id="6929" href="PropTychonoff.html#6877" class="Function">γ</a> <a id="6931" class="Symbol">=</a> <a id="6933" href="PropTychonoff.html#3658" class="Function">φ₀</a> <a id="6936" href="Sigma-Type.html#202" class="InductiveConstructor Operator">,</a> <a id="6938" href="PropTychonoff.html#6752" class="Function">φ₀-is-universal-witness</a>
+
+<a id="6963" class="Markup">\end{code}</a><a id="6973" class="Background">
+
+And we are done.
+
+TODO. 9 Sep 2015. We can generalize from X being a subsingleton (or
+proposition) to X being subfinite (embedded into a finite type).
+
+A particular case is the following:
+
+</a><a id="7164" class="Markup">\begin{code}</a>
+
+<a id="prop-tychonoff-corollary"></a><a id="7178" href="PropTychonoff.html#7178" class="Function">prop-tychonoff-corollary</a> <a id="7203" class="Symbol">:</a> <a id="7205" class="Symbol">{</a><a id="7206" href="PropTychonoff.html#7206" class="Bound">X</a> <a id="7208" class="Symbol">:</a> <a id="7210" href="Universes.html#274" class="Generalizable">𝓤</a> <a id="7212" href="Universes.html#417" class="Function Operator">̇</a> <a id="7214" class="Symbol">}</a> <a id="7216" class="Symbol">{</a><a id="7217" href="PropTychonoff.html#7217" class="Bound">Y</a> <a id="7219" class="Symbol">:</a> <a id="7221" href="Universes.html#276" class="Generalizable">𝓥</a> <a id="7223" href="Universes.html#417" class="Function Operator">̇</a> <a id="7225" class="Symbol">}</a>
+                         <a id="7252" class="Symbol">→</a> <a id="7254" href="UF-Subsingletons.html#487" class="Function">is-prop</a> <a id="7262" href="PropTychonoff.html#7206" class="Bound">X</a>
+                         <a id="7289" class="Symbol">→</a> <a id="7291" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="7300" href="PropTychonoff.html#7217" class="Bound">Y</a>
+                         <a id="7327" class="Symbol">→</a> <a id="7329" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="7338" class="Symbol">(</a><a id="7339" href="PropTychonoff.html#7206" class="Bound">X</a> <a id="7341" class="Symbol">→</a> <a id="7343" href="PropTychonoff.html#7217" class="Bound">Y</a><a id="7344" class="Symbol">)</a>
+<a id="7346" href="PropTychonoff.html#7178" class="Function">prop-tychonoff-corollary</a> <a id="7371" href="PropTychonoff.html#7371" class="Bound">X-is-prop</a> <a id="7381" href="PropTychonoff.html#7381" class="Bound">ε</a> <a id="7383" class="Symbol">=</a> <a id="7385" href="PropTychonoff.html#2359" class="Function">prop-tychonoff</a> <a id="7400" href="PropTychonoff.html#7371" class="Bound">X-is-prop</a> <a id="7410" class="Symbol">(λ</a> <a id="7413" href="PropTychonoff.html#7413" class="Bound">x</a> <a id="7415" class="Symbol">→</a> <a id="7417" href="PropTychonoff.html#7381" class="Bound">ε</a><a id="7418" class="Symbol">)</a>
+
+<a id="7421" class="Markup">\end{code}</a><a id="7431" class="Background">
+
+This holds even for undecided X (such as X = LPO), or when we have no
+idea whether X or (X → 𝟘), and hence whether (X → Y) is 𝟙 or Y (or
+none, if this is undecided)!
+
+Better (9 Sep 2015):
+
+</a><a id="7622" class="Markup">\begin{code}</a>
+
+<a id="prop-tychonoff-corollary&#39;"></a><a id="7636" href="PropTychonoff.html#7636" class="Function">prop-tychonoff-corollary&#39;</a> <a id="7662" class="Symbol">:</a> <a id="7664" class="Symbol">{</a><a id="7665" href="PropTychonoff.html#7665" class="Bound">X</a> <a id="7667" class="Symbol">:</a> <a id="7669" href="Universes.html#274" class="Generalizable">𝓤</a> <a id="7671" href="Universes.html#417" class="Function Operator">̇</a> <a id="7673" class="Symbol">}</a> <a id="7675" class="Symbol">{</a><a id="7676" href="PropTychonoff.html#7676" class="Bound">Y</a> <a id="7678" class="Symbol">:</a> <a id="7680" href="Universes.html#276" class="Generalizable">𝓥</a> <a id="7682" href="Universes.html#417" class="Function Operator">̇</a> <a id="7684" class="Symbol">}</a>
+                          <a id="7712" class="Symbol">→</a> <a id="7714" href="UF-Subsingletons.html#487" class="Function">is-prop</a> <a id="7722" href="PropTychonoff.html#7665" class="Bound">X</a>
+                          <a id="7750" class="Symbol">→</a> <a id="7752" class="Symbol">(</a><a id="7753" href="PropTychonoff.html#7665" class="Bound">X</a> <a id="7755" class="Symbol">→</a> <a id="7757" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="7766" href="PropTychonoff.html#7676" class="Bound">Y</a><a id="7767" class="Symbol">)</a>
+                          <a id="7795" class="Symbol">→</a> <a id="7797" href="CompactTypes.html#4291" class="Function">compact∙</a> <a id="7806" class="Symbol">(</a><a id="7807" href="PropTychonoff.html#7665" class="Bound">X</a> <a id="7809" class="Symbol">→</a> <a id="7811" href="PropTychonoff.html#7676" class="Bound">Y</a><a id="7812" class="Symbol">)</a>
+<a id="7814" href="PropTychonoff.html#7636" class="Function">prop-tychonoff-corollary&#39;</a> <a id="7840" class="Symbol">=</a> <a id="7842" href="PropTychonoff.html#2359" class="Function">prop-tychonoff</a>
+
+<a id="7858" class="Markup">\end{code}</a><a id="7868" class="Background">
+
+So the function type (LPO → ℕ) is compact! (See the module LPO for a
+proof.)
+
+The Tychonoff theorem for prop-indexed products of compact types
+doesn&#39;t hold. To see this, first notice that a proposition is
+compact iff it is decidable. Now, the empty type 𝟘 is compact
+(but not compact‌∙), and if 𝟘^P, that is, ¬P, where compact for a
+proposition P, this would imply that ¬P is decidable for every
+proposition P, which is weak excluded middle, which is not provable.
+
+</a><a id="8336" class="Markup">\begin{code}</a>
+
+<a id="8350" class="Keyword">open</a> <a id="8355" class="Keyword">import</a> <a id="8362" href="UF-ExcludedMiddle.html" class="Module">UF-ExcludedMiddle</a>
+
+<a id="compact-prop-tychonoff-gives-WEM"></a><a id="8381" href="PropTychonoff.html#8381" class="Function">compact-prop-tychonoff-gives-WEM</a> <a id="8414" class="Symbol">:</a> <a id="8416" class="Symbol">((</a><a id="8418" href="PropTychonoff.html#8418" class="Bound">X</a> <a id="8420" class="Symbol">:</a> <a id="8422" href="Universes.html#274" class="Generalizable">𝓤</a> <a id="8424" href="Universes.html#417" class="Function Operator">̇</a> <a id="8426" class="Symbol">)</a> <a id="8428" class="Symbol">(</a><a id="8429" href="PropTychonoff.html#8429" class="Bound">Y</a> <a id="8431" class="Symbol">:</a> <a id="8433" href="PropTychonoff.html#8418" class="Bound">X</a> <a id="8435" class="Symbol">→</a> <a id="8437" href="Universes.html#276" class="Generalizable">𝓥</a> <a id="8439" href="Universes.html#417" class="Function Operator">̇</a> <a id="8441" class="Symbol">)</a>
+                                       <a id="8482" class="Symbol">→</a> <a id="8484" href="UF-Subsingletons.html#487" class="Function">is-prop</a> <a id="8492" href="PropTychonoff.html#8418" class="Bound">X</a>
+                                       <a id="8533" class="Symbol">→</a> <a id="8535" class="Symbol">((</a><a id="8537" href="PropTychonoff.html#8537" class="Bound">x</a> <a id="8539" class="Symbol">:</a> <a id="8541" href="PropTychonoff.html#8418" class="Bound">X</a><a id="8542" class="Symbol">)</a> <a id="8544" class="Symbol">→</a> <a id="8546" href="CompactTypes.html#3876" class="Function">compact</a> <a id="8554" class="Symbol">(</a><a id="8555" href="PropTychonoff.html#8429" class="Bound">Y</a> <a id="8557" href="PropTychonoff.html#8537" class="Bound">x</a><a id="8558" class="Symbol">))</a>
+                                       <a id="8600" class="Symbol">→</a> <a id="8602" href="CompactTypes.html#3876" class="Function">compact</a> <a id="8610" class="Symbol">(</a><a id="8611" href="Pi.html#182" class="Function">Π</a> <a id="8613" href="PropTychonoff.html#8429" class="Bound">Y</a><a id="8614" class="Symbol">))</a>
+                                 <a id="8650" class="Symbol">→</a> <a id="8652" href="UF-ExcludedMiddle.html#1796" class="Function">WEM</a> <a id="8656" href="Universes.html#274" class="Generalizable">𝓤</a>
+<a id="8658" href="PropTychonoff.html#8381" class="Function">compact-prop-tychonoff-gives-WEM</a> <a id="8691" class="Symbol">{</a><a id="8692" href="PropTychonoff.html#8692" class="Bound">𝓤</a><a id="8693" class="Symbol">}</a> <a id="8695" class="Symbol">{</a><a id="8696" href="PropTychonoff.html#8696" class="Bound">𝓥</a><a id="8697" class="Symbol">}</a> <a id="8699" href="PropTychonoff.html#8699" class="Bound">τ</a> <a id="8701" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8703" href="PropTychonoff.html#8703" class="Bound">X-is-prop</a> <a id="8713" class="Symbol">=</a> <a id="8715" href="PropTychonoff.html#8928" class="Function">δ</a> <a id="8717" href="PropTychonoff.html#8850" class="Function">γ</a>
+ <a id="8720" class="Keyword">where</a>
+  <a id="8728" href="PropTychonoff.html#8728" class="Function">Y</a> <a id="8730" class="Symbol">:</a> <a id="8732" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8734" class="Symbol">→</a> <a id="8736" href="PropTychonoff.html#8696" class="Bound">𝓥</a> <a id="8738" href="Universes.html#417" class="Function Operator">̇</a>
+  <a id="8742" href="PropTychonoff.html#8728" class="Function">Y</a> <a id="8744" href="PropTychonoff.html#8744" class="Bound">x</a> <a id="8746" class="Symbol">=</a> <a id="8748" href="Empty-Type.html#139" class="Datatype">𝟘</a>
+
+  <a id="8753" href="PropTychonoff.html#8753" class="Function">negation-compact</a> <a id="8770" class="Symbol">:</a> <a id="8772" href="CompactTypes.html#3876" class="Function">compact</a> <a id="8780" class="Symbol">(</a><a id="8781" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8783" class="Symbol">→</a> <a id="8785" href="Empty-Type.html#139" class="Datatype">𝟘</a> <a id="8787" class="Symbol">{</a><a id="8788" href="PropTychonoff.html#8696" class="Bound">𝓥</a><a id="8789" class="Symbol">})</a>
+  <a id="8794" href="PropTychonoff.html#8753" class="Function">negation-compact</a> <a id="8811" class="Symbol">=</a> <a id="8813" href="PropTychonoff.html#8699" class="Bound">τ</a> <a id="8815" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8817" href="PropTychonoff.html#8728" class="Function">Y</a> <a id="8819" href="PropTychonoff.html#8703" class="Bound">X-is-prop</a> <a id="8829" class="Symbol">(λ</a> <a id="8832" href="PropTychonoff.html#8832" class="Bound">p</a> <a id="8834" class="Symbol">→</a> <a id="8836" href="CompactTypes.html#11721" class="Function">𝟘-compact</a><a id="8845" class="Symbol">)</a>
+
+  <a id="8850" href="PropTychonoff.html#8850" class="Function">γ</a> <a id="8852" class="Symbol">:</a> <a id="8854" href="Negation.html#1095" class="Function">decidable</a> <a id="8864" class="Symbol">(</a><a id="8865" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8867" class="Symbol">→</a> <a id="8869" href="Empty-Type.html#139" class="Datatype">𝟘</a> <a id="8871" class="Symbol">{</a><a id="8872" href="PropTychonoff.html#8696" class="Bound">𝓥</a><a id="8873" class="Symbol">})</a>
+  <a id="8878" href="PropTychonoff.html#8850" class="Function">γ</a> <a id="8880" class="Symbol">=</a> <a id="8882" href="CompactTypes.html#11798" class="Function">compact-decidable</a> <a id="8900" class="Symbol">(</a><a id="8901" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8903" class="Symbol">→</a> <a id="8905" href="Empty-Type.html#139" class="Datatype">𝟘</a><a id="8906" class="Symbol">)</a> <a id="8908" href="PropTychonoff.html#8753" class="Function">negation-compact</a>
+
+  <a id="8928" href="PropTychonoff.html#8928" class="Function">δ</a> <a id="8930" class="Symbol">:</a> <a id="8932" href="Negation.html#1095" class="Function">decidable</a> <a id="8942" class="Symbol">(</a><a id="8943" href="PropTychonoff.html#8701" class="Bound">X</a> <a id="8945" class="Symbol">→</a> <a id="8947" href="Empty-Type.html#139" class="Datatype">𝟘</a> <a id="8949" class="Symbol">{</a><a id="8950" href="PropTychonoff.html#8696" class="Bound">𝓥</a><a id="8951" class="Symbol">})</a> <a id="8954" class="Symbol">→</a> <a id="8956" href="Negation.html#1095" class="Function">decidable</a> <a id="8966" class="Symbol">(</a><a id="8967" href="Negation.html#298" class="Function Operator">¬</a> <a id="8969" href="PropTychonoff.html#8701" class="Bound">X</a><a id="8970" class="Symbol">)</a>
+  <a id="8974" href="PropTychonoff.html#8928" class="Function">δ</a> <a id="8976" class="Symbol">(</a><a id="8977" href="Plus-Type.html#188" class="InductiveConstructor">inl</a> <a id="8981" href="PropTychonoff.html#8981" class="Bound">f</a><a id="8982" class="Symbol">)</a> <a id="8984" class="Symbol">=</a> <a id="8986" href="Plus-Type.html#188" class="InductiveConstructor">inl</a> <a id="8990" class="Symbol">(</a><a id="8991" href="Empty.html#374" class="Function">𝟘-elim</a> <a id="8998" href="Pi.html#531" class="Function Operator">∘</a> <a id="9000" href="PropTychonoff.html#8981" class="Bound">f</a><a id="9001" class="Symbol">)</a>
+  <a id="9005" href="PropTychonoff.html#8928" class="Function">δ</a> <a id="9007" class="Symbol">(</a><a id="9008" href="Plus-Type.html#205" class="InductiveConstructor">inr</a> <a id="9012" href="PropTychonoff.html#9012" class="Bound">ϕ</a><a id="9013" class="Symbol">)</a> <a id="9015" class="Symbol">=</a> <a id="9017" href="Plus-Type.html#205" class="InductiveConstructor">inr</a> <a id="9021" class="Symbol">(</a><a id="9022" href="Negation.html#689" class="Function">contrapositive</a> <a id="9037" class="Symbol">(λ</a> <a id="9040" href="PropTychonoff.html#9040" class="Bound">f</a> <a id="9042" class="Symbol">→</a> <a id="9044" href="Empty.html#374" class="Function">𝟘-elim</a> <a id="9051" href="Pi.html#531" class="Function Operator">∘</a> <a id="9053" href="PropTychonoff.html#9040" class="Bound">f</a><a id="9054" class="Symbol">)</a> <a id="9056" href="PropTychonoff.html#9012" class="Bound">ϕ</a><a id="9057" class="Symbol">)</a>
+
+<a id="9060" class="Markup">\end{code}</a><a id="9070" class="Background">
+</a></pre></body></html>
