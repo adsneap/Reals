@@ -54,7 +54,7 @@ Work on the Dedekind reals are in the following files. DedekindRealsProperties p
 These files prove that the rationals are a metric space, and that the Dedekind reals are a complete metric space.
 
 - [MetricSpaceAltDef](https://adsneap.github.io/Reals/MetricSpaceAltDef.html)
-- [MetricSpaceRationals](https://adsneap.github.io/Reals/MetricRationals.html)
+- [MetricSpaceRationals](https://adsneap.github.io/Reals/MetricSpaceRationals.html)
 - [MetricSpaceDedekindReals](https://adsneap.github.io/Reals/MetricSpaceDedekindReals.html)
 
 This work in progress file defines continuity, proves that that embedding from rationals to reals is continuous, proves that composition of continuous functions are continuous.
