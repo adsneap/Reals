@@ -1,3 +1,6 @@
+The report I wrote for my third year project [can be found here](https://adsneap.github.io/Reals/AndrewSneapReport1.pdf).
+The report I wrote for my fourth year project [can be found here](https://adsneap.github.io/Reals/AndrewSneapReport2.pdf).
+
 This github pages website contains a html rendering of the Agda code I have produced as part of my 40 credit MSci Computer Science project: Formalising Real Number Computation and Real Analysis.
 
 An Agda file which indexes the relevant files for my project [can be seen here](https://adsneap.github.io/Reals/AndrewIndex).
